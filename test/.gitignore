@@ -1,0 +1,8 @@
+
+Makefile
+*.make
+out/
+
+general/headers
+
+tty/info
