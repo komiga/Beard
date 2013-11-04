@@ -10,6 +10,8 @@
 #include <iomanip>
 #include <fstream>
 
+#include "../common/common.hpp"
+
 using Beard::tty::CapFlag;
 using Beard::tty::CapNumber;
 using Beard::tty::CapString;
@@ -32,7 +34,8 @@ load_term_info(
 
 	try {
 		term_info.deserialize(stream);
-	} catch (...) {
+	} catch (Beard::Error const& ex) {
+		report_error(ex);
 		// Just rethrow and let the program explode
 		throw;
 	}
