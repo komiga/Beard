@@ -18,12 +18,12 @@ see @ref index or the accompanying LICENSE file for full text.
 #include <cstring>
 #include <cerrno>
 
-#define BEARD_DEBUG_CERR_FQN(m_)					\
+#define BEARD_DEBUG_CERR_FQN(err_, m_)				\
 	DUCT_DEBUGF(									\
 		BEARD_SCOPE_FQN_STR ": " m_					\
 		"; errno: %d, reason: %s",					\
-		errno,										\
-		std::strerror(errno)						\
+		err_,										\
+		std::strerror(err_)							\
 	)
 //
 

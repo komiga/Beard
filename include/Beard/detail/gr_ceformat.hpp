@@ -18,6 +18,9 @@ see @ref index or the accompanying LICENSE file for full text.
 
 #include <duct/GR/ceformat.hpp>
 
+#include <cerrno>
+#include <cstring>
+
 #define BEARD_DEF_FMT(ident_, fmt_) \
 	DUCT_GR_DEF_CEFMT(ident_, fmt_)
 
@@ -32,5 +35,28 @@ see @ref index or the accompanying LICENSE file for full text.
 
 #define BEARD_THROW_FMT(ec_, cefmt_, ...) \
 	DUCT_GR_THROW_CEFMT(ec_, cefmt_, __VA_ARGS__)
+
+#define BEARD_DEF_FMT_FQN_CERR(ident_, fmt_) \
+	DUCT_GR_DEF_CEFMT_FQN(ident_, fmt_ "; errno: %d, reason: %s")
+
+#ifndef BEARD_DETAIL_GR_CEFORMAT_NS_GUARD_
+#define BEARD_DETAIL_GR_CEFORMAT_NS_GUARD_
+namespace Beard {
+namespace detail {
+	BEARD_DEF_FMT_FQN_CERR(
+		s_cerr_generic,
+		"%s"
+	);
+}}
+#endif // BEARD_DETAIL_GR_CEFORMAT_NS_GUARD_
+
+#define BEARD_THROW_FMT_CERR(ec_, cefmt_, err_, ...) \
+	DUCT_GR_THROW_CEFMT(ec_, cefmt_, __VA_ARGS__, err_, std::strerror(err_))
+
+#define BEARD_THROW_CERR(ec_, err_, msg_)		\
+	DUCT_GR_THROW_CEFMT(						\
+		ec_, ::Beard::detail::s_cerr_generic,	\
+		msg_, err_, std::strerror(err_)			\
+	)
 
 #endif // BEARD_DETAIL_GR_CEFORMAT_HPP_

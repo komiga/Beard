@@ -26,6 +26,8 @@ s_error_invalid[]{BEARD_STR_LIT("INVALID")},
 	BEARD_STR_LIT("tty_sigaction_failed"),
 	BEARD_STR_LIT("tty_device_open_failed"),
 	BEARD_STR_LIT("tty_invalid_fd"),
+
+	BEARD_STR_LIT("tty_init_failed"),
 };
 } // anonymous namespace
 

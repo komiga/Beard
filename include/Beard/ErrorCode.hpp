@@ -76,6 +76,11 @@ enum class ErrorCode : unsigned {
 		invalid.
 	*/
 	tty_invalid_fd,
+
+	/**
+		Failed to setup terminal.
+	*/
+	tty_init_failed,
 /// @}
 
 /** @name name_group_name */ /// @{
