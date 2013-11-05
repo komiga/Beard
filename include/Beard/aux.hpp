@@ -20,6 +20,10 @@ namespace Beard {
 namespace aux {
 
 /**
+	@addtogroup etc
+	@{
+*/
+/**
 	@addtogroup aux
 	@{
 */
@@ -65,6 +69,7 @@ using unordered_map
 >;
 
 /** @} */ // end of doc-group aux
+/** @} */ // end of doc-group etc
 
 } // namespace aux
 } // namespace Beard

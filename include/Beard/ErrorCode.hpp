@@ -83,9 +83,6 @@ enum class ErrorCode : unsigned {
 	tty_init_failed,
 /// @}
 
-/** @name name_group_name */ /// @{
-/// @}
-
 /** @cond INTERNAL */
 	LAST
 /** @endcond */
