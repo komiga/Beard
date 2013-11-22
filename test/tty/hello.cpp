@@ -9,6 +9,7 @@
 #include <Beard/tty/Terminal.hpp>
 
 #include <signal.h>
+#include <sched.h>
 
 #include <chrono>
 #include <iostream>
@@ -34,7 +35,7 @@ load_term_info(
 ) {
 	std::ifstream stream{path};
 	if (stream.fail() || !stream.is_open()) {
-		std::cout
+		std::cerr
 			<< "failed to open terminfo path for reading: '"
 			<< path
 			<< "'\n"
@@ -87,6 +88,8 @@ main(
 	if (!load_term_info(term.get_info(), info_path)) {
 		return -2;
 	}
+
+	term.update_cache();
 
 	bool use_sigwinch = false;
 	Beard::String tty_path{};
@@ -144,13 +147,12 @@ main(
 		{BEARD_STR_LIT("Hello, terminal overlord! 元気ですか？")}
 	);
 
-	term.set_caret_pos(0u, 1u);
-	term.set_caret_visible(true);
+	term.set_caret_pos(0u, 2u);
+	term.set_caret_visible(false);
 
 	Beard::tty::Event ev;
 	term.render();
 	while (!s_close) {
-		// std::this_thread::yield();
 		std::this_thread::sleep_for(std::chrono::milliseconds{1u});
 		switch (term.poll(ev)) {
 		case Beard::tty::EventType::resize:

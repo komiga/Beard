@@ -33,4 +33,11 @@ see @ref index or the accompanying LICENSE file for full text.
 	)
 //
 
+#define BEARD_DEBUG_MSG_FQN_F(m_, ...)				\
+	DUCT_DEBUGF(									\
+		BEARD_SCOPE_FQN_STR ": " m_,				\
+		__VA_ARGS__									\
+	)
+//
+
 #endif // BEARD_DETAIL_DEBUG_HPP_

@@ -7,12 +7,14 @@
 #include <Beard/tty/Terminal.hpp>
 
 #include <duct/traits.hpp>
+#include <duct/debug.hpp>
 #include <duct/char.hpp>
 #include <duct/EncodingUtils.hpp>
 
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/ioctl.h>
+#include <sys/epoll.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <termios.h>
@@ -37,6 +39,7 @@ static_assert(
 );
 
 struct Terminal::terminal_private final {
+	bool have_orig{false};
 	struct ::termios tios_orig;
 	struct ::termios tios;
 };
@@ -54,7 +57,7 @@ s_cap_cache_table[]{
 	tty::CapString::clear_screen,
 
 	tty::CapString::cursor_invisible,
-	tty::CapString::cursor_visible,
+	tty::CapString::cursor_normal,
 
 	tty::CapString::enter_ca_mode,
 	tty::CapString::exit_ca_mode,
@@ -69,6 +72,25 @@ s_cap_cache_table[]{
 	tty::CapString::keypad_xmit,
 };
 
+static struct {
+	tty::KeyMod const mod;
+	tty::KeyCode const code;
+	tty::CapString const cap;
+} const s_cap_keys[]{
+	{tty::KeyMod::none, tty::KeyCode::f1, tty::CapString::key_f1},
+	{tty::KeyMod::none, tty::KeyCode::f2, tty::CapString::key_f2},
+	{tty::KeyMod::none, tty::KeyCode::f3, tty::CapString::key_f3},
+	{tty::KeyMod::none, tty::KeyCode::f4, tty::CapString::key_f4},
+	{tty::KeyMod::none, tty::KeyCode::f5, tty::CapString::key_f5},
+	{tty::KeyMod::none, tty::KeyCode::f6, tty::CapString::key_f6},
+	{tty::KeyMod::none, tty::KeyCode::f7, tty::CapString::key_f7},
+	{tty::KeyMod::none, tty::KeyCode::f8, tty::CapString::key_f8},
+	{tty::KeyMod::none, tty::KeyCode::f9, tty::CapString::key_f9},
+	{tty::KeyMod::none, tty::KeyCode::f10, tty::CapString::key_f10},
+	{tty::KeyMod::none, tty::KeyCode::f11, tty::CapString::key_f11},
+	{tty::KeyMod::none, tty::KeyCode::f12, tty::CapString::key_f12},
+};
+
 static constexpr tty::Cell const
 s_cell_default{
 	{' '},
@@ -81,27 +103,36 @@ struct terminal_internal final
 	: duct::traits::restrict_all
 {
 
-#define BEARD_SCOPE_FUNC internal::close_tty
+static_assert(
+	std::extent<decltype(s_cap_cache_table)>::value
+	== static_cast<std::size_t>(Terminal::CapCache::COUNT),
+	"s_cap_cache_table is not the correct size"
+);
+
+#define BEARD_SCOPE_FUNC internal::close_fd
 static void
-close_tty(
-	tty::fd_type const tty_fd
+close_fd(
+	tty::fd_type const fd
 ) noexcept {
+	if (tty::FD_INVALID == fd) {
+		return;
+	}
 	unsigned close_tries = 4;
 	while (close_tries--) {
-		if (0 == ::close(tty_fd)) {
+		if (0 == ::close(fd)) {
 			break;
 		} else {
-			auto const err = errno;
+			int const err = errno;
 			BEARD_DEBUG_CERR_FQN(
 				err,
-				"failed to close terminal file descriptor"
+				"failed to close file descriptor"
 			);
 			if (EINTR == err || EIO == err) {
-				// Only retry when we're either interrupted by a
-				// signal or hit an I/O error
+				// Only retry when we're interrupted by a signal
+				// or hit an IO error
 				continue;
 			} else {
-				// EBADF or something nonstandard
+				// EBADF or something non-standard
 				break;
 			}
 		}
@@ -381,9 +412,10 @@ static void
 flush(
 	tty::Terminal& terminal
 ) {
-	std::size_t size = terminal.m_streambuf_out.get_sequence_size();
+	std::size_t const size = terminal.m_streambuf_out.get_sequence_size();
 	ssize_t written = 0;
-	unsigned tries = 2;
+	int err = 0;
+	unsigned retries = 1;
 	do {
 		written = ::write(
 			terminal.m_tty_fd,
@@ -391,35 +423,34 @@ flush(
 			size
 		);
 		if (-1 == written) {
+			err = errno;
 			BEARD_DEBUG_CERR_FQN(
-				errno,
+				err,
 				"write() failed or was interrupted"
 				" (potentially retrying)"
 			);
 		} else {
 			break;
 		}
-	} while (
-		tries-- &&
-		(errno == EAGAIN || errno == EWOULDBLOCK || errno == EINTR)
-	);
-	if (-1 != written && written != static_cast<ssize_t>(size)) {
-		BEARD_DEBUG_MSG_FQN(
-			"failed to flush all bytes to terminal"
-		);
-
-		// Slide back the remaining data
-		size = static_cast<std::size_t>(size - written);
-		std::memmove(
-			terminal.m_streambuf_out.get_buffer().data(),
-			terminal.m_streambuf_out.get_buffer().data() + written,
-			size
-		);
-
-		// Reset and inform the streambuf of the data
-		terminal.m_streambuf_out.reset(0x800 < size ? size : 0x800);
-		terminal.m_stream_out.seekp(size);
-		terminal.m_stream_out.seekp(0u);
+	} while (retries-- && err == EINTR);
+	if (-1 != written) {
+		if (static_cast<std::size_t>(written) != size) {
+			BEARD_DEBUG_MSG_FQN(
+				"failed to flush all bytes to terminal"
+			);
+			// Slide back the remaining data and seek to end of buffer
+			terminal.m_stream_out.seekp(
+				terminal.m_streambuf_out.discard(
+					static_cast<std::size_t>(written)
+				)
+			);
+		} else {
+			// Reset buffer (position is 0)
+			DUCT_ASSERT(
+				terminal.m_streambuf_out.reset(size),
+				"failed to resize buffer"
+			);
+		}
 	}
 }
 #undef BEARD_SCOPE_FUNC
@@ -442,7 +473,9 @@ Terminal::Terminal(
 )
 	: m_tty_priv(new Terminal::terminal_private())
 	, m_info(std::move(term_info))
-{}
+{
+	update_cache();
+}
 
 Terminal::Terminal(Terminal&&) = default;
 Terminal& Terminal::operator=(Terminal&&) = default;
@@ -453,6 +486,55 @@ Terminal::put_cap_cache(
 ) {
 	auto const& str = m_cap_cache[enum_cast(cap)];
 	m_stream_out.write(str.data(), str.size());
+}
+
+void
+Terminal::add_key_cap(
+	KeyDecodeNode* node,
+	tty::KeyMod const mod,
+	tty::KeyCode const code,
+	String::const_iterator it,
+	String::const_iterator const end
+) {
+	// On termination by for condition, branch already exists
+	for (
+		auto next_it = node->next.begin();
+		end != it;
+	) {
+		if (node->next.end() == next_it) {
+			// New branch
+			while (end != it) {
+				node->next.emplace_front(new KeyDecodeNode({
+					*it,
+					tty::KeyMod::none,
+					static_cast<tty::KeyCode>(-1),
+					{}
+				}));
+				node = (&node->next.front())->get();
+				++it;
+			}
+			node->mod = mod;
+			node->code = code;
+			return;
+		} else if ((*it) == (*next_it)->ch) {
+			// Existing branch; step in
+			node = next_it->get();
+			next_it = node->next.begin();
+			++it;
+		} else {
+			++next_it;
+		}
+	}
+}
+
+bool
+Terminal::decode_key(
+	char const* const /*buffer*/,
+	std::size_t const /*size*/,
+	tty::KeyMod& /*mod*/,
+	tty::KeyCode& /*code*/
+) {
+	return false;
 }
 
 void
@@ -513,7 +595,35 @@ Terminal::resize(
 
 #define BEARD_SCOPE_FUNC init
 void
-Terminal::init() {
+Terminal::init(
+	tty::fd_type const tty_fd,
+	bool const use_sigwinch
+) try {
+	m_tty_fd = tty_fd;
+
+	tty::fd_type const epoll_fd = ::epoll_create1(0);
+	if (-1 == epoll_fd) {
+		BEARD_THROW_CERR(
+			ErrorCode::tty_init_failed,
+			errno,
+			"failed to create epoll instance"
+		);
+	}
+
+	struct ::epoll_event epoll_ev;
+	epoll_ev.events = EPOLLIN | EPOLLPRI;
+	if (0 != ::epoll_ctl(epoll_fd, EPOLL_CTL_ADD, m_tty_fd, &epoll_ev)) {
+		auto const err = errno;
+		::close(epoll_fd);
+		BEARD_THROW_CERR(
+			ErrorCode::tty_init_failed,
+			err,
+			"failed to add tty to epoll"
+		);
+	}
+	m_epoll_fd = epoll_fd;
+
+	m_tty_priv->have_orig = false;
 	if (0 != ::tcgetattr(m_tty_fd, &m_tty_priv->tios_orig)) {
 		BEARD_THROW_CERR(
 			ErrorCode::tty_init_failed,
@@ -522,6 +632,12 @@ Terminal::init() {
 		);
 	}
 	m_tty_priv->tios = m_tty_priv->tios_orig;
+	/*std::memcpy(
+		&m_tty_priv->tios,
+		&m_tty_priv->tios_orig,
+		sizeof(struct ::termios)
+	);*/
+	m_tty_priv->have_orig = true;
 
 	// Input modes
 	m_tty_priv->tios.c_iflag &=
@@ -546,7 +662,7 @@ Terminal::init() {
 	// Disable parity generation on input and checking on output;
 	// set character size to 8
 	m_tty_priv->tios.c_cflag &= ~(CSIZE | PARENB);
-	m_tty_priv->tios.c_cflag |= CS8;
+	m_tty_priv->tios.c_cflag |= CS8 | CLOCAL;
 
 	// Local modes
 	m_tty_priv->tios.c_lflag &=
@@ -567,7 +683,7 @@ Terminal::init() {
 	// Timeout for noncanonical read (deciseconds)
 	m_tty_priv->tios.c_cc[VTIME] = 0;
 
-	// TODO: tcsetattr can succeed despite not applying all modes;
+	// TODO: tcsetattr() can succeed despite not applying all modes;
 	// should we compare with the new state to make sure the modes
 	// were applied?
 	if (0 != ::tcsetattr(m_tty_fd, TCSAFLUSH, &m_tty_priv->tios)) {
@@ -579,48 +695,149 @@ Terminal::init() {
 		);
 	}
 
-	update_size();
-
 	put_cap_cache(CapCache::enter_ca_mode);
 	put_cap_cache(CapCache::keypad_xmit);
 	(m_caret_visible)
-		? put_cap_cache(CapCache::cursor_visible)
+		? put_cap_cache(CapCache::cursor_normal)
 		: put_cap_cache(CapCache::cursor_invisible)
 	;
+	update_size();
 	terminal_internal::flush(*this);
+
+	if (use_sigwinch) {
+		terminal_internal::setup_sigwinch_handler(*this);
+	}
+} catch (...) {
+	if (use_sigwinch) {
+		terminal_internal::release_sigwinch_handler(*this);
+	}
+	terminal_internal::close_fd(m_epoll_fd);
+	m_epoll_fd = tty::FD_INVALID;
+
+	if (m_tty_priv->have_orig) {
+		if (0 != ::tcsetattr(m_tty_fd, TCSAFLUSH, &m_tty_priv->tios_orig)) {
+			BEARD_DEBUG_CERR_FQN(
+				errno,
+				"failed to reset original termios"
+			);
+		}
+		m_tty_priv->have_orig = false;
+	}
+	m_tty_fd = tty::FD_INVALID;
+
+	throw;
 }
 #undef BEARD_SCOPE_FUNC
 
 #define BEARD_SCOPE_FUNC deinit
 void
 Terminal::deinit() {
+	terminal_internal::close_fd(m_epoll_fd);
+	terminal_internal::release_sigwinch_handler(*this);
+
 	set_caret_pos(0u, 0u);
 	set_caret_visible(false);
 
-	bool const resized = resize(0u, 0u);
+	/*bool const resized = */resize(0u, 0u);
+	put_cap_cache(CapCache::cursor_normal);
 	put_cap_cache(CapCache::exit_attribute_mode);
-	if (!resized) {
+	//if (!resized) {
 		put_cap_cache(CapCache::clear_screen);
-	}
-	put_cap_cache(CapCache::cursor_visible);
-	put_cap_cache(CapCache::keypad_local);
+	//}
 	put_cap_cache(CapCache::exit_ca_mode);
+	put_cap_cache(CapCache::keypad_local);
 	terminal_internal::flush(*this);
 
-	m_cap_max_colors = 8u;
-	m_attr_fg_last = tty::Color::term_default;
-	m_attr_bg_last = tty::Color::term_default;
-
-	ev_pending.resize.pending = false;
-
-	if (0 != ::tcsetattr(m_tty_fd, TCSAFLUSH, &m_tty_priv->tios_orig)) {
+	if (m_tty_priv->have_orig
+	 && 0 != ::tcsetattr(m_tty_fd, TCSAFLUSH, &m_tty_priv->tios_orig)
+	) {
 		BEARD_DEBUG_CERR_FQN(
 			errno,
 			"failed to reset original termios"
 		);
 	}
+	m_tty_priv->have_orig = false;
+
+	m_attr_fg_last = tty::Color::term_default;
+	m_attr_bg_last = tty::Color::term_default;
+
+	ev_pending.resize.pending = false;
+
+	m_streambuf_in.commit_direct(0u);
 }
 #undef BEARD_SCOPE_FUNC
+
+#define BEARD_SCOPE_FUNC poll_input
+void
+Terminal::poll_input() {
+	m_stream_in.clear();
+	std::size_t const seq_size = m_streambuf_in.get_sequence_size();
+	if (0u != m_streambuf_in.get_position() && inbuf_high_mark <= seq_size) {
+		m_streambuf_in.discard(m_streambuf_in.get_position());
+	}/* else if (inbuf_parseable_amount <= m_streambuf_in.get_remaining()) {
+		return;
+	}*/
+
+	struct ::epoll_event ev;
+	int ready_count = -1, err = 0;
+	unsigned retries = 1;
+	do {
+		ready_count = ::epoll_wait(m_epoll_fd, &ev, 1, 0);
+		if (-1 == ready_count) {
+			err = errno;
+			BEARD_DEBUG_CERR_FQN(
+				err,
+				"failed to epoll tty (potentially retrying)"
+			);
+		} else {
+			break;
+		}
+	} while (retries-- && EINTR == err);
+
+	if (0 < ready_count && (ev.events & (EPOLLIN | EPOLLPRI))) {
+		err = 0;
+		retries = 1;
+		ssize_t amt_read = 0;
+		do {
+			amt_read = ::read(
+				m_tty_fd,
+				m_streambuf_in.get_buffer().data() + seq_size,
+				inbuf_size - seq_size
+			);
+			if (-1 == amt_read) {
+				err = errno;
+				BEARD_DEBUG_CERR_FQN(
+					err,
+					"failed to read from tty (potentially retrying)"
+				);
+			} else {
+				break;
+			}
+		} while (retries-- && EINTR == err);
+		if (0 < amt_read) {
+			m_streambuf_in.commit_direct(
+				seq_size + static_cast<std::size_t>(amt_read)
+			);
+		}
+	}
+}
+#undef BEARD_SCOPE_FUNC
+
+bool
+Terminal::parse_input(
+	tty::Event& /*event*/
+) {
+	char const* const buffer
+		= m_streambuf_in.get_buffer().data()
+		+ m_streambuf_in.get_position()
+	;
+	tty::KeyMod mod = tty::KeyMod::none;
+	tty::KeyCode code = static_cast<tty::KeyCode>(-1);
+	if (decode_key(buffer, m_streambuf_in.get_sequence_size(), mod, code)) {
+		// TODO
+	}
+	return false;
+}
 
 // input control
 
@@ -648,7 +865,7 @@ Terminal::set_caret_visible(
 	if (visible != m_caret_visible) {
 		m_caret_visible = visible;
 		if (m_caret_visible) {
-			put_cap_cache(CapCache::cursor_visible);
+			put_cap_cache(CapCache::cursor_normal);
 		} else {
 			put_cap_cache(CapCache::cursor_invisible);
 		}
@@ -834,16 +1051,82 @@ tty::EventType
 Terminal::poll(
 	tty::Event& event
 ) {
+	event.type = tty::EventType::none;
 	if (ev_pending.resize.pending) {
 		event.resize.old_width  = ev_pending.resize.old_width;
 		event.resize.old_height = ev_pending.resize.old_height;
 		ev_pending.resize.pending = false;
-		return tty::EventType::resize;
+		event.type = tty::EventType::resize;
+	} else {
+		//poll_input();
+		if (0u < m_streambuf_in.get_sequence_size()) {
+			if (parse_input(event)) {
+			}
+		}
 	}
-	return tty::EventType::none;
+	return event.type;
 }
 
 // operations
+
+void
+Terminal::update_cache() {
+	// TODO: Debug on missing caps
+	// Cache caps
+	tty::TerminalInfo::cap_string_map_type::const_iterator cap_it;
+	for (
+		unsigned idx = 0u;
+		enum_cast(Terminal::CapCache::COUNT) > idx;
+		++idx
+	) {
+		if (m_info.lookup_cap_string(s_cap_cache_table[idx], cap_it)) {
+			m_cap_cache[idx].assign(cap_it->second);
+		} else {
+			m_cap_cache[idx].clear();
+			BEARD_DEBUG_MSG_FQN_F(
+				"missing function cap: %u (CapString) %u (CapCache)",
+				idx,
+				s_cap_cache_table[idx]
+			);
+		}
+	}
+
+	// TODO: Should colors be disabled if the terminal says they're
+	// not supported? (What if it's lying to us!?)
+	// NB: Assuming terminal is capable of at least 8 colors
+	auto const max_colors = m_info.get_cap_number(tty::CapNumber::max_colors);
+	m_cap_max_colors =
+		(tty::CAP_NUMBER_NOT_SUPPORTED == max_colors)
+		? 8u
+		: static_cast<unsigned>(max_colors)
+	;
+
+	// Cache key decoding graph
+	m_key_decode_graph.next.clear();
+	for (auto const kmap : s_cap_keys) {
+		if (m_info.lookup_cap_string(kmap.cap, cap_it)) {
+			if (!cap_it->second.empty() && '\033' == cap_it->second.at(0u)) {
+				add_key_cap(
+					&m_key_decode_graph,
+					kmap.mod,
+					kmap.code,
+					cap_it->second.cbegin(),
+					cap_it->second.cend()
+				);
+			} else {
+				BEARD_DEBUG_MSG_FQN_F(
+					"key %u (CapString) %u (KeyCode) is either"
+					" empty or does not begin with '\\033'"
+					" (size: %u, 0x%02x)",
+					static_cast<unsigned>(kmap.cap),
+					static_cast<unsigned>(kmap.code),
+					static_cast<unsigned>(cap_it->second.size()),
+					static_cast<uint8_t>(cap_it->second.at(0u))
+				);
+			}
+		}
+	}
+}
 
 // NB: If the terminal is uninitialized (i.e., closed), it
 // will not own the SIGWINCH handler.
@@ -890,7 +1173,7 @@ Terminal::open(
 	try {
 		this->open(tty_fd, use_sigwinch);
 	} catch (...) {
-		terminal_internal::close_tty(tty_fd);
+		terminal_internal::close_fd(tty_fd);
 		throw;
 	}
 }
@@ -932,40 +1215,7 @@ Terminal::open(
 		}
 	}
 
-	tty::TerminalInfo::cap_string_map_type::const_iterator iterator;
-	for (
-		unsigned idx = 0u;
-		enum_cast(Terminal::CapCache::COUNT) > idx;
-		++idx
-	) {
-		if (m_info.lookup_cap_string(s_cap_cache_table[idx], iterator)) {
-			m_cap_cache[idx].assign(iterator->second);
-		} else {
-			m_cap_cache[idx].clear();
-		}
-	}
-
-	// TODO: Should colors be disabled if the terminal says they're
-	// not supported? (What if it's lying to us!?)
-	// NB: Assuming terminal is capable of at least 8 colors
-	auto const max_colors = m_info.get_cap_number(tty::CapNumber::max_colors);
-	m_cap_max_colors =
-		(tty::CAP_NUMBER_NOT_SUPPORTED == max_colors)
-		? 8u
-		: static_cast<unsigned>(max_colors)
-	;
-
-	if (use_sigwinch) {
-		terminal_internal::setup_sigwinch_handler(*this);
-	}
-
-	try {
-		m_tty_fd = tty_fd;
-		init();
-	} catch (...) {
-		m_tty_fd = tty::FD_INVALID;
-		throw;
-	}
+	init(tty_fd, use_sigwinch);
 }
 #undef BEARD_SCOPE_FUNC
 
@@ -976,11 +1226,8 @@ Terminal::close() noexcept {
 		return;
 	}
 
-	terminal_internal::release_sigwinch_handler(*this);
-
 	deinit();
-
-	terminal_internal::close_tty(m_tty_fd);
+	terminal_internal::close_fd(m_tty_fd);
 	m_tty_fd = tty::FD_INVALID;
 }
 #undef BEARD_SCOPE_FUNC

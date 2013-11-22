@@ -29,7 +29,7 @@ struct Cell;
 enum class EventType : unsigned;
 enum class KeyMod : unsigned;
 enum class KeyCode : unsigned;
-union Event;
+struct Event;
 
 /**
 	@addtogroup tty
@@ -334,7 +334,6 @@ struct Cell final {
 /**
 	Create a cell with default colors.
 
-	@returns The created cell.
 	@param u8block Code unit block.
 	@param attr_fg Foreground attributes.
 	@param attr_bg Background attributes.
@@ -363,16 +362,44 @@ enum class EventType : unsigned {
 	key_input,
 };
 
-// TODO
-enum class KeyMod : unsigned {};
-enum class KeyCode : unsigned {};
+/**
+	Modifier keys.
+*/
+enum class KeyMod : unsigned {
+	none = 0,
+	ctrl = 1 << 0,
+	alt = 1 << 1
+};
+
+/**
+	Unprintable keys.
+*/
+enum class KeyCode : unsigned {
+	f1,
+	f2,
+	f3,
+	f4,
+	f5,
+	f6,
+	f7,
+	f8,
+	f9,
+	f10,
+	f11,
+	f12
+};
 
 /**
 	%Event.
 
 	@sa tty::EventType
 */
-union Event final {
+struct Event final {
+	/**
+		Type.
+	*/
+	EventType type;
+
 	/**
 		%Event data for tty::EventType::resize.
 

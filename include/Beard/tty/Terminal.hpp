@@ -56,6 +56,7 @@ public:
 		: base(std::move(other))
 	{
 		this->set_rdbuf(other.rdbuf());
+		other.set_rdbuf(nullptr);
 	}
 
 	moveable_ostream&
@@ -64,6 +65,7 @@ public:
 	) {
 		base::operator=(std::move(other));
 		this->set_rdbuf(other.rdbuf());
+		other.set_rdbuf(nullptr);
 		return *this;
 	}
 };
@@ -87,6 +89,7 @@ public:
 		: base(std::move(other))
 	{
 		this->set_rdbuf(other.rdbuf());
+		other.set_rdbuf(nullptr);
 	}
 
 	moveable_istream&
@@ -95,6 +98,7 @@ public:
 	) {
 		base::operator=(std::move(other));
 		this->set_rdbuf(other.rdbuf());
+		other.set_rdbuf(nullptr);
 		return *this;
 	}
 };
@@ -113,11 +117,18 @@ private:
 	struct terminal_private;
 	friend struct terminal_internal;
 
+	enum : unsigned {
+		inbuf_size = 0x80,
+		inbuf_high_mark = 0x60,
+		inbuf_parseable_amount = 0x04,
+		outbuf_size = 0x800
+	};
+
 	enum class CapCache : unsigned {
 		clear_screen = 0u,
 
 		cursor_invisible,
-		cursor_visible,
+		cursor_normal,
 
 		enter_ca_mode,
 		exit_ca_mode,
@@ -134,9 +145,47 @@ private:
 		COUNT
 	};
 
+	// CapString keys are flattened into a digraph for faster lookup.
+	// Top level is the escape character. A match is found as soon as
+	// -1 != KeyDecodeNode::code (the other way would be on
+	// next.empty(), but neither are "correct" when dealing with a
+	// sequence that is a subset of another..).
+	// The number of nodes traversed to a match is the length of the
+	// CapString.
+	struct KeyDecodeNode {
+		// Urk. Can't guarantee forward_list supports incomplete
+		// types :(
+		using list_type
+		= aux::forward_list<
+			duct::cc_unique_ptr<KeyDecodeNode>
+		>;
+
+		char ch;
+		tty::KeyMod mod;
+		tty::KeyCode code;
+		list_type next;
+	};
+
 	void
 	put_cap_cache(
 		CapCache const cap
+	);
+
+	void
+	add_key_cap(
+		KeyDecodeNode* node,
+		tty::KeyMod const mod,
+		tty::KeyCode const code,
+		String::const_iterator it,
+		String::const_iterator const end
+	);
+
+	bool
+	decode_key(
+		char const* const buffer,
+		std::size_t const size,
+		tty::KeyMod& mod,
+		tty::KeyCode& code
 	);
 
 	bool
@@ -151,21 +200,39 @@ private:
 	);
 
 	void
-	init();
+	init(
+		tty::fd_type const tty_fd,
+		bool const use_sigwinch
+	);
 
 	void
 	deinit();
+
+	void
+	poll_input();
+
+	bool
+	parse_input(
+		tty::Event& event
+	);
 
 private:
 	duct::cc_unique_ptr<terminal_private> m_tty_priv;
 	tty::fd_type m_tty_fd{tty::FD_INVALID};
 	tty::TerminalInfo m_info{};
 
-	String m_cap_cache[enum_cast(Terminal::CapCache::COUNT)]{};
+	String m_cap_cache[enum_cast(CapCache::COUNT)]{};
 	unsigned m_cap_max_colors{8u};
+	KeyDecodeNode m_key_decode_graph{
+		'\033',
+		tty::KeyMod::none,
+		static_cast<tty::KeyCode>(-1),
+		{}
+	};
 
-	duct::IO::dynamic_streambuf m_streambuf_in {0x80, 0u, 0x80};
-	duct::IO::dynamic_streambuf m_streambuf_out{0x800};
+	tty::fd_type m_epoll_fd{tty::FD_INVALID};
+	duct::IO::dynamic_streambuf m_streambuf_in {inbuf_size, 0u, inbuf_size};
+	duct::IO::dynamic_streambuf m_streambuf_out{outbuf_size};
 	moveable_istream m_stream_in {m_streambuf_in};
 	moveable_ostream m_stream_out{m_streambuf_out};
 
@@ -173,14 +240,14 @@ private:
 	unsigned m_tty_height{0u};
 
 	bool m_caret_visible{false};
-	unsigned m_caret_x{0};
-	unsigned m_caret_y{0};
+	unsigned m_caret_x{0u};
+	unsigned m_caret_y{0u};
 
 	unsigned m_attr_fg_last{tty::Color::term_default};
 	unsigned m_attr_bg_last{tty::Color::term_default};
 
 	aux::vector<bool> m_dirty_rows{};
-	cell_vector_type m_cell_backbuffer{};
+	cell_vector_type m_cell_backbuffer {};
 	cell_vector_type m_cell_frontbuffer{};
 
 	struct {
@@ -199,7 +266,12 @@ public:
 	/** Destructor. */
 	~Terminal() noexcept;
 
-	/** Default constructor. */
+	/**
+		Default constructor.
+
+		@note The terminal info and cache are uninitialized with this
+		ctor. See update_cache() and set_info(tty::TerminalInfo).
+	*/
 	Terminal();
 
 	/**
@@ -264,6 +336,8 @@ public:
 	/**
 		Set terminal info.
 
+		@note This will call update_cache().
+
 		@param term_info %Terminal info.
 	*/
 	void
@@ -271,6 +345,7 @@ public:
 		tty::TerminalInfo term_info
 	) noexcept {
 		m_info = std::move(term_info);
+		update_cache();
 	}
 /// @}
 
@@ -369,6 +444,16 @@ public:
 /// @}
 
 /** @name Operations */ /// @{
+	/**
+		Update cached information.
+
+		@note This primarily caches information from
+		tty::TerminalInfo. It should be called if the info object is
+		modified without calling set_info().
+	*/
+	void
+	update_cache();
+
 	/**
 		Open terminal from device path.
 

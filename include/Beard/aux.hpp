@@ -14,6 +14,7 @@ see @ref index or the accompanying LICENSE file for full text.
 
 #include <string>
 #include <vector>
+#include <forward_list>
 #include <unordered_map>
 
 namespace Beard {
@@ -49,6 +50,18 @@ template<
 >
 using vector
 = std::vector<
+	T,
+	BEARD_AUX_ALLOCATOR<T>
+>;
+
+/**
+	@c std::forward_list<T>.
+*/
+template<
+	typename T
+>
+using forward_list
+= std::forward_list<
 	T,
 	BEARD_AUX_ALLOCATOR<T>
 >;
