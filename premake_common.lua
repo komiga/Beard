@@ -83,7 +83,8 @@ project = function()
 			"-Wnon-virtual-dtor",
 			"-Woverloaded-virtual",
 
-			"-Wunused"
+			"-Wunused",
+			"-Wundef",
 		}
 end}})
 
