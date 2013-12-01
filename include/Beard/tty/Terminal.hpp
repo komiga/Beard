@@ -11,11 +11,13 @@ see @ref index or the accompanying LICENSE file for full text.
 #define BEARD_TTY_TERMINAL_HPP_
 
 #include <Beard/config.hpp>
+#include <Beard/keys.hpp>
 #include <Beard/aux.hpp>
 #include <Beard/utility.hpp>
 #include <Beard/tty/Defs.hpp>
 #include <Beard/tty/TerminalInfo.hpp>
 
+#include <duct/char.hpp>
 #include <duct/cc_unique_ptr.hpp>
 #include <duct/IO/dynamic_streambuf.hpp>
 
@@ -120,7 +122,6 @@ private:
 	enum : unsigned {
 		inbuf_size = 0x80,
 		inbuf_high_mark = 0x60,
-		inbuf_parseable_amount = 0x04,
 		outbuf_size = 0x800
 	};
 
@@ -145,13 +146,12 @@ private:
 		COUNT
 	};
 
-	// CapString keys are flattened into a digraph for faster lookup.
-	// Top level is the escape character. A match is found as soon as
-	// -1 != KeyDecodeNode::code (the other way would be on
-	// next.empty(), but neither are "correct" when dealing with a
-	// sequence that is a subset of another..).
+	// CapString keys and non-ASCII single-char key combinations are
+	// flattened into a digraph for faster lookup. Top level is a
+	// dummy. A match is found as soon as true == is_terminator().
 	// The number of nodes traversed to a match is the length of the
-	// CapString.
+	// sequence representing the key (size of the CapString, 1 for
+	// non-ASCII single-char input).
 	struct KeyDecodeNode {
 		// Urk. Can't guarantee forward_list supports incomplete
 		// types :(
@@ -161,31 +161,35 @@ private:
 		>;
 
 		char ch;
-		tty::KeyMod mod;
-		tty::KeyCode code;
+		KeyMod mod;
+		KeyCode code;
+		duct::char32 cp;
 		list_type next;
+
+		KeyDecodeNode(
+			char ch,
+			KeyMod mod,
+			KeyCode code,
+			duct::char32 cp
+		) noexcept
+			: ch(ch)
+			, mod(mod)
+			, code(code)
+			, cp(cp)
+		{}
+
+		bool
+		is_terminator() const noexcept {
+			return
+				KeyCode::none != code ||
+				duct::CHAR_SENTINEL != cp
+			;
+		}
 	};
 
 	void
 	put_cap_cache(
 		CapCache const cap
-	);
-
-	void
-	add_key_cap(
-		KeyDecodeNode* node,
-		tty::KeyMod const mod,
-		tty::KeyCode const code,
-		String::const_iterator it,
-		String::const_iterator const end
-	);
-
-	bool
-	decode_key(
-		char const* const buffer,
-		std::size_t const size,
-		tty::KeyMod& mod,
-		tty::KeyCode& code
 	);
 
 	bool
@@ -209,12 +213,12 @@ private:
 	deinit();
 
 	void
-	poll_input();
+	poll_input(
+		unsigned const input_timeout
+	);
 
 	bool
-	parse_input(
-		tty::Event& event
-	);
+	parse_input();
 
 private:
 	duct::cc_unique_ptr<terminal_private> m_tty_priv;
@@ -224,16 +228,15 @@ private:
 	String m_cap_cache[enum_cast(CapCache::COUNT)]{};
 	unsigned m_cap_max_colors{8u};
 	KeyDecodeNode m_key_decode_graph{
-		'\033',
-		tty::KeyMod::none,
-		static_cast<tty::KeyCode>(-1),
-		{}
+		'\0',
+		KeyMod::none,
+		KeyCode::none,
+		duct::CHAR_SENTINEL
 	};
 
 	tty::fd_type m_epoll_fd{tty::FD_INVALID};
 	duct::IO::dynamic_streambuf m_streambuf_in {inbuf_size, 0u, inbuf_size};
 	duct::IO::dynamic_streambuf m_streambuf_out{outbuf_size};
-	moveable_istream m_stream_in {m_streambuf_in};
 	moveable_ostream m_stream_out{m_streambuf_out};
 
 	unsigned m_tty_width{0u};
@@ -255,7 +258,35 @@ private:
 			bool pending{false};
 			unsigned old_width{0u};
 			unsigned old_height{0u};
+
+			void
+			reset() noexcept {
+				pending = false;
+				old_width = 0u;
+				old_height = 0u;
+			}
 		} resize;
+
+		struct {
+			bool escaped{false};
+			KeyMod mod{KeyMod::none};
+			KeyCode code{KeyCode::none};
+			duct::char32 cp{duct::CHAR_SENTINEL};
+
+			void
+			reset() noexcept {
+				escaped = false;
+				mod = KeyMod::none;
+				code = KeyCode::none;
+				cp = duct::CHAR_SENTINEL;
+			}
+		} key_input;
+
+		void
+		reset() noexcept {
+			resize.reset();
+			key_input.reset();
+		}
 	} ev_pending{};
 
 	Terminal(Terminal const&) = delete;
@@ -436,10 +467,12 @@ public:
 		@returns The event type, or @c tty::EventType::none if no
 		event is available.
 		@param[out] event %Event object to store the result.
+		@param input_timeout Input polling timeout in milliseconds.
 	*/
 	tty::EventType
 	poll(
-		tty::Event& event
+		tty::Event& event,
+		unsigned const input_timeout
 	);
 /// @}
 

@@ -1,4 +1,5 @@
 
+#include <Beard/keys.hpp>
 #include <Beard/utility.hpp>
 #include <Beard/detail/gr_ceformat.hpp>
 #include <Beard/detail/debug.hpp>
@@ -73,22 +74,83 @@ s_cap_cache_table[]{
 };
 
 static struct {
-	tty::KeyMod const mod;
-	tty::KeyCode const code;
+	KeyMod const mod;
+	KeyCode const code;
+	duct::char32 const cp;
 	tty::CapString const cap;
-} const s_cap_keys[]{
-	{tty::KeyMod::none, tty::KeyCode::f1, tty::CapString::key_f1},
-	{tty::KeyMod::none, tty::KeyCode::f2, tty::CapString::key_f2},
-	{tty::KeyMod::none, tty::KeyCode::f3, tty::CapString::key_f3},
-	{tty::KeyMod::none, tty::KeyCode::f4, tty::CapString::key_f4},
-	{tty::KeyMod::none, tty::KeyCode::f5, tty::CapString::key_f5},
-	{tty::KeyMod::none, tty::KeyCode::f6, tty::CapString::key_f6},
-	{tty::KeyMod::none, tty::KeyCode::f7, tty::CapString::key_f7},
-	{tty::KeyMod::none, tty::KeyCode::f8, tty::CapString::key_f8},
-	{tty::KeyMod::none, tty::KeyCode::f9, tty::CapString::key_f9},
-	{tty::KeyMod::none, tty::KeyCode::f10, tty::CapString::key_f10},
-	{tty::KeyMod::none, tty::KeyCode::f11, tty::CapString::key_f11},
-	{tty::KeyMod::none, tty::KeyCode::f12, tty::CapString::key_f12},
+	tty::Sequence seq;
+} const s_input_keymap[]{
+// cap input
+	{KeyMod::none , KeyCode::insert, duct::CHAR_SENTINEL, tty::CapString::key_ic, {nullptr, 0u}},
+	{KeyMod::shift, KeyCode::insert, duct::CHAR_SENTINEL, tty::CapString::key_sic, {nullptr, 0u}},
+	{KeyMod::none , KeyCode::del, duct::CHAR_SENTINEL, tty::CapString::key_dc, {nullptr, 0u}},
+	{KeyMod::shift, KeyCode::del, duct::CHAR_SENTINEL, tty::CapString::key_sdc, {nullptr, 0u}},
+	{KeyMod::none , KeyCode::home, duct::CHAR_SENTINEL, tty::CapString::key_home, {nullptr, 0u}},
+	{KeyMod::shift, KeyCode::home, duct::CHAR_SENTINEL, tty::CapString::key_shome, {nullptr, 0u}},
+	{KeyMod::none , KeyCode::end, duct::CHAR_SENTINEL, tty::CapString::key_end, {nullptr, 0u}},
+	{KeyMod::shift, KeyCode::end, duct::CHAR_SENTINEL, tty::CapString::key_send, {nullptr, 0u}},
+	{KeyMod::none, KeyCode::pgup, duct::CHAR_SENTINEL, tty::CapString::key_ppage, {nullptr, 0u}},
+	{KeyMod::none, KeyCode::pgdn, duct::CHAR_SENTINEL, tty::CapString::key_npage, {nullptr, 0u}},
+
+	{KeyMod::none , KeyCode::up, duct::CHAR_SENTINEL, tty::CapString::key_up, {nullptr, 0u}},
+	{KeyMod::shift, KeyCode::up, duct::CHAR_SENTINEL, tty::CapString::key_sr, {nullptr, 0u}},
+	{KeyMod::none , KeyCode::down, duct::CHAR_SENTINEL, tty::CapString::key_down, {nullptr, 0u}},
+	{KeyMod::shift, KeyCode::down, duct::CHAR_SENTINEL, tty::CapString::key_sf, {nullptr, 0u}},
+	{KeyMod::none , KeyCode::left, duct::CHAR_SENTINEL, tty::CapString::key_left, {nullptr, 0u}},
+	{KeyMod::shift, KeyCode::left, duct::CHAR_SENTINEL, tty::CapString::key_sleft, {nullptr, 0u}},
+	{KeyMod::none , KeyCode::right, duct::CHAR_SENTINEL, tty::CapString::key_right, {nullptr, 0u}},
+	{KeyMod::shift, KeyCode::right, duct::CHAR_SENTINEL, tty::CapString::key_sright, {nullptr, 0u}},
+
+	{KeyMod::none, KeyCode::f1, duct::CHAR_SENTINEL, tty::CapString::key_f1, {nullptr, 0u}},
+	{KeyMod::none, KeyCode::f2, duct::CHAR_SENTINEL, tty::CapString::key_f2, {nullptr, 0u}},
+	{KeyMod::none, KeyCode::f3, duct::CHAR_SENTINEL, tty::CapString::key_f3, {nullptr, 0u}},
+	{KeyMod::none, KeyCode::f4, duct::CHAR_SENTINEL, tty::CapString::key_f4, {nullptr, 0u}},
+	{KeyMod::none, KeyCode::f5, duct::CHAR_SENTINEL, tty::CapString::key_f5, {nullptr, 0u}},
+	{KeyMod::none, KeyCode::f6, duct::CHAR_SENTINEL, tty::CapString::key_f6, {nullptr, 0u}},
+	{KeyMod::none, KeyCode::f7, duct::CHAR_SENTINEL, tty::CapString::key_f7, {nullptr, 0u}},
+	{KeyMod::none, KeyCode::f8, duct::CHAR_SENTINEL, tty::CapString::key_f8, {nullptr, 0u}},
+	{KeyMod::none, KeyCode::f9, duct::CHAR_SENTINEL, tty::CapString::key_f9, {nullptr, 0u}},
+	{KeyMod::none, KeyCode::f10, duct::CHAR_SENTINEL, tty::CapString::key_f10, {nullptr, 0u}},
+	{KeyMod::none, KeyCode::f11, duct::CHAR_SENTINEL, tty::CapString::key_f11, {nullptr, 0u}},
+	{KeyMod::none, KeyCode::f12, duct::CHAR_SENTINEL, tty::CapString::key_f12, {nullptr, 0u}},
+
+// single-char input
+	//{KeyMod::ctrl, KeyCode::none, '~', static_cast<tty::CapString>(-1), "\x00"},
+	{KeyMod::ctrl, KeyCode::none, '2', static_cast<tty::CapString>(-1), "\x00"},
+	{KeyMod::ctrl, KeyCode::none, 'a', static_cast<tty::CapString>(-1), "\x01"},
+	{KeyMod::ctrl, KeyCode::none, 'b', static_cast<tty::CapString>(-1), "\x02"},
+	{KeyMod::ctrl, KeyCode::none, 'c', static_cast<tty::CapString>(-1), "\x03"},
+	{KeyMod::ctrl, KeyCode::none, 'd', static_cast<tty::CapString>(-1), "\x04"},
+	{KeyMod::ctrl, KeyCode::none, 'e', static_cast<tty::CapString>(-1), "\x05"},
+	{KeyMod::ctrl, KeyCode::none, 'f', static_cast<tty::CapString>(-1), "\x06"},
+	{KeyMod::ctrl, KeyCode::none, 'g', static_cast<tty::CapString>(-1), "\x07"},
+	{KeyMod::none, KeyCode::backspace, '\x1', static_cast<tty::CapString>(-1), "\x08"},
+	{KeyMod::none , KeyCode::none, '\t', static_cast<tty::CapString>(-1), "\x09"},
+	{KeyMod::shift, KeyCode::none, '\t', tty::CapString::key_btab, {nullptr, 0u}},
+	{KeyMod::ctrl, KeyCode::none, 'j', static_cast<tty::CapString>(-1), "\x0A"},
+	{KeyMod::ctrl, KeyCode::none, 'k', static_cast<tty::CapString>(-1), "\x0B"},
+	{KeyMod::ctrl, KeyCode::none, 'l', static_cast<tty::CapString>(-1), "\x0C"},
+	{KeyMod::none, KeyCode::enter, duct::CHAR_SENTINEL, static_cast<tty::CapString>(-1), "\x0D"},
+	{KeyMod::ctrl, KeyCode::none, 'n', static_cast<tty::CapString>(-1), "\x0E"},
+	{KeyMod::ctrl, KeyCode::none, 'o', static_cast<tty::CapString>(-1), "\x0F"},
+	{KeyMod::ctrl, KeyCode::none, 'p', static_cast<tty::CapString>(-1), "\x10"},
+	{KeyMod::ctrl, KeyCode::none, 'q', static_cast<tty::CapString>(-1), "\x11"},
+	{KeyMod::ctrl, KeyCode::none, 'r', static_cast<tty::CapString>(-1), "\x12"},
+	{KeyMod::ctrl, KeyCode::none, 's', static_cast<tty::CapString>(-1), "\x13"},
+	{KeyMod::ctrl, KeyCode::none, 't', static_cast<tty::CapString>(-1), "\x14"},
+	{KeyMod::ctrl, KeyCode::none, 'u', static_cast<tty::CapString>(-1), "\x15"},
+	{KeyMod::ctrl, KeyCode::none, 'v', static_cast<tty::CapString>(-1), "\x16"},
+	{KeyMod::ctrl, KeyCode::none, 'w', static_cast<tty::CapString>(-1), "\x17"},
+	{KeyMod::ctrl, KeyCode::none, 'x', static_cast<tty::CapString>(-1), "\x18"},
+	{KeyMod::ctrl, KeyCode::none, 'y', static_cast<tty::CapString>(-1), "\x19"},
+	{KeyMod::ctrl, KeyCode::none, 'z', static_cast<tty::CapString>(-1), "\x1A"},
+	{KeyMod::none, KeyCode::esc, duct::CHAR_SENTINEL, static_cast<tty::CapString>(-1), "\x1B\x1B"},
+	{KeyMod::ctrl, KeyCode::none, '4', static_cast<tty::CapString>(-1), "\x1C"},
+	{KeyMod::ctrl, KeyCode::none, '5', static_cast<tty::CapString>(-1), "\x1D"},
+	{KeyMod::ctrl, KeyCode::none, '6', static_cast<tty::CapString>(-1), "\x1E"},
+	{KeyMod::ctrl, KeyCode::none, '/', static_cast<tty::CapString>(-1), "\x1F"},
+	{KeyMod::none, KeyCode::none, ' ', static_cast<tty::CapString>(-1), "\x20"},
+	{KeyMod::none, KeyCode::backspace, duct::CHAR_SENTINEL, static_cast<tty::CapString>(-1), "\x7F"},
 };
 
 static constexpr tty::Cell const
@@ -108,6 +170,8 @@ static_assert(
 	== static_cast<std::size_t>(Terminal::CapCache::COUNT),
 	"s_cap_cache_table is not the correct size"
 );
+
+using KeyDecodeNode = tty::Terminal::KeyDecodeNode;
 
 #define BEARD_SCOPE_FUNC internal::close_fd
 static void
@@ -455,6 +519,87 @@ flush(
 }
 #undef BEARD_SCOPE_FUNC
 
+static void
+add_key_cap(
+	KeyDecodeNode* node,
+	char const* it,
+	char const* const end,
+	KeyMod const mod,
+	KeyCode const code,
+	duct::char32 const cp
+) {
+	// On termination by for condition, branch already exists
+	for (
+		auto next_it = node->next.begin();
+		end != it;
+	) {
+		if (node->next.end() == next_it) {
+			// New branch
+			while (end != it) {
+				node->next.emplace_front(new KeyDecodeNode(
+					*it,
+					KeyMod::none,
+					KeyCode::none,
+					duct::CHAR_SENTINEL
+				));
+				node = node->next.front().get();
+				++it;
+			}
+			node->mod = mod;
+			node->code = code;
+			node->cp = cp;
+			return;
+		} else if ((*it) == (*next_it)->ch) {
+			// Existing branch; step in
+			node = next_it->get();
+			next_it = node->next.begin();
+			++it;
+		} else {
+			++next_it;
+		}
+	}
+}
+
+static std::size_t
+decode_key(
+	KeyDecodeNode const* node,
+	char const* it,
+	char const* const end,
+	KeyMod& mod,
+	KeyCode& code,
+	duct::char32& cp
+) {
+	// NB: Root in the graph is just a dummy
+	std::size_t seq_size = 0u;
+	for (
+		auto next_it = node->next.begin();
+		end != it;
+	) {
+		if (node->next.end() == next_it) {
+			// Not found
+			break;
+		} else if ((*it) == (*next_it)->ch) {
+			// Matching branch
+			++seq_size;
+			if ((*next_it)->is_terminator()) {
+				// Terminating sequence
+				mod = (*next_it)->mod;
+				code = (*next_it)->code;
+				cp = (*next_it)->cp;
+				return seq_size;
+			} else {
+				// Step into branch
+				node = next_it->get();
+				next_it = node->next.begin();
+				++it;
+			}
+		} else {
+			++next_it;
+		}
+	}
+	return 0u;
+}
+
 }; // struct terminal_internal
 
 
@@ -486,55 +631,6 @@ Terminal::put_cap_cache(
 ) {
 	auto const& str = m_cap_cache[enum_cast(cap)];
 	m_stream_out.write(str.data(), str.size());
-}
-
-void
-Terminal::add_key_cap(
-	KeyDecodeNode* node,
-	tty::KeyMod const mod,
-	tty::KeyCode const code,
-	String::const_iterator it,
-	String::const_iterator const end
-) {
-	// On termination by for condition, branch already exists
-	for (
-		auto next_it = node->next.begin();
-		end != it;
-	) {
-		if (node->next.end() == next_it) {
-			// New branch
-			while (end != it) {
-				node->next.emplace_front(new KeyDecodeNode({
-					*it,
-					tty::KeyMod::none,
-					static_cast<tty::KeyCode>(-1),
-					{}
-				}));
-				node = (&node->next.front())->get();
-				++it;
-			}
-			node->mod = mod;
-			node->code = code;
-			return;
-		} else if ((*it) == (*next_it)->ch) {
-			// Existing branch; step in
-			node = next_it->get();
-			next_it = node->next.begin();
-			++it;
-		} else {
-			++next_it;
-		}
-	}
-}
-
-bool
-Terminal::decode_key(
-	char const* const /*buffer*/,
-	std::size_t const /*size*/,
-	tty::KeyMod& /*mod*/,
-	tty::KeyCode& /*code*/
-) {
-	return false;
 }
 
 void
@@ -599,6 +695,7 @@ Terminal::init(
 	tty::fd_type const tty_fd,
 	bool const use_sigwinch
 ) try {
+	ev_pending.reset();
 	m_tty_fd = tty_fd;
 
 	tty::fd_type const epoll_fd = ::epoll_create1(0);
@@ -668,7 +765,7 @@ Terminal::init(
 	m_tty_priv->tios.c_lflag &=
 	~(
 		// Disable signal generation
-		//ISIG |
+		ISIG |
 		// Disable canonical mode
 		ICANON |
 		// Disable echoing
@@ -687,7 +784,6 @@ Terminal::init(
 	// should we compare with the new state to make sure the modes
 	// were applied?
 	if (0 != ::tcsetattr(m_tty_fd, TCSAFLUSH, &m_tty_priv->tios)) {
-		// TODO: reset to tios_orig
 		BEARD_THROW_CERR(
 			ErrorCode::tty_init_failed,
 			errno,
@@ -732,6 +828,8 @@ Terminal::init(
 #define BEARD_SCOPE_FUNC deinit
 void
 Terminal::deinit() {
+	ev_pending.reset();
+
 	terminal_internal::close_fd(m_epoll_fd);
 	terminal_internal::release_sigwinch_handler(*this);
 
@@ -761,34 +859,44 @@ Terminal::deinit() {
 	m_attr_fg_last = tty::Color::term_default;
 	m_attr_bg_last = tty::Color::term_default;
 
-	ev_pending.resize.pending = false;
-
 	m_streambuf_in.commit_direct(0u);
 }
 #undef BEARD_SCOPE_FUNC
 
 #define BEARD_SCOPE_FUNC poll_input
 void
-Terminal::poll_input() {
-	m_stream_in.clear();
-	std::size_t const seq_size = m_streambuf_in.get_sequence_size();
-	if (0u != m_streambuf_in.get_position() && inbuf_high_mark <= seq_size) {
-		m_streambuf_in.discard(m_streambuf_in.get_position());
-	}/* else if (inbuf_parseable_amount <= m_streambuf_in.get_remaining()) {
-		return;
-	}*/
+Terminal::poll_input(
+	unsigned const input_timeout
+) {
+	std::size_t seq_size = m_streambuf_in.get_sequence_size();
+	if (inbuf_high_mark <= seq_size) {
+		seq_size = m_streambuf_in.discard(
+			inbuf_size == seq_size && 0u == m_streambuf_in.get_position()
+			? seq_size
+			: m_streambuf_in.get_position()
+		);
+	}
 
 	struct ::epoll_event ev;
 	int ready_count = -1, err = 0;
 	unsigned retries = 1;
 	do {
-		ready_count = ::epoll_wait(m_epoll_fd, &ev, 1, 0);
+		ready_count = ::epoll_wait(
+			m_epoll_fd, &ev, 1,
+			static_cast<signed>(input_timeout)
+		);
 		if (-1 == ready_count) {
 			err = errno;
-			BEARD_DEBUG_CERR_FQN(
-				err,
-				"failed to epoll tty (potentially retrying)"
-			);
+			if (EINTR != err) {
+				BEARD_DEBUG_CERR_FQN(
+					err,
+					"failed to epoll tty (potentially retrying)"
+				);
+			} else if (0 != input_timeout && ev_pending.resize.pending) {
+				// Avoid infinite/long timeout if a SIGWINCH
+				// interrupted epoll_wait().
+				return;
+			}
 		} else {
 			break;
 		}
@@ -824,19 +932,65 @@ Terminal::poll_input() {
 #undef BEARD_SCOPE_FUNC
 
 bool
-Terminal::parse_input(
-	tty::Event& /*event*/
-) {
+Terminal::parse_input() {
 	char const* const buffer
 		= m_streambuf_in.get_buffer().data()
 		+ m_streambuf_in.get_position()
 	;
-	tty::KeyMod mod = tty::KeyMod::none;
-	tty::KeyCode code = static_cast<tty::KeyCode>(-1);
-	if (decode_key(buffer, m_streambuf_in.get_sequence_size(), mod, code)) {
-		// TODO
+	bool have_event = false;
+	std::size_t seq_size = terminal_internal::decode_key(
+		&m_key_decode_graph,
+		buffer,
+		buffer + m_streambuf_in.get_remaining(),
+		ev_pending.key_input.mod,
+		ev_pending.key_input.code,
+		ev_pending.key_input.cp
+	);
+	if (0u != seq_size) {
+		// Key specified by a cap or single non-ASCII char
+		have_event = true;
+	} else if ('\033' == buffer[0u]) {
+		seq_size = 1u;
+		if (ev_pending.key_input.escaped) {
+			// Already have escape character
+			ev_pending.key_input.escaped = false;
+			ev_pending.key_input.mod  = KeyMod::none;
+			ev_pending.key_input.code = KeyCode::esc;
+			ev_pending.key_input.cp   = duct::CHAR_SENTINEL;
+			have_event = true;
+		} else {
+			ev_pending.key_input.escaped = true;
+			have_event = false;
+		}
+	} else {
+		// Else hopefully a sequence of UTF-8 units
+		seq_size = tty::EncUtils::required_first_whole(buffer[0u]);
+		if (m_streambuf_in.get_remaining() >= seq_size) {
+			duct::char32 cp = duct::CHAR_SENTINEL;
+			tty::EncUtils::decode(
+				buffer,
+				buffer + seq_size,
+				cp,
+				duct::CHAR_SENTINEL
+			);
+			if (duct::CHAR_SENTINEL != cp) {
+				ev_pending.key_input.mod = KeyMod::none;
+				ev_pending.key_input.code = KeyCode::none;
+				ev_pending.key_input.cp = cp;
+				have_event = true;
+			}
+		} else {
+			seq_size = 0u;
+		}
 	}
-	return false;
+	if (0u < seq_size) {
+		m_streambuf_in.pubseekoff(
+			static_cast<duct::IO::dynamic_streambuf::off_type>(seq_size),
+			std::ios_base::cur,
+			std::ios_base::in
+		);
+	}
+	return have_event;
 }
 
 // input control
@@ -1047,31 +1201,62 @@ Terminal::render() {
 
 // events
 
+#define BEARD_SCOPE_FUNC poll
 tty::EventType
 Terminal::poll(
-	tty::Event& event
+	tty::Event& event,
+	unsigned const input_timeout
 ) {
 	event.type = tty::EventType::none;
 	if (ev_pending.resize.pending) {
+		event.type = tty::EventType::resize;
 		event.resize.old_width  = ev_pending.resize.old_width;
 		event.resize.old_height = ev_pending.resize.old_height;
 		ev_pending.resize.pending = false;
-		event.type = tty::EventType::resize;
 	} else {
-		//poll_input();
-		if (0u < m_streambuf_in.get_sequence_size()) {
-			if (parse_input(event)) {
+		poll_input(input_timeout);
+		bool parse_escape = false;
+		l_parse_escape:
+		if (0u < m_streambuf_in.get_remaining()) {
+			if (parse_input()) {
+				/*BEARD_DEBUG_MSG_FQN_F(
+					"parsed: seq_size = %zu  pos = %zu  remaining = %zu",
+					m_streambuf_in.get_sequence_size(),
+					m_streambuf_in.get_position(),
+					m_streambuf_in.get_remaining()
+				);*/
+				event.type = tty::EventType::key_input;
+				event.key_input.mod =
+				(true == ev_pending.key_input.escaped)
+					? static_cast<KeyMod>(
+						enum_cast(event.key_input.mod) |
+						enum_cast(KeyMod::esc)
+					)
+					: ev_pending.key_input.mod
+				;
+				event.key_input.code = ev_pending.key_input.code;
+				event.key_input.cp   = ev_pending.key_input.cp;
+				ev_pending.key_input.reset();
+			} else if (!parse_escape && ev_pending.key_input.escaped) {
+				/*BEARD_DEBUG_MSG_FQN_F(
+					"escaped: seq_size = %zu  pos = %zu  remaining = %zu",
+					m_streambuf_in.get_sequence_size(),
+					m_streambuf_in.get_position(),
+					m_streambuf_in.get_remaining()
+				);*/
+				parse_escape = true;
+				goto l_parse_escape;
 			}
 		}
 	}
 	return event.type;
 }
+#undef BEARD_SCOPE_FUNC
 
 // operations
 
 void
 Terminal::update_cache() {
-	// TODO: Debug on missing caps
 	// Cache caps
 	tty::TerminalInfo::cap_string_map_type::const_iterator cap_it;
 	for (
@@ -1103,27 +1288,37 @@ Terminal::update_cache() {
 
 	// Cache key decoding graph
 	m_key_decode_graph.next.clear();
-	for (auto const kmap : s_cap_keys) {
-		if (m_info.lookup_cap_string(kmap.cap, cap_it)) {
-			if (!cap_it->second.empty() && '\033' == cap_it->second.at(0u)) {
-				add_key_cap(
-					&m_key_decode_graph,
-					kmap.mod,
-					kmap.code,
-					cap_it->second.cbegin(),
-					cap_it->second.cend()
-				);
-			} else {
-				BEARD_DEBUG_MSG_FQN_F(
-					"key %u (CapString) %u (KeyCode) is either"
-					" empty or does not begin with '\\033'"
-					" (size: %u, 0x%02x)",
-					static_cast<unsigned>(kmap.cap),
-					static_cast<unsigned>(kmap.code),
-					static_cast<unsigned>(cap_it->second.size()),
-					static_cast<uint8_t>(cap_it->second.at(0u))
-				);
+	for (auto const kmap : s_input_keymap) {
+		if (static_cast<tty::CapString>(-1) != kmap.cap) {
+			if (m_info.lookup_cap_string(kmap.cap, cap_it)) {
+				if (!cap_it->second.empty()) {
+					terminal_internal::add_key_cap(
+						&m_key_decode_graph,
+						cap_it->second.data(),
+						cap_it->second.data() + cap_it->second.size(),
+						kmap.mod,
+						kmap.code,
+						kmap.cp
+					);
+				} else {
+					BEARD_DEBUG_MSG_FQN_F(
+						"key %u (CapString) %u (KeyCode) %u (codepoint)"
+						" is empty",
+						static_cast<unsigned>(kmap.cap),
+						static_cast<unsigned>(kmap.code),
+						static_cast<unsigned>(kmap.cp)
+					);
+				}
 			}
+		} else {
+			terminal_internal::add_key_cap(
+				&m_key_decode_graph,
+				kmap.seq.data,
+				kmap.seq.data + kmap.seq.size,
+				kmap.mod,
+				kmap.code,
+				kmap.cp
+			);
 		}
 	}
 }

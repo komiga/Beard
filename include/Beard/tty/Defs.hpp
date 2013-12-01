@@ -12,6 +12,7 @@ see @ref index or the accompanying LICENSE file for full text.
 
 #include <Beard/config.hpp>
 #include <Beard/String.hpp>
+#include <Beard/keys.hpp>
 
 #include <duct/char.hpp>
 #include <duct/EncodingUtils.hpp>
@@ -27,8 +28,6 @@ struct UTF8Block;
 struct Cell;
 
 enum class EventType : unsigned;
-enum class KeyMod : unsigned;
-enum class KeyCode : unsigned;
 struct Event;
 
 /**
@@ -104,14 +103,14 @@ struct Sequence final {
 
 /** @name Constructors and destructor */ /// @{
 	/** Destructor. */
-	~Sequence() = default;
+	~Sequence() noexcept = default;
 
 	/** Default constructor. */
-	Sequence() = default;
+	Sequence() noexcept = default;
 	/** Copy constructor. */
-	Sequence(Sequence const&) = default;
-	/** Move constructor (deleted). */
-	Sequence(Sequence&&) = delete;
+	Sequence(Sequence const&) noexcept = default;
+	/** Move constructor. */
+	Sequence(Sequence&&) noexcept = default;
 
 	/**
 		Constructor with n-ary C string.
@@ -125,6 +124,7 @@ struct Sequence final {
 	template<
 		std::size_t const N
 	>
+	constexpr
 	Sequence(
 		tty::EncUtils::char_type const (&data)[N]
 	) noexcept
@@ -138,6 +138,7 @@ struct Sequence final {
 		@param data Code unit sequence.
 		@param size Number of units in sequence.
 	*/
+	constexpr
 	Sequence(
 		tty::EncUtils::char_type const* const data,
 		std::size_t const size
@@ -149,11 +150,14 @@ struct Sequence final {
 	/**
 		Constructor with string.
 
-		@warning The sequence will be invalid if @a str changes
-		the terminal consumes it.
+		@warning The sequence will be invalid if @a str changes.
+		If this is given to a terminal, it will consume the units,
+		so this is generally safe to use as long as @a str doesn't
+		change beforehand.
 
 		@param str %String.
 	*/
+	constexpr
 	Sequence(
 		String const& str
 	) noexcept
@@ -164,9 +168,9 @@ struct Sequence final {
 
 /** @name Operators */ /// @{
 	/** Copy assignment operator. */
-	Sequence& operator=(Sequence const&) = default;
-	/** Move assignment operator (deleted). */
-	Sequence& operator=(Sequence&&) = default;
+	Sequence& operator=(Sequence const&) noexcept = default;
+	/** Move assignment operator. */
+	Sequence& operator=(Sequence&&) noexcept = default;
 /// @}
 };
 
@@ -192,14 +196,14 @@ struct UTF8Block final {
 
 /** @name Constructors and destructor */ /// @{
 	/** Destructor. */
-	~UTF8Block() = default;
+	~UTF8Block() noexcept = default;
 
 	/** Default constructor. */
-	UTF8Block() = default;
+	UTF8Block() noexcept = default;
 	/** Copy constructor. */
-	UTF8Block(UTF8Block const&) = default;
+	UTF8Block(UTF8Block const&) noexcept = default;
 	/** Move constructor. */
-	UTF8Block(UTF8Block&&) = default;
+	UTF8Block(UTF8Block&&) noexcept = default;
 
 	/**
 		Constructor with ASCII character.
@@ -244,9 +248,9 @@ struct UTF8Block final {
 
 /** @name Operators */ /// @{
 	/** Copy assignment operator. */
-	UTF8Block& operator=(UTF8Block const&) = default;
+	UTF8Block& operator=(UTF8Block const&) noexcept = default;
 	/** Move assignment operator. */
-	UTF8Block& operator=(UTF8Block&&) = default;
+	UTF8Block& operator=(UTF8Block&&) noexcept = default;
 /// @}
 
 /** @name Operations */ /// @{
@@ -363,33 +367,6 @@ enum class EventType : unsigned {
 };
 
 /**
-	Modifier keys.
-*/
-enum class KeyMod : unsigned {
-	none = 0,
-	ctrl = 1 << 0,
-	alt = 1 << 1
-};
-
-/**
-	Unprintable keys.
-*/
-enum class KeyCode : unsigned {
-	f1,
-	f2,
-	f3,
-	f4,
-	f5,
-	f6,
-	f7,
-	f8,
-	f9,
-	f10,
-	f11,
-	f12
-};
-
-/**
 	%Event.
 
 	@sa tty::EventType
@@ -417,12 +394,12 @@ struct Event final {
 		%Event data for tty::EventType::key_input.
 	*/
 	struct {
-		/** Code point. */
-		duct::char32 cp;
 		/** Key modifier. */
 		KeyMod mod;
 		/** Key code. */
 		KeyCode code;
+		/** Code point. */
+		duct::char32 cp;
 	} key_input;
 };
 
