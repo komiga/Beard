@@ -15,9 +15,9 @@ namespace tty {
 
 #define BEARD_SCOPE_CLASS tty::TerminalInfo
 
-TerminalInfo::~TerminalInfo() = default;
+TerminalInfo::~TerminalInfo() noexcept = default;
 
-TerminalInfo::TerminalInfo()
+TerminalInfo::TerminalInfo() noexcept
 	: m_initialized(false)
 	, m_names()
 	, m_cap_flags()
@@ -25,9 +25,9 @@ TerminalInfo::TerminalInfo()
 	, m_cap_strings()
 {}
 
-TerminalInfo::TerminalInfo(TerminalInfo&&) = default;
+TerminalInfo::TerminalInfo(TerminalInfo&&) noexcept = default;
 TerminalInfo::TerminalInfo(TerminalInfo const&) = default;
-TerminalInfo& TerminalInfo::operator=(TerminalInfo&&) = default;
+TerminalInfo& TerminalInfo::operator=(TerminalInfo&&) noexcept = default;
 
 // serialization
 

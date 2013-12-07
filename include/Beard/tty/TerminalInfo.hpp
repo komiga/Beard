@@ -67,19 +67,19 @@ private:
 public:
 /** @name Constructors and destructor */ /// @{
 	/** Destructor. */
-	~TerminalInfo();
+	~TerminalInfo() noexcept;
 
 	/** Default constructor. */
-	TerminalInfo();
+	TerminalInfo() noexcept;
 	/** Move constructor. */
-	TerminalInfo(TerminalInfo&&);
+	TerminalInfo(TerminalInfo&&) noexcept;
 	/** Copy constructor. */
 	TerminalInfo(TerminalInfo const&);
 /// @}
 
 /** @name Operators */ /// @{
 	/** Move assignment operator. */
-	TerminalInfo& operator=(TerminalInfo&&);
+	TerminalInfo& operator=(TerminalInfo&&) noexcept;
 /// @}
 
 /** @name Properties */ /// @{
