@@ -11,14 +11,16 @@ see @ref index or the accompanying LICENSE file for full text.
 #define BEARD_TTY_TERMINAL_HPP_
 
 #include <Beard/config.hpp>
-#include <Beard/keys.hpp>
 #include <Beard/aux.hpp>
+#include <Beard/keys.hpp>
+#include <Beard/geometry.hpp>
 #include <Beard/utility.hpp>
 #include <Beard/tty/Defs.hpp>
 #include <Beard/tty/TerminalInfo.hpp>
 
 #include <duct/char.hpp>
 #include <duct/cc_unique_ptr.hpp>
+#include <duct/StateStore.hpp>
 #include <duct/IO/dynamic_streambuf.hpp>
 
 #include <utility>
@@ -125,6 +127,12 @@ private:
 		outbuf_size = 0x800
 	};
 
+	enum class State : unsigned {
+		retain_backbuffer = 1u << 0,
+		backbuffer_dirty = 1u << 1,
+		caret_visible = 1u << 2
+	};
+
 	enum class CapCache : unsigned {
 		clear_screen = 0u,
 
@@ -182,7 +190,7 @@ private:
 		is_terminator() const noexcept {
 			return
 				KeyCode::none != code ||
-				duct::CHAR_SENTINEL != cp
+				codepoint_none != cp
 			;
 		}
 	};
@@ -194,13 +202,13 @@ private:
 
 	bool
 	resize(
-		unsigned const new_width,
-		unsigned const new_height
+		geom_value_type const new_width,
+		geom_value_type const new_height
 	);
 
 	void
-	clear(
-		bool const clear_frontbuffer
+	clear_screen(
+		bool const back_dirty
 	);
 
 	void
@@ -221,6 +229,8 @@ private:
 	parse_input();
 
 private:
+	duct::StateStore<State> m_states{};
+
 	duct::cc_unique_ptr<terminal_private> m_tty_priv;
 	tty::fd_type m_tty_fd{tty::FD_INVALID};
 	tty::TerminalInfo m_info{};
@@ -231,7 +241,7 @@ private:
 		'\0',
 		KeyMod::none,
 		KeyCode::none,
-		duct::CHAR_SENTINEL
+		codepoint_none
 	};
 
 	tty::fd_type m_epoll_fd{tty::FD_INVALID};
@@ -239,12 +249,8 @@ private:
 	duct::IO::dynamic_streambuf m_streambuf_out{outbuf_size};
 	moveable_ostream m_stream_out{m_streambuf_out};
 
-	unsigned m_tty_width{0u};
-	unsigned m_tty_height{0u};
-
-	bool m_caret_visible{false};
-	unsigned m_caret_x{0u};
-	unsigned m_caret_y{0u};
+	Vec2 m_tty_size{0, 0};
+	Vec2 m_caret_pos{0, 0};
 
 	unsigned m_attr_fg_last{tty::Color::term_default};
 	unsigned m_attr_bg_last{tty::Color::term_default};
@@ -256,14 +262,13 @@ private:
 	struct {
 		struct {
 			bool pending{false};
-			unsigned old_width{0u};
-			unsigned old_height{0u};
+			Vec2 old_size{0, 0};
 
 			void
 			reset() noexcept {
 				pending = false;
-				old_width = 0u;
-				old_height = 0u;
+				old_size.width = 0;
+				old_size.height = 0;
 			}
 		} resize;
 
@@ -271,14 +276,14 @@ private:
 			bool escaped{false};
 			KeyMod mod{KeyMod::none};
 			KeyCode code{KeyCode::none};
-			duct::char32 cp{duct::CHAR_SENTINEL};
+			duct::char32 cp{codepoint_none};
 
 			void
 			reset() noexcept {
 				escaped = false;
 				mod = KeyMod::none;
 				code = KeyCode::none;
-				cp = duct::CHAR_SENTINEL;
+				cp = codepoint_none;
 			}
 		} key_input;
 
@@ -287,7 +292,7 @@ private:
 			resize.reset();
 			key_input.reset();
 		}
-	} ev_pending{};
+	} m_ev_pending{};
 
 	Terminal(Terminal const&) = delete;
 	Terminal& operator=(Terminal const&) = delete;
@@ -333,19 +338,42 @@ public:
 	}
 
 	/**
+		Get size.
+	*/
+	Vec2 const&
+	get_size() const noexcept {
+		return m_tty_size;
+	}
+
+	/**
 		Get terminal width.
 	*/
-	unsigned
+	geom_value_type
 	get_width() const noexcept {
-		return m_tty_width;
+		return m_tty_size.width;
 	}
 
 	/**
 		Get terminal height.
 	*/
-	unsigned
+	geom_value_type
 	get_height() const noexcept {
-		return m_tty_height;
+		return m_tty_size.height;
+	}
+
+	/**
+		Set terminal info.
+
+		@note This will call update_cache().
+
+		@param term_info %Terminal info.
+	*/
+	void
+	set_info(
+		tty::TerminalInfo term_info
+	) noexcept {
+		m_info = std::move(term_info);
+		update_cache();
 	}
 
 	/**
@@ -365,18 +393,21 @@ public:
 	}
 
 	/**
-		Set terminal info.
+		Enable or disable back buffer retention after a resize.
 
-		@note This will call update_cache().
+		@note This is disabled by default. During a resize, the front
+		buffer is cheaply cleared. When this option is disabled, the
+		back buffer is also cleared; otherwise, the entire back buffer
+		is marked as dirty and all non-default cells will be rewritten
+		to the front buffer on the next present().
 
-		@param term_info %Terminal info.
+		@param enable Whether to enable or disable retention.
 	*/
 	void
-	set_info(
-		tty::TerminalInfo term_info
+	set_opt_retain_backbuffer(
+		bool const enable
 	) noexcept {
-		m_info = std::move(term_info);
-		update_cache();
+		m_states.set(State::retain_backbuffer, enable);
 	}
 /// @}
 
@@ -391,9 +422,17 @@ public:
 	*/
 	void
 	set_caret_pos(
-		unsigned const x,
-		unsigned const y
+		geom_value_type const x,
+		geom_value_type const y
 	);
+
+	/**
+		Get caret position.
+	*/
+	Vec2 const&
+	get_caret_pos() const noexcept {
+		return m_caret_pos;
+	}
 
 	/**
 		Set caret visibility.
@@ -410,13 +449,13 @@ public:
 	*/
 	bool
 	is_caret_visible() const noexcept {
-		return m_caret_visible;
+		return m_states.test(State::caret_visible);
 	}
 /// @}
 
 /** @name Rendering */ /// @{
 	/**
-		Put a cell on the backbuffer.
+		Put a cell on the back buffer.
 
 		@note If @a x or @a y are out-of-bounds, this function will
 		fail silently.
@@ -427,13 +466,13 @@ public:
 	*/
 	void
 	put_cell(
-		unsigned const x,
-		unsigned const y,
+		geom_value_type const x,
+		geom_value_type const y,
 		tty::Cell const& cell
 	) noexcept;
 
 	/**
-		Put a string on the backbuffer.
+		Put a string on the back buffer.
 
 		@note If @a x or @a y are out-of-bounds, this function will
 		fail silently.
@@ -446,18 +485,100 @@ public:
 	*/
 	void
 	put_sequence(
-		unsigned x,
-		unsigned const y,
+		geom_value_type x,
+		geom_value_type const y,
 		tty::Sequence const& seq,
 		uint16_t const attr_fg = tty::Color::term_default,
 		uint16_t const attr_bg = tty::Color::term_default
 	) noexcept;
 
 	/**
-		Flip buffers and render cells.
+		Put a line on the back buffer.
+
+		@note Out-of-bounds areas in the rectangle are not rendered.
+
+		@param position Position.
+		@param length Length of the line.
+		@param direction Direction of the line.
+		@param cell %Cell to put.
 	*/
 	void
-	render();
+	put_line(
+		Vec2 position,
+		geom_value_type const length,
+		Axis const direction,
+		Cell const& cell
+	) noexcept;
+
+	/**
+		Put a rectangle on the back buffer.
+
+		@note Out-of-bounds areas in the rectangle are not rendered.
+
+		@param rect Rectangle bounds.
+		@param frame Rectangle frame. Clockwise from the top-left:
+		-# top-left corner
+		-# top border
+		-# top-right corner
+		-# right border
+		-# bottom-right corner
+		-# bottom border
+		-# bottom-left corner
+		-# left border
+		@param attr_fg Foreground attributes.
+		@param attr_bg Background attributes.
+	*/
+	void
+	put_rect(
+		Rect const& rect,
+		tty::UTF8Block const (&frame)[8u],
+		uint16_t const attr_fg = tty::Color::term_default,
+		uint16_t const attr_bg = tty::Color::term_default
+	) noexcept;
+
+	/**
+		Write changes in the back buffer to the front buffer.
+	*/
+	void
+	present();
+
+	/**
+		Clear the front buffer.
+
+		@note This immediately clears the front buffer (i.e., the
+		terminal screen itself).
+
+		@remarks To clear both buffers, @c clear_front(true) is
+		cheaper than <code>clear_back(); present();</code>.
+
+		@param clear_back Whether to also clear the back buffer.
+	*/
+	void
+	clear_front(
+		bool const clear_back
+	);
+
+	/**
+		Clear the back buffer.
+
+		@param cell Fill cell.
+	*/
+	void
+	clear_back(
+		tty::Cell const& cell = tty::s_cell_default
+	) noexcept;
+
+	/**
+		Clear a rectangle of the back buffer.
+
+		@param rect Rectangle to clear.
+		@param cell Fill cell.
+	*/
+	void
+	clear_back(
+		Rect const& rect,
+		tty::Cell const& cell = tty::s_cell_default
+	) noexcept;
 /// @}
 
 /** @name Events */ /// @{
@@ -569,7 +690,9 @@ public:
 	/**
 		Update the size of the terminal.
 
-		@note This can be used to query and update to the actual
+		@note This will not trigger a resize event.
+
+		@remarks This can be used to query and update to the actual
 		terminal size if the @c SIGWINCH handler is not enabled.
 
 		@returns @c true if the terminal size changed.

@@ -29,6 +29,14 @@
 #include <iterator>
 #include <string>
 
+#if !defined(BEARD_TTY_TERMINAL_IGNORE_OLD_CASTS) && (	\
+	 (DUCT_COMPILER & DUCT_FLAG_COMPILER_GCC) ||		\
+	((DUCT_COMPILER & DUCT_FLAG_COMPILER_CLANG) &&		\
+	  DUCT_COMPILER > DUCT_FLAG_COMPILER_CLANG33))
+//
+	#define BEARD_TTY_TERMINAL_IGNORE_OLD_CASTS
+#endif
+
 namespace Beard {
 namespace tty {
 
@@ -81,38 +89,38 @@ static struct {
 	tty::Sequence seq;
 } const s_input_keymap[]{
 // cap input
-	{KeyMod::none , KeyCode::insert, duct::CHAR_SENTINEL, tty::CapString::key_ic, {nullptr, 0u}},
-	{KeyMod::shift, KeyCode::insert, duct::CHAR_SENTINEL, tty::CapString::key_sic, {nullptr, 0u}},
-	{KeyMod::none , KeyCode::del, duct::CHAR_SENTINEL, tty::CapString::key_dc, {nullptr, 0u}},
-	{KeyMod::shift, KeyCode::del, duct::CHAR_SENTINEL, tty::CapString::key_sdc, {nullptr, 0u}},
-	{KeyMod::none , KeyCode::home, duct::CHAR_SENTINEL, tty::CapString::key_home, {nullptr, 0u}},
-	{KeyMod::shift, KeyCode::home, duct::CHAR_SENTINEL, tty::CapString::key_shome, {nullptr, 0u}},
-	{KeyMod::none , KeyCode::end, duct::CHAR_SENTINEL, tty::CapString::key_end, {nullptr, 0u}},
-	{KeyMod::shift, KeyCode::end, duct::CHAR_SENTINEL, tty::CapString::key_send, {nullptr, 0u}},
-	{KeyMod::none, KeyCode::pgup, duct::CHAR_SENTINEL, tty::CapString::key_ppage, {nullptr, 0u}},
-	{KeyMod::none, KeyCode::pgdn, duct::CHAR_SENTINEL, tty::CapString::key_npage, {nullptr, 0u}},
+	{KeyMod::none , KeyCode::insert, codepoint_none, tty::CapString::key_ic, {nullptr, 0u}},
+	{KeyMod::shift, KeyCode::insert, codepoint_none, tty::CapString::key_sic, {nullptr, 0u}},
+	{KeyMod::none , KeyCode::del, codepoint_none, tty::CapString::key_dc, {nullptr, 0u}},
+	{KeyMod::shift, KeyCode::del, codepoint_none, tty::CapString::key_sdc, {nullptr, 0u}},
+	{KeyMod::none , KeyCode::home, codepoint_none, tty::CapString::key_home, {nullptr, 0u}},
+	{KeyMod::shift, KeyCode::home, codepoint_none, tty::CapString::key_shome, {nullptr, 0u}},
+	{KeyMod::none , KeyCode::end, codepoint_none, tty::CapString::key_end, {nullptr, 0u}},
+	{KeyMod::shift, KeyCode::end, codepoint_none, tty::CapString::key_send, {nullptr, 0u}},
+	{KeyMod::none, KeyCode::pgup, codepoint_none, tty::CapString::key_ppage, {nullptr, 0u}},
+	{KeyMod::none, KeyCode::pgdn, codepoint_none, tty::CapString::key_npage, {nullptr, 0u}},
 
-	{KeyMod::none , KeyCode::up, duct::CHAR_SENTINEL, tty::CapString::key_up, {nullptr, 0u}},
-	{KeyMod::shift, KeyCode::up, duct::CHAR_SENTINEL, tty::CapString::key_sr, {nullptr, 0u}},
-	{KeyMod::none , KeyCode::down, duct::CHAR_SENTINEL, tty::CapString::key_down, {nullptr, 0u}},
-	{KeyMod::shift, KeyCode::down, duct::CHAR_SENTINEL, tty::CapString::key_sf, {nullptr, 0u}},
-	{KeyMod::none , KeyCode::left, duct::CHAR_SENTINEL, tty::CapString::key_left, {nullptr, 0u}},
-	{KeyMod::shift, KeyCode::left, duct::CHAR_SENTINEL, tty::CapString::key_sleft, {nullptr, 0u}},
-	{KeyMod::none , KeyCode::right, duct::CHAR_SENTINEL, tty::CapString::key_right, {nullptr, 0u}},
-	{KeyMod::shift, KeyCode::right, duct::CHAR_SENTINEL, tty::CapString::key_sright, {nullptr, 0u}},
+	{KeyMod::none , KeyCode::up, codepoint_none, tty::CapString::key_up, {nullptr, 0u}},
+	{KeyMod::shift, KeyCode::up, codepoint_none, tty::CapString::key_sr, {nullptr, 0u}},
+	{KeyMod::none , KeyCode::down, codepoint_none, tty::CapString::key_down, {nullptr, 0u}},
+	{KeyMod::shift, KeyCode::down, codepoint_none, tty::CapString::key_sf, {nullptr, 0u}},
+	{KeyMod::none , KeyCode::left, codepoint_none, tty::CapString::key_left, {nullptr, 0u}},
+	{KeyMod::shift, KeyCode::left, codepoint_none, tty::CapString::key_sleft, {nullptr, 0u}},
+	{KeyMod::none , KeyCode::right, codepoint_none, tty::CapString::key_right, {nullptr, 0u}},
+	{KeyMod::shift, KeyCode::right, codepoint_none, tty::CapString::key_sright, {nullptr, 0u}},
 
-	{KeyMod::none, KeyCode::f1, duct::CHAR_SENTINEL, tty::CapString::key_f1, {nullptr, 0u}},
-	{KeyMod::none, KeyCode::f2, duct::CHAR_SENTINEL, tty::CapString::key_f2, {nullptr, 0u}},
-	{KeyMod::none, KeyCode::f3, duct::CHAR_SENTINEL, tty::CapString::key_f3, {nullptr, 0u}},
-	{KeyMod::none, KeyCode::f4, duct::CHAR_SENTINEL, tty::CapString::key_f4, {nullptr, 0u}},
-	{KeyMod::none, KeyCode::f5, duct::CHAR_SENTINEL, tty::CapString::key_f5, {nullptr, 0u}},
-	{KeyMod::none, KeyCode::f6, duct::CHAR_SENTINEL, tty::CapString::key_f6, {nullptr, 0u}},
-	{KeyMod::none, KeyCode::f7, duct::CHAR_SENTINEL, tty::CapString::key_f7, {nullptr, 0u}},
-	{KeyMod::none, KeyCode::f8, duct::CHAR_SENTINEL, tty::CapString::key_f8, {nullptr, 0u}},
-	{KeyMod::none, KeyCode::f9, duct::CHAR_SENTINEL, tty::CapString::key_f9, {nullptr, 0u}},
-	{KeyMod::none, KeyCode::f10, duct::CHAR_SENTINEL, tty::CapString::key_f10, {nullptr, 0u}},
-	{KeyMod::none, KeyCode::f11, duct::CHAR_SENTINEL, tty::CapString::key_f11, {nullptr, 0u}},
-	{KeyMod::none, KeyCode::f12, duct::CHAR_SENTINEL, tty::CapString::key_f12, {nullptr, 0u}},
+	{KeyMod::none, KeyCode::f1, codepoint_none, tty::CapString::key_f1, {nullptr, 0u}},
+	{KeyMod::none, KeyCode::f2, codepoint_none, tty::CapString::key_f2, {nullptr, 0u}},
+	{KeyMod::none, KeyCode::f3, codepoint_none, tty::CapString::key_f3, {nullptr, 0u}},
+	{KeyMod::none, KeyCode::f4, codepoint_none, tty::CapString::key_f4, {nullptr, 0u}},
+	{KeyMod::none, KeyCode::f5, codepoint_none, tty::CapString::key_f5, {nullptr, 0u}},
+	{KeyMod::none, KeyCode::f6, codepoint_none, tty::CapString::key_f6, {nullptr, 0u}},
+	{KeyMod::none, KeyCode::f7, codepoint_none, tty::CapString::key_f7, {nullptr, 0u}},
+	{KeyMod::none, KeyCode::f8, codepoint_none, tty::CapString::key_f8, {nullptr, 0u}},
+	{KeyMod::none, KeyCode::f9, codepoint_none, tty::CapString::key_f9, {nullptr, 0u}},
+	{KeyMod::none, KeyCode::f10, codepoint_none, tty::CapString::key_f10, {nullptr, 0u}},
+	{KeyMod::none, KeyCode::f11, codepoint_none, tty::CapString::key_f11, {nullptr, 0u}},
+	{KeyMod::none, KeyCode::f12, codepoint_none, tty::CapString::key_f12, {nullptr, 0u}},
 
 // single-char input
 	//{KeyMod::ctrl, KeyCode::none, '~', static_cast<tty::CapString>(-1), "\x00"},
@@ -130,7 +138,7 @@ static struct {
 	{KeyMod::ctrl, KeyCode::none, 'j', static_cast<tty::CapString>(-1), "\x0A"},
 	{KeyMod::ctrl, KeyCode::none, 'k', static_cast<tty::CapString>(-1), "\x0B"},
 	{KeyMod::ctrl, KeyCode::none, 'l', static_cast<tty::CapString>(-1), "\x0C"},
-	{KeyMod::none, KeyCode::enter, duct::CHAR_SENTINEL, static_cast<tty::CapString>(-1), "\x0D"},
+	{KeyMod::none, KeyCode::enter, codepoint_none, static_cast<tty::CapString>(-1), "\x0D"},
 	{KeyMod::ctrl, KeyCode::none, 'n', static_cast<tty::CapString>(-1), "\x0E"},
 	{KeyMod::ctrl, KeyCode::none, 'o', static_cast<tty::CapString>(-1), "\x0F"},
 	{KeyMod::ctrl, KeyCode::none, 'p', static_cast<tty::CapString>(-1), "\x10"},
@@ -144,20 +152,13 @@ static struct {
 	{KeyMod::ctrl, KeyCode::none, 'x', static_cast<tty::CapString>(-1), "\x18"},
 	{KeyMod::ctrl, KeyCode::none, 'y', static_cast<tty::CapString>(-1), "\x19"},
 	{KeyMod::ctrl, KeyCode::none, 'z', static_cast<tty::CapString>(-1), "\x1A"},
-	{KeyMod::none, KeyCode::esc, duct::CHAR_SENTINEL, static_cast<tty::CapString>(-1), "\x1B\x1B"},
+	{KeyMod::none, KeyCode::esc, codepoint_none, static_cast<tty::CapString>(-1), "\x1B\x1B"},
 	{KeyMod::ctrl, KeyCode::none, '4', static_cast<tty::CapString>(-1), "\x1C"},
 	{KeyMod::ctrl, KeyCode::none, '5', static_cast<tty::CapString>(-1), "\x1D"},
 	{KeyMod::ctrl, KeyCode::none, '6', static_cast<tty::CapString>(-1), "\x1E"},
 	{KeyMod::ctrl, KeyCode::none, '/', static_cast<tty::CapString>(-1), "\x1F"},
 	{KeyMod::none, KeyCode::none, ' ', static_cast<tty::CapString>(-1), "\x20"},
-	{KeyMod::none, KeyCode::backspace, duct::CHAR_SENTINEL, static_cast<tty::CapString>(-1), "\x7F"},
-};
-
-static constexpr tty::Cell const
-s_cell_default{
-	{' '},
-	tty::Color::term_default,
-	tty::Color::term_default
+	{KeyMod::none, KeyCode::backspace, codepoint_none, static_cast<tty::CapString>(-1), "\x7F"},
 };
 } // anonymous namespace
 
@@ -209,7 +210,7 @@ close_fd(
 static void
 sigwinch_handler(int /*signum*/) {
 	if (nullptr != s_sigwinch_terminal) {
-		s_sigwinch_terminal->update_size();
+		s_sigwinch_terminal->m_ev_pending.resize.pending = true;
 	}
 }
 
@@ -247,14 +248,22 @@ setup_sigwinch_handler(
 		);
 	}
 
+	// Curse you, SIG_DFL
+	#ifdef BEARD_TTY_TERMINAL_IGNORE_OLD_CASTS
+		#pragma GCC diagnostic push
+		#pragma GCC diagnostic ignored "-Wold-style-cast"
+	#endif
 	if (!BEARD_TERMINAL_SIG_HANDLER_IS_NULLARY_(sig_current)) {
 		BEARD_THROW_FQN(
 			ErrorCode::tty_sigwinch_handler_already_active,
 			"someone else already owns the SIGWINCH handler"
 		);
 	}
+	#ifdef BEARD_TTY_TERMINAL_IGNORE_OLD_CASTS
+		#pragma GCC diagnostic pop
+	#endif
 
-	struct ::sigaction sig;
+	struct ::sigaction sig{};
 	sig.sa_handler = sigwinch_handler;
 	sig.sa_flags = 0;
 	if (0 != ::sigaction(SIGWINCH, &sig, nullptr)) {
@@ -287,8 +296,15 @@ release_sigwinch_handler(
 	struct ::sigaction sig_current;
 	if (0 == ::sigaction(SIGWINCH, nullptr, &sig_current)) {
 		if (sigwinch_handler == sig_current.sa_handler) {
-			struct ::sigaction sig;
+			struct ::sigaction sig{};
+			#ifdef BEARD_TTY_TERMINAL_IGNORE_OLD_CASTS
+				#pragma GCC diagnostic push
+				#pragma GCC diagnostic ignored "-Wold-style-cast"
+			#endif
 			sig.sa_handler = SIG_IGN;
+			#ifdef BEARD_TTY_TERMINAL_IGNORE_OLD_CASTS
+				#pragma GCC diagnostic pop
+			#endif
 			sig.sa_flags = 0;
 			if (0 != ::sigaction(SIGWINCH, &sig, nullptr)) {
 				BEARD_DEBUG_CERR_FQN(
@@ -317,36 +333,37 @@ release_sigwinch_handler(
 
 static void
 clear_buffer(
-	tty::Terminal::cell_vector_type& cell_buffer
+	tty::Terminal::cell_vector_type& cell_buffer,
+	tty::Cell const& cell = tty::s_cell_default
 ) {
 	// TODO: Optimize with cache buffer of constant size and std::copy()?
 	std::fill(
 		cell_buffer.begin(),
 		cell_buffer.end(),
-		s_cell_default
+		cell
 	);
 }
 
 static void
 resize_buffer(
-	unsigned const old_width,
-	unsigned const old_height,
+	geom_value_type const old_width,
+	geom_value_type const old_height,
 	tty::Terminal::cell_vector_type& oldb,
 	unsigned const new_size,
-	unsigned const new_width,
-	unsigned const new_height,
+	geom_value_type const new_width,
+	geom_value_type const new_height,
 	bool const retain
 ) {
 	// TODO: Choose optimal ctor if new buffer is strictly smaller
-	tty::Terminal::cell_vector_type newb{new_size, s_cell_default};
+	tty::Terminal::cell_vector_type newb{new_size, tty::s_cell_default};
 	if (retain && 0u < oldb.size() && 0u < newb.size()) {
-		unsigned const
-			min_width  = std::min(old_width , new_width),
-			min_height = std::min(old_height, new_height)
+		auto const
+			min_width  = min_ce(old_width , new_width),
+			min_height = min_ce(old_height, new_height)
 		;
 		auto it_old = oldb.cbegin();
 		auto it_new = newb.begin();
-		for (unsigned y = 0u; min_height > y; ++y) {
+		for (geom_value_type y = 0; min_height > y; ++y) {
 			std::copy(it_old, it_old + min_width, it_new);
 			it_old += old_width;
 			it_new += new_width;
@@ -363,8 +380,8 @@ resize_buffer(
 static void
 repos_out(
 	std::ostream& stream,
-	unsigned const x,
-	unsigned const y
+	geom_value_type const x,
+	geom_value_type const y
 ) {
 	BEARD_TERMINAL_WRITE_STRLIT(stream, "\033[");
 	String str{std::to_string(y + 1u)};
@@ -379,8 +396,8 @@ repos_out(
 static void
 write_caret(
 	std::ostream& stream,
-	unsigned const caret_x,
-	unsigned const caret_y
+	geom_value_type const caret_x,
+	geom_value_type const caret_y
 ) {
 	repos_out(stream, caret_x, caret_y);
 }
@@ -540,7 +557,7 @@ add_key_cap(
 					*it,
 					KeyMod::none,
 					KeyCode::none,
-					duct::CHAR_SENTINEL
+					codepoint_none
 				));
 				node = node->next.front().get();
 				++it;
@@ -634,12 +651,12 @@ Terminal::put_cap_cache(
 }
 
 void
-Terminal::clear(
-	bool const clear_frontbuffer
+Terminal::clear_screen(
+	bool const back_dirty
 ) {
-	if (clear_frontbuffer) {
-		terminal_internal::clear_buffer(m_cell_frontbuffer);
-	}
+	m_states.set(State::backbuffer_dirty, back_dirty);
+	std::fill(m_dirty_rows.begin(), m_dirty_rows.end(), back_dirty);
+
 	put_cap_cache(CapCache::clear_screen);
 	terminal_internal::write_attrs(
 		*this,
@@ -647,9 +664,9 @@ Terminal::clear(
 		tty::Color::term_default,
 		true
 	);
-	if (m_caret_visible) {
+	if (is_caret_visible()) {
 		terminal_internal::write_caret(
-			m_stream_out, m_caret_x, m_caret_y
+			m_stream_out, m_caret_pos.x, m_caret_pos.y
 		);
 	}
 	terminal_internal::flush(*this);
@@ -657,35 +674,30 @@ Terminal::clear(
 
 bool
 Terminal::resize(
-	unsigned const new_width,
-	unsigned const new_height
+	geom_value_type const new_width,
+	geom_value_type const new_height
 ) {
-	if (new_width == m_tty_width && new_height == m_tty_height) {
+	if (new_width == m_tty_size.width && new_height == m_tty_size.height) {
 		return false;
 	}
 
 	std::size_t const size = new_width * new_height;
 	terminal_internal::resize_buffer(
-		m_tty_width, m_tty_height,
-		m_cell_backbuffer, size, new_width, new_height, true
+		m_tty_size.width, m_tty_size.height,
+		m_cell_backbuffer, size, new_width, new_height,
+		m_states.test(State::retain_backbuffer)
 	);
 	terminal_internal::resize_buffer(
-		m_tty_width, m_tty_height,
-		m_cell_frontbuffer, size, new_width, new_height, false
+		m_tty_size.width, m_tty_size.height,
+		m_cell_frontbuffer, size, new_width, new_height,
+		false
 	);
 
-	clear(false);
-	m_dirty_rows.clear();
 	m_dirty_rows.resize(new_height);
-	m_dirty_rows.flip();
+	clear_screen(m_states.test(State::retain_backbuffer));
 
-	if (!ev_pending.resize.pending) {
-		ev_pending.resize.old_width  = m_tty_width;
-		ev_pending.resize.old_height = m_tty_height;
-		ev_pending.resize.pending = true;
-	}
-	m_tty_width  = new_width;
-	m_tty_height = new_height;
+	m_tty_size.width  = new_width;
+	m_tty_size.height = new_height;
 	return true;
 }
 
@@ -695,7 +707,7 @@ Terminal::init(
 	tty::fd_type const tty_fd,
 	bool const use_sigwinch
 ) try {
-	ev_pending.reset();
+	m_ev_pending.reset();
 	m_tty_fd = tty_fd;
 
 	tty::fd_type const epoll_fd = ::epoll_create1(0);
@@ -707,7 +719,7 @@ Terminal::init(
 		);
 	}
 
-	struct ::epoll_event epoll_ev;
+	struct ::epoll_event epoll_ev{};
 	epoll_ev.events = EPOLLIN | EPOLLPRI;
 	if (0 != ::epoll_ctl(epoll_fd, EPOLL_CTL_ADD, m_tty_fd, &epoll_ev)) {
 		auto const err = errno;
@@ -793,7 +805,7 @@ Terminal::init(
 
 	put_cap_cache(CapCache::enter_ca_mode);
 	put_cap_cache(CapCache::keypad_xmit);
-	(m_caret_visible)
+	(is_caret_visible())
 		? put_cap_cache(CapCache::cursor_normal)
 		: put_cap_cache(CapCache::cursor_invisible)
 	;
@@ -828,7 +840,7 @@ Terminal::init(
 #define BEARD_SCOPE_FUNC deinit
 void
 Terminal::deinit() {
-	ev_pending.reset();
+	m_ev_pending.reset();
 
 	terminal_internal::close_fd(m_epoll_fd);
 	terminal_internal::release_sigwinch_handler(*this);
@@ -892,7 +904,7 @@ Terminal::poll_input(
 					err,
 					"failed to epoll tty (potentially retrying)"
 				);
-			} else if (0 != input_timeout && ev_pending.resize.pending) {
+			} else if (0 != input_timeout && m_ev_pending.resize.pending) {
 				// Avoid infinite/long timeout if a SIGWINCH
 				// interrupted epoll_wait().
 				return;
@@ -942,41 +954,41 @@ Terminal::parse_input() {
 		&m_key_decode_graph,
 		buffer,
 		buffer + m_streambuf_in.get_remaining(),
-		ev_pending.key_input.mod,
-		ev_pending.key_input.code,
-		ev_pending.key_input.cp
+		m_ev_pending.key_input.mod,
+		m_ev_pending.key_input.code,
+		m_ev_pending.key_input.cp
 	);
 	if (0u != seq_size) {
 		// Key specified by a cap or single non-ASCII char
 		have_event = true;
 	} else if ('\033' == buffer[0u]) {
 		seq_size = 1u;
-		if (ev_pending.key_input.escaped) {
+		if (m_ev_pending.key_input.escaped) {
 			// Already have escape character
-			ev_pending.key_input.escaped = false;
-			ev_pending.key_input.mod  = KeyMod::none;
-			ev_pending.key_input.code = KeyCode::esc;
-			ev_pending.key_input.cp   = duct::CHAR_SENTINEL;
+			m_ev_pending.key_input.escaped = false;
+			m_ev_pending.key_input.mod  = KeyMod::none;
+			m_ev_pending.key_input.code = KeyCode::esc;
+			m_ev_pending.key_input.cp   = codepoint_none;
 			have_event = true;
 		} else {
-			ev_pending.key_input.escaped = true;
+			m_ev_pending.key_input.escaped = true;
 			have_event = false;
 		}
 	} else {
 		// Else hopefully a sequence of UTF-8 units
 		seq_size = tty::EncUtils::required_first_whole(buffer[0u]);
 		if (m_streambuf_in.get_remaining() >= seq_size) {
-			duct::char32 cp = duct::CHAR_SENTINEL;
+			duct::char32 cp = codepoint_none;
 			tty::EncUtils::decode(
 				buffer,
 				buffer + seq_size,
 				cp,
-				duct::CHAR_SENTINEL
+				codepoint_none
 			);
-			if (duct::CHAR_SENTINEL != cp) {
-				ev_pending.key_input.mod = KeyMod::none;
-				ev_pending.key_input.code = KeyCode::none;
-				ev_pending.key_input.cp = cp;
+			if (codepoint_none != cp) {
+				m_ev_pending.key_input.mod = KeyMod::none;
+				m_ev_pending.key_input.code = KeyCode::none;
+				m_ev_pending.key_input.cp = cp;
 				have_event = true;
 			}
 		} else {
@@ -997,15 +1009,15 @@ Terminal::parse_input() {
 
 void
 Terminal::set_caret_pos(
-	unsigned const x,
-	unsigned const y
+	geom_value_type const x,
+	geom_value_type const y
 ) {
-	if (x != m_caret_x || y != m_caret_y) {
-		m_caret_x = x;
-		m_caret_y = y;
-		if (m_caret_visible) {
+	if (x != m_caret_pos.x || y != m_caret_pos.y) {
+		m_caret_pos.x = x;
+		m_caret_pos.y = y;
+		if (is_caret_visible()) {
 			terminal_internal::write_caret(
-				m_stream_out, m_caret_x, m_caret_y
+				m_stream_out, m_caret_pos.x, m_caret_pos.y
 			);
 			terminal_internal::flush(*this);
 		}
@@ -1016,9 +1028,9 @@ void
 Terminal::set_caret_visible(
 	bool const visible
 ) {
-	if (visible != m_caret_visible) {
-		m_caret_visible = visible;
-		if (m_caret_visible) {
+	if (is_caret_visible() != visible) {
+		m_states.set(State::caret_visible, visible);
+		if (visible) {
 			put_cap_cache(CapCache::cursor_normal);
 		} else {
 			put_cap_cache(CapCache::cursor_invisible);
@@ -1037,16 +1049,18 @@ Terminal::set_caret_visible(
 
 void
 Terminal::put_cell(
-	unsigned const x,
-	unsigned const y,
+	geom_value_type const x,
+	geom_value_type const y,
 	tty::Cell const& cell
 ) noexcept {
-	if (x < m_tty_width && y < m_tty_height
+	if (0 <= x && x < m_tty_size.width
+	 && 0 <= y && y < m_tty_size.height
 	 && '\0' != cell.u8block.units[0u]
 	) {
-		auto it = m_cell_backbuffer.begin() + (y * m_tty_width) + x;
+		auto const it = m_cell_backbuffer.begin() + (y * m_tty_size.width) + x;
 		if (BEARD_TERMINAL_CELL_CMP(*it, cell)) {
 			std::copy(&cell, &cell + 1u, it);
+			m_states.enable(State::backbuffer_dirty);
 			m_dirty_rows[y] = true;
 		}
 	}
@@ -1054,21 +1068,22 @@ Terminal::put_cell(
 
 void
 Terminal::put_sequence(
-	unsigned x,
-	unsigned const y,
+	geom_value_type x,
+	geom_value_type const y,
 	tty::Sequence const& seq,
 	uint16_t const attr_fg,
 	uint16_t const attr_bg
 ) noexcept {
-	if (x < m_tty_width && y < m_tty_height) {
+	// TODO: Handle \n and clipping
+	if (0 <= x && x < m_tty_size.width && 0 <= y && y < m_tty_size.height) {
 		bool dirtied = false;
 		std::size_t ss_size = 0u;
 		tty::Cell cell{{}, attr_fg, attr_bg};
-		auto it_put = m_cell_backbuffer.begin() + (y * m_tty_width) + x;
+		auto it_put = m_cell_backbuffer.begin() + (y * m_tty_size.width) + x;
 		auto it_seq = seq.data;
 		auto const seq_end = seq.data + seq.size;
 		for (
-			; seq_end > it_seq && x < m_tty_width;
+			; seq_end > it_seq && x < m_tty_size.width;
 			++x,
 			++it_put,
 			it_seq += ss_size
@@ -1096,13 +1111,139 @@ Terminal::put_sequence(
 			}
 		}
 		if (dirtied) {
+			m_states.enable(State::backbuffer_dirty);
 			m_dirty_rows[y] = true;
 		}
 	}
 }
 
 void
-Terminal::render() {
+Terminal::put_line(
+	Vec2 position,
+	geom_value_type length,
+	Axis const direction,
+	Cell const& cell
+) noexcept {
+	// NB: The transpose axis value won't vary
+	if (
+		'\0' == cell.u8block.units[0u] ||
+		0 >= length ||
+		!value_in_bounds(
+			vec2_axis_value(position, axis_transpose(direction)),
+			0, vec2_axis_value(m_tty_size, axis_transpose(direction))
+		)
+	) {
+		return;
+	}
+
+	geom_value_type&
+		aval = vec2_axis_ref(position, direction);
+	geom_value_type const
+		target = value_clamp(
+			aval + length,
+			0, vec2_axis_value(m_tty_size, direction) - 1
+		),
+		stride = Axis::horizontal == direction
+			? 1
+			: m_tty_size.width
+	;
+	if (vec2_axis_value(m_tty_size, direction) > aval) {
+		aval = max_ce(aval, 0);
+		bool dirtied = false;
+		auto it
+			= m_cell_backbuffer.begin()
+			+ (position.y * m_tty_size.width) + position.x
+		;
+		for (
+			;
+			aval < target;
+			++aval, it += stride
+		) {
+			if (BEARD_TERMINAL_CELL_CMP(*it, cell)) {
+				std::copy(&cell, &cell + 1u, it);
+				m_dirty_rows[position.y] = true;
+				dirtied = true;
+			}
+		}
+		if (dirtied) {
+			m_states.enable(State::backbuffer_dirty);
+		}
+	}
+}
+
+void
+Terminal::put_rect(
+	Rect const& rect,
+	tty::UTF8Block const (&frame)[8u],
+	uint16_t const attr_fg,
+	uint16_t const attr_bg
+) noexcept {
+	enum : unsigned {
+		corner_top_left = 0u,
+		edge_top,
+		corner_top_right,
+		edge_right,
+		corner_bot_right,
+		edge_bot,
+		corner_bot_left,
+		edge_left
+	};
+
+	if (
+		1 >= rect.size.width ||
+		1 >= rect.size.height ||
+		!rect_intersects(rect, Rect{{0, 0}, m_tty_size})
+	) {
+		return;
+	}
+
+	Vec2 pos = rect.pos;
+	tty::Cell cell{frame[edge_top], attr_fg, attr_bg};
+	++pos.x;
+	put_line(pos, rect.size.width - 2, Axis::x, cell);
+	cell.u8block = frame[edge_bot];
+	pos.y += rect.size.height - 1;
+	put_line(pos, rect.size.width - 2, Axis::x, cell);
+
+	cell.u8block = frame[edge_left];
+	--pos.x; pos.y = rect.pos.y + 1;
+	put_line(pos, rect.size.height - 2, Axis::y, cell);
+	cell.u8block = frame[edge_right];
+	pos.x += rect.size.width - 1;
+	put_line(pos, rect.size.height - 2, Axis::y, cell);
+
+	cell.u8block = frame[corner_top_left];
+	put_cell(
+		rect.pos.x,
+		rect.pos.y,
+		cell
+	);
+	cell.u8block = frame[corner_top_right];
+	put_cell(
+		rect.pos.x + rect.size.width - 1,
+		rect.pos.y,
+		cell
+	);
+	cell.u8block = frame[corner_bot_right];
+	put_cell(
+		rect.pos.x + rect.size.width - 1,
+		rect.pos.y + rect.size.height - 1,
+		cell
+	);
+	cell.u8block = frame[corner_bot_left];
+	put_cell(
+		rect.pos.x,
+		rect.pos.y + rect.size.height - 1,
+		cell
+	);
+}
+
+void
+Terminal::present() {
+	if (!is_open() || !m_states.test(State::backbuffer_dirty)) {
+		return;
+	}
+
 	m_stream_out.clear();
 	//put_cap_cache(CapCache::exit_attribute_mode);
 
@@ -1121,21 +1262,21 @@ Terminal::render() {
 		bit_row,
 		bit_col
 	;
+	geom_value_type row = 0;
 	unsigned
-		row = 0u,
 		cseq_f = 0u,
 		cseq_e = 0u
 	;
 	for (
 		fit_row = m_cell_frontbuffer.begin(),
-		fit_row_n = fit_row + m_tty_width,
+		fit_row_n = fit_row + m_tty_size.width,
 		bit_row = m_cell_backbuffer.cbegin()
-		; m_tty_height != row
+		; m_tty_size.height != row
 		; fit_row = fit_row_n,
 		// FIXME: Danger danger. stdlib should be OK with this?
 		// (It's not being dereferenced.)
-		fit_row_n += m_tty_width,
-		bit_row += m_tty_width,
+		fit_row_n += m_tty_size.width,
+		bit_row += m_tty_size.width,
 		++it_dirty,
 		++row
 	) {
@@ -1190,13 +1331,83 @@ Terminal::render() {
 		}
 		(*it_dirty) = false;
 	}
+	m_states.disable(State::backbuffer_dirty);
 
-	if (m_caret_visible) {
+	if (is_caret_visible()) {
 		terminal_internal::write_caret(
-			m_stream_out, m_caret_x, m_caret_y
+			m_stream_out, m_caret_pos.x, m_caret_pos.y
 		);
 	}
 	terminal_internal::flush(*this);
+}
+
+void
+Terminal::clear_front(
+	bool const clear_back
+) {
+	terminal_internal::clear_buffer(m_cell_frontbuffer);
+	if (clear_back) {
+		terminal_internal::clear_buffer(m_cell_backbuffer);
+	}
+	clear_screen(!clear_back);
+}
+
+void
+Terminal::clear_back(
+	tty::Cell const& cell
+) noexcept {
+	terminal_internal::clear_buffer(m_cell_backbuffer, cell);
+	m_states.enable(State::backbuffer_dirty);
+	std::fill(m_dirty_rows.begin(), m_dirty_rows.end(), true);
+}
+
+void
+Terminal::clear_back(
+	Rect const& rect,
+	tty::Cell const& cell
+) noexcept {
+	Vec2 const v0{0, 0};
+	Quad quad = rect_abs_quad(rect);
+	vec2_clamp_max(quad.v1, v0);
+	vec2_clamp_min(quad.v2, m_tty_size);
+	if (v0 == quad.v1 && make_const(m_tty_size) == quad.v2) {
+		clear_back(cell);
+	} else {
+		// Eliminate degeneracies
+		vec2_clamp_max(quad.v2, quad.v1);
+		Rect const rect_clamped = quad_rect(quad);
+		if (v0 == rect_clamped.size) {
+			return;
+		}
+		auto it_row = m_cell_backbuffer.begin()
+			+ (rect_clamped.pos.y * m_tty_size.width) + rect_clamped.pos.x;
+		auto it_dirty = m_dirty_rows.begin() + rect_clamped.pos.y;
+		bool row_dirtied = false, state_dirtied = false;
+		for (
+			auto it_row_n = it_row + m_tty_size.width;
+			m_cell_backbuffer.end() > it_row;
+			it_row = it_row_n, it_row_n += m_tty_size.width, ++it_dirty
+		) {
+			for (
+				auto it = it_row;
+				it_row_n != it;
+				++it
+			) {
+				if (BEARD_TERMINAL_CELL_CMP(*it, cell)) {
+					std::copy(&cell, &cell + 1u, it);
+					row_dirtied = true;
+				}
+			}
+			if (row_dirtied) {
+				(*it_dirty) = true;
+				state_dirtied = true;
+				row_dirtied = false;
+			}
+		}
+		if (state_dirtied) {
+			m_states.enable(State::backbuffer_dirty);
+		}
+	}
 }
 
 // events
@@ -1208,11 +1419,14 @@ Terminal::poll(
 	unsigned const input_timeout
 ) {
 	event.type = tty::EventType::none;
-	if (ev_pending.resize.pending) {
-		event.type = tty::EventType::resize;
-		event.resize.old_width  = ev_pending.resize.old_width;
-		event.resize.old_height = ev_pending.resize.old_height;
-		ev_pending.resize.pending = false;
+	if (!is_open()) {
+		/* Do nothing. */
+	} else if (m_ev_pending.resize.pending) {
+		m_ev_pending.resize.pending = false;
+		event.resize.old_size = m_tty_size;
+		if (update_size()) {
+			event.type = tty::EventType::resize;
+		}
 	} else {
 		poll_input(input_timeout);
 		bool parse_escape = false;
@@ -1227,17 +1441,17 @@ Terminal::poll(
 				);*/
 				event.type = tty::EventType::key_input;
 				event.key_input.mod =
-				(true == ev_pending.key_input.escaped)
+				(true == m_ev_pending.key_input.escaped)
 					? static_cast<KeyMod>(
 						enum_cast(event.key_input.mod) |
 						enum_cast(KeyMod::esc)
 					)
-					: ev_pending.key_input.mod
+					: m_ev_pending.key_input.mod
 				;
-				event.key_input.code = ev_pending.key_input.code;
-				event.key_input.cp   = ev_pending.key_input.cp;
-				ev_pending.key_input.reset();
-			} else if (!parse_escape && ev_pending.key_input.escaped) {
+				event.key_input.code = m_ev_pending.key_input.code;
+				event.key_input.cp   = m_ev_pending.key_input.cp;
+				m_ev_pending.key_input.reset();
+			} else if (!parse_escape && m_ev_pending.key_input.escaped) {
 				/*BEARD_DEBUG_MSG_FQN_F(
 					"escaped: seq_size = %zu  pos = %zu  remaining = %zu",
 					m_streambuf_in.get_sequence_size(),

@@ -13,6 +13,7 @@ see @ref index or the accompanying LICENSE file for full text.
 #include <Beard/config.hpp>
 #include <Beard/String.hpp>
 #include <Beard/keys.hpp>
+#include <Beard/geometry.hpp>
 
 #include <duct/char.hpp>
 #include <duct/EncodingUtils.hpp>
@@ -156,13 +157,15 @@ struct Sequence final {
 		change beforehand.
 
 		@param str %String.
+		@param size Size of sequence. Clamped to str.size().
 	*/
 	constexpr
 	Sequence(
-		String const& str
+		String const& str,
+		String::size_type const size = String::npos
 	) noexcept
 		: data(str.data())
-		, size(str.size())
+		, size(str.size() < size ? str.size() : size)
 	{}
 /// @}
 
@@ -251,6 +254,32 @@ struct UTF8Block final {
 	UTF8Block& operator=(UTF8Block const&) noexcept = default;
 	/** Move assignment operator. */
 	UTF8Block& operator=(UTF8Block&&) noexcept = default;
+
+	/**
+		Assign to ASCII character.
+
+		@param c ASCII character.
+	*/
+	UTF8Block&
+	operator=(
+		char const c
+	) noexcept {
+		units[0u] = c;
+		return *this;
+	}
+
+	/**
+		Assign to (decoded) code point.
+
+		@param cp Code point to decode.
+	*/
+	UTF8Block&
+	operator=(
+		duct::char32 const cp
+	) noexcept {
+		assign(cp);
+		return *this;
+	}
 /// @}
 
 /** @name Operations */ /// @{
@@ -336,13 +365,13 @@ struct Cell final {
 };
 
 /**
-	Create a cell with default colors.
+	Construct a cell.
 
 	@param u8block Code unit block.
 	@param attr_fg Foreground attributes.
 	@param attr_bg Background attributes.
 */
-constexpr inline tty::Cell
+inline constexpr tty::Cell
 make_cell(
 	tty::UTF8Block&& u8block,
 	uint16_t attr_fg = tty::Color::term_default,
@@ -354,6 +383,21 @@ make_cell(
 		attr_bg
 	};
 }
+
+/** @name Pre-defined cells */ /// @{
+
+static constexpr Cell const
+	/**
+		Default buffer cell.
+	*/
+	s_cell_default = make_cell(
+		' ',
+		tty::Color::term_default,
+		tty::Color::term_default
+	)
+;
+
+/// @}
 
 /**
 	%Event types.
@@ -375,32 +419,22 @@ struct Event final {
 	/**
 		Type.
 	*/
-	EventType type;
+	tty::EventType type;
 
 	/**
 		%Event data for tty::EventType::resize.
 
-		@sa tty::Terminal::get_width(),
-			tty::Terminal::get_height()
+		@sa tty::Terminal::get_size()
 	*/
 	struct {
-		/** Old width of terminal. */
-		unsigned old_width;
-		/** Old height of terminal. */
-		unsigned old_height;
+		/** Old size of terminal. */
+		Vec2 old_size;
 	} resize;
 
 	/**
 		%Event data for tty::EventType::key_input.
 	*/
-	struct {
-		/** Key modifier. */
-		KeyMod mod;
-		/** Key code. */
-		KeyCode code;
-		/** Code point. */
-		duct::char32 cp;
-	} key_input;
+	KeyInputData key_input;
 };
 
 /** @} */ // end of doc-group tty

@@ -8,7 +8,6 @@
 
 #include <iostream>
 #include <iomanip>
-#include <fstream>
 
 #include "../common/common.hpp"
 
@@ -16,32 +15,6 @@ using Beard::tty::CapFlag;
 using Beard::tty::CapNumber;
 using Beard::tty::CapString;
 using Beard::tty::TerminalInfo;
-
-bool
-load_term_info(
-	TerminalInfo& term_info,
-	Beard::String const& path
-) {
-	std::ifstream stream{path};
-	if (stream.fail() || !stream.is_open()) {
-		std::cout
-			<< "failed to open terminfo path for reading: '"
-			<< path
-			<< "'\n"
-		;
-		return false;
-	}
-
-	try {
-		term_info.deserialize(stream);
-	} catch (Beard::Error const& ex) {
-		report_error(ex);
-		// Just rethrow and let the program explode
-		throw;
-	}
-	stream.close();
-	return true;
-}
 
 void
 cout_flag(
