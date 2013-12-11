@@ -83,6 +83,13 @@ enum class ErrorCode : unsigned {
 	tty_init_failed,
 /// @}
 
+/** @name UI */ /// @{
+	/**
+		Context is already open.
+	*/
+	ui_context_already_open,
+/// @}
+
 /** @cond INTERNAL */
 	LAST
 /** @endcond */

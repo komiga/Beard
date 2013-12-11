@@ -28,6 +28,9 @@ s_error_invalid[]{BEARD_STR_LIT("INVALID")},
 	BEARD_STR_LIT("tty_invalid_fd"),
 
 	BEARD_STR_LIT("tty_init_failed"),
+
+// ui
+	BEARD_STR_LIT("ui_context_already_open"),
 };
 } // anonymous namespace
 
