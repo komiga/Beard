@@ -27,6 +27,10 @@ struct Rect;
 
 /**
 	Axes.
+
+	@note Axis::both and Axis::none are for special purposes.
+	The geometric type operations (for Vec2, Rect, and Quad) only
+	accept single, valid axes.
 */
 enum class Axis : unsigned {
 	/** X-axis. */
@@ -37,7 +41,12 @@ enum class Axis : unsigned {
 	/** Alias for Axis::x. */
 	horizontal = x,
 	/** Alias for Axis::y. */
-	vertical   = y
+	vertical   = y,
+
+	/** No axes. */
+	none = 0u,
+	/** Both axes. */
+	both = x | y
 };
 
 /**
@@ -93,58 +102,10 @@ struct Quad final {
 };
 
 /**
-	Vector equality comparison operator.
-
-	@param lhs Left-hand side.
-	@param rhs Right-hand side.
-*/
-inline constexpr bool
-operator==(
-	Vec2 const& lhs,
-	Vec2 const& rhs
-) noexcept {
-	return
-		lhs.x == rhs.x &&
-		lhs.y == rhs.y
-	;
-}
-
-/**
-	Rectangle equality comparison operator.
-
-	@param lhs Left-hand side.
-	@param rhs Right-hand side.
-*/
-inline constexpr bool
-operator==(
-	Rect const& lhs,
-	Rect const& rhs
-) noexcept {
-	return
-		lhs.pos == rhs.pos &&
-		lhs.size == rhs.size
-	;
-}
-
-/**
-	%Quad equality comparison operator.
-
-	@param lhs Left-hand side.
-	@param rhs Right-hand side.
-*/
-inline constexpr bool
-operator==(
-	Quad const& lhs,
-	Quad const& rhs
-) noexcept {
-	return
-		lhs.v1 == rhs.v1 &&
-		lhs.v2 == rhs.v2
-	;
-}
-
-/**
 	Get an axis's transpose-axis.
+
+	@note Axis::none and Axis::both are handled as transposes of
+	eachother.
 
 	@param axis %Axis.
 */
@@ -153,9 +114,7 @@ axis_transpose(
 	Axis const axis
 ) noexcept {
 	return
-		Axis::x == axis
-		? Axis::y
-		: Axis::x
+		static_cast<Axis>(enum_cast(axis) ^ 0x03)
 	;
 }
 
@@ -192,6 +151,39 @@ vec2_axis_ref(
 		Axis::x == axis
 		? v.x
 		: v.y
+	;
+}
+
+/**
+	Get the transpose of a vector.
+
+	@param v Vector.
+*/
+inline constexpr Vec2
+vec2_transpose(
+	Vec2 const& v
+) noexcept {
+	return Vec2{
+		v.y, v.x
+	};
+}
+
+/**
+	Get an axis-placed-first vector.
+
+	@returns A copy of @a v where @a axis is in the X axis.
+	@param v Vector.
+	@param axis %Axis to place first.
+*/
+inline constexpr Vec2
+vec2_axis_first(
+	Vec2 const& v,
+	Axis const axis
+) noexcept {
+	return
+		Axis::x == axis
+		? Vec2{v.x, v.y}
+		: Vec2{v.y, v.x}
 	;
 }
 
@@ -419,24 +411,6 @@ rect_abs_quad(
 }
 
 /**
-	Construct rectangle from quad.
-
-	@note The resultant rectangle can be degenerate -- i.e., its size
-	might have negative values.
-
-	@param quad %Quad.
-*/
-inline constexpr Rect
-quad_rect(
-	Quad const& quad
-) noexcept {
-	return Rect{
-		{quad.v1.x, quad.v1.y},
-		{quad.v2.x - quad.v1.x, quad.v2.y - quad.v1.y}
-	};
-}
-
-/**
 	Check if a rectangle intersects with another rectangle.
 
 	@param a,b Rectangles to test.
@@ -461,6 +435,24 @@ rect_intersects(
 }
 
 /**
+	Construct rectangle from quad.
+
+	@note The resultant rectangle can be degenerate -- i.e., its size
+	might have negative values.
+
+	@param quad %Quad.
+*/
+inline constexpr Rect
+quad_rect(
+	Quad const& quad
+) noexcept {
+	return Rect{
+		{quad.v1.x, quad.v1.y},
+		{quad.v2.x - quad.v1.x, quad.v2.y - quad.v1.y}
+	};
+}
+
+/**
 	Check if a quad intersects with another quad.
 
 	@param a,b Quads to test.
@@ -477,6 +469,193 @@ quad_intersects(
 		a.v1.y > b.v2.y
 	);
 }
+
+/** @name Operators */ /// @{
+
+/**
+	Vector equality comparison operator.
+
+	@param lhs Left-hand side.
+	@param rhs Right-hand side.
+*/
+inline constexpr bool
+operator==(
+	Vec2 const& lhs,
+	Vec2 const& rhs
+) noexcept {
+	return
+		lhs.x == rhs.x &&
+		lhs.y == rhs.y
+	;
+}
+
+/**
+	Vector addition operator.
+
+	@param lhs Left-hand side.
+	@param rhs Right-hand side.
+*/
+inline constexpr Vec2
+operator+(
+	Vec2 const& lhs,
+	Vec2 const& rhs
+) noexcept {
+	return Vec2{
+		lhs.x + rhs.x,
+		lhs.y + rhs.y
+	};
+}
+
+/**
+	Vector addition assignment operator.
+
+	@param lhs Left-hand side.
+	@param rhs Right-hand side.
+*/
+inline /*constexpr*/ Vec2&
+operator+=(
+	Vec2& lhs,
+	Vec2 const& rhs
+) noexcept {
+	lhs.x += rhs.x;
+	lhs.y += rhs.y;
+	return lhs;
+}
+
+/**
+	Vector subtraction operator.
+
+	@param lhs Left-hand side.
+	@param rhs Right-hand side.
+*/
+inline constexpr Vec2
+operator-(
+	Vec2 const& lhs,
+	Vec2 const& rhs
+) noexcept {
+	return Vec2{
+		lhs.x - rhs.x,
+		lhs.y - rhs.y
+	};
+}
+
+/**
+	Vector subtraction assignment operator.
+
+	@param lhs Left-hand side.
+	@param rhs Right-hand side.
+*/
+inline /*constexpr*/ Vec2&
+operator-=(
+	Vec2& lhs,
+	Vec2 const& rhs
+) noexcept {
+	lhs.x -= rhs.x;
+	lhs.y -= rhs.y;
+	return lhs;
+}
+
+/**
+	Vector multiplication operator.
+
+	@param lhs Left-hand side.
+	@param rhs Right-hand side.
+*/
+inline constexpr Vec2
+operator*(
+	Vec2 const& lhs,
+	Vec2 const& rhs
+) noexcept {
+	return Vec2{
+		lhs.x * rhs.x,
+		lhs.y * rhs.y
+	};
+}
+
+/**
+	Vector multiplication assignment operator.
+
+	@param lhs Left-hand side.
+	@param rhs Right-hand side.
+*/
+inline /*constexpr*/ Vec2&
+operator*=(
+	Vec2& lhs,
+	Vec2 const& rhs
+) noexcept {
+	lhs.x *= rhs.x;
+	lhs.y *= rhs.y;
+	return lhs;
+}
+
+/**
+	Vector division operator.
+
+	@param lhs Left-hand side.
+	@param rhs Right-hand side.
+*/
+inline constexpr Vec2
+operator/(
+	Vec2 const& lhs,
+	Vec2 const& rhs
+) noexcept {
+	return Vec2{
+		lhs.x / rhs.x,
+		lhs.y / rhs.y
+	};
+}
+
+/**
+	Vector division assignment operator.
+
+	@param lhs Left-hand side.
+	@param rhs Right-hand side.
+*/
+inline /*constexpr*/ Vec2&
+operator/=(
+	Vec2& lhs,
+	Vec2 const& rhs
+) noexcept {
+	lhs.x /= rhs.x;
+	lhs.y /= rhs.y;
+	return lhs;
+}
+
+/**
+	Rectangle equality comparison operator.
+
+	@param lhs Left-hand side.
+	@param rhs Right-hand side.
+*/
+inline constexpr bool
+operator==(
+	Rect const& lhs,
+	Rect const& rhs
+) noexcept {
+	return
+		lhs.pos == rhs.pos &&
+		lhs.size == rhs.size
+	;
+}
+
+/**
+	%Quad equality comparison operator.
+
+	@param lhs Left-hand side.
+	@param rhs Right-hand side.
+*/
+inline constexpr bool
+operator==(
+	Quad const& lhs,
+	Quad const& rhs
+) noexcept {
+	return
+		lhs.v1 == rhs.v1 &&
+		lhs.v2 == rhs.v2
+	;
+}
+
+/// @} // end of name-group Operators
 
 /** @} */ // end of doc-group geometry
 
