@@ -1,4 +1,5 @@
 
+#include <Beard/utility.hpp>
 #include <Beard/ui/packing.hpp>
 #include <Beard/ui/Context.hpp>
 #include <Beard/ui/Container.hpp>
@@ -12,19 +13,31 @@ Container::~Container() noexcept = default;
 
 void
 Container::cache_geometry_impl() noexcept {
-	// TODO
+	Vec2 rs = get_geometry().get_request_size();
+	for (auto& slot : m_slots) {
+		if (slot.widget) {
+			slot.widget->cache_geometry();
+			Vec2 const& ws = slot.widget->get_geometry().get_request_size();
+			rs.width  = max_ce(rs.width , ws.width);
+			rs.height = max_ce(rs.height, ws.height);
+		}
+	}
+	if (!get_geometry().is_static()) {
+		get_geometry().set_request_size(std::move(rs));
+	}
 }
 
 void
 Container::reflow_impl(
-	Rect const& area
+	Rect const& area,
+	bool const cache
 ) noexcept {
-	ui::reflow(area, get_geometry());
+	Widget::reflow_impl(area, cache);
 	ui::reflow_slots(
 		get_geometry().get_frame(),
 		m_slots,
 		m_orientation,
-		true
+		false
 	);
 }
 

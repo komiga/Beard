@@ -101,11 +101,13 @@ protected:
 	/**
 		reflow() implementation.
 
-		Base definition generically reflows geometry.
+		Base definition generically reflows geometry. If @a cache is
+		@c true, cache_geometry() will be called before reflowing.
 	*/
 	virtual void
 	reflow_impl(
-		Rect const& area
+		Rect const& area,
+		bool const cache
 	) noexcept;
 
 	/**
@@ -309,12 +311,14 @@ public:
 		widgets.
 
 		@param area Area available to the widget.
+		@param cache Whether to cache geometry.
 	*/
 	void
 	reflow(
-		Rect const& area
+		Rect const& area,
+		bool const cache
 	) noexcept {
-		reflow_impl(area);
+		reflow_impl(area, cache);
 	}
 
 	/**

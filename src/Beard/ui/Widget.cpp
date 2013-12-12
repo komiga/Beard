@@ -19,8 +19,12 @@ Widget::cache_geometry_impl() noexcept {
 
 void
 Widget::reflow_impl(
-	Rect const& area
+	Rect const& area,
+	bool const cache
 ) noexcept {
+	if (cache) {
+		cache_geometry();
+	}
 	ui::reflow(area, get_geometry());
 }
 

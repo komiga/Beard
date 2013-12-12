@@ -143,7 +143,7 @@ reflow_slots(
 			s.area.size = vec2_transpose(s.area.size);
 		}
 		if (s.widget) {
-			s.widget->reflow(s.area);
+			s.widget->reflow(s.area, false);
 		}
 	}
 }

@@ -104,8 +104,7 @@ void
 Context::reflow() noexcept {
 	if (m_root) {
 		Rect const area{{0, 0}, m_terminal.get_size()};
-		m_root->cache_geometry();
-		m_root->reflow(area);
+		m_root->reflow(area, true);
 	}
 }
 
@@ -114,10 +113,10 @@ Context::render(
 	bool const reflow
 ) {
 	// TODO: Propagate cleared state to m_root->render()
+	if (reflow) {
+		this->reflow();
+	}
 	if (m_root) {
-		if (reflow) {
-			this->reflow();
-		}
 		m_root->render();
 	}
 	m_terminal.present();

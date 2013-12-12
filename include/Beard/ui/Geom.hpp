@@ -69,11 +69,13 @@ public:
 		Constructor with request size and modes.
 
 		@param request_size Natural size.
+		@param static_size Static size mode.
 		@param expand Expand axes.
 		@param fill Fill axes.
 	*/
 	Geom(
 		Vec2 request_size,
+		bool const static_size = false,
 		Axis const expand = Axis::none,
 		Axis const fill = Axis::none
 	)
@@ -81,6 +83,7 @@ public:
 		, m_area()
 		, m_frame()
 		, m_flags(
+			static_size ? Flags::static_size : Flags::none,
 			static_cast<Flags>(enum_cast(expand) << expand_shift),
 			static_cast<Flags>(enum_cast(fill) << fill_shift)
 		)
@@ -89,20 +92,16 @@ public:
 	/**
 		Constructor with modes.
 
+		@param static_size Static size mode.
 		@param expand Expand axes.
 		@param fill Fill axes.
 	*/
 	Geom(
-		Axis const expand,
+		bool const static_size,
+		Axis const expand = Axis::none,
 		Axis const fill = Axis::none
 	)
-		: m_request_size()
-		, m_area()
-		, m_frame()
-		, m_flags(
-			static_cast<Flags>(enum_cast(expand) << expand_shift),
-			static_cast<Flags>(enum_cast(fill) << fill_shift)
-		)
+		: Geom(Vec2(), static_size, expand, fill)
 	{}
 
 	/** Copy constructor. */

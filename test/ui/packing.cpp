@@ -68,7 +68,7 @@ operator<<(
 		<< "{\n"
 		<< "  area  = " << geom.get_area() << ",\n"
 		<< "  frame = " << geom.get_frame() << ",\n"
-		<< "  nsize = " << geom.get_request_size() << ",\n"
+		<< "  request_size = " << geom.get_request_size() << ",\n"
 		<< std::boolalpha
 		<< "  expand = " << geom.get_expand() << ",\n"
 		<< "  fill   = " << geom.get_fill()

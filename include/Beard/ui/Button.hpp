@@ -57,8 +57,9 @@ private:
 
 	void
 	reflow_impl(
-		Rect const& area
-	) noexcept;
+		Rect const& area,
+		bool const cache
+	) noexcept override;
 
 	bool
 	handle_event_impl(
@@ -85,7 +86,7 @@ public:
 			enum_combine(ui::Widget::Flags::visible),
 			context,
 			std::move(parent),
-			{{1, 1}, Axis::none, Axis::none}
+			{{1, 1}, false, Axis::none, Axis::none}
 		)
 		, signal_pressed()
 		, m_text(std::move(text))

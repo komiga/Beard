@@ -28,9 +28,10 @@ Button::cache_geometry_impl() noexcept {
 
 void
 Button::reflow_impl(
-	Rect const& area
+	Rect const& area,
+	bool const cache
 ) noexcept {
-	Widget::reflow_impl(area);
+	Widget::reflow_impl(area, cache);
 
 	auto const& geom = get_geometry();
 	auto const& fr = geom.get_frame();

@@ -50,7 +50,8 @@ private:
 
 	void
 	reflow_impl(
-		Rect const& area
+		Rect const& area,
+		bool const cache
 	) noexcept override;
 
 	void
@@ -74,7 +75,7 @@ public:
 			enum_combine(ui::Widget::Flags::visible),
 			context,
 			std::move(parent),
-			{{0, 0}, Axis::both, Axis::both}
+			{{0, 0}, true, Axis::both, Axis::both}
 		)
 		, m_orientation(orientation)
 		, m_slots(slot_count)
