@@ -3,6 +3,26 @@
 
 *Beard* is a TUI library for C++11.
 
+## Dependencies
+
+Beard uses:
+
+1. [duct++](https://github.com/komiga/duct-cpp) (HEAD)
+2. [ceformat](https://github.com/komiga/ceformat) (HEAD)
+
+See `dep/README.md` for dependency setup.
+
+## Building
+
+Beard is a compiled shared library (by default).
+
+All features support Clang 3.5+ with libc++ (SVN head). GCC is not supported
+due to the ceformat dependency. This may be alleviated in the near future, but
+Beard is currently in heavy development, so expect things to break often.
+
+Once dependencies are setup (see `dep/README.md`), the library and tests can be
+compiled using plash's standard project protocol: http://komiga.com/pp-cpp
+
 ## License
 
 *Beard* carries the MIT license, which can be found both below and in the
