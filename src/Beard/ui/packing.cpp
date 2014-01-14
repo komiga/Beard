@@ -2,7 +2,8 @@
 #include <Beard/utility.hpp>
 #include <Beard/geometry.hpp>
 #include <Beard/ui/Geom.hpp>
-#include <Beard/ui/Widget.hpp>
+#include <Beard/ui/Widget/Defs.hpp>
+#include <Beard/ui/Widget/Base.hpp>
 #include <Beard/ui/packing.hpp>
 
 namespace Beard {
@@ -71,7 +72,7 @@ reflow(
 void
 reflow_slots(
 	Rect const& area,
-	ui::slot_vector_type& slots,
+	ui::Widget::slot_vector_type& slots,
 	Axis const axis,
 	bool const cache_geometry
 ) noexcept {

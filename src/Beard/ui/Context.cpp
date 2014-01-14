@@ -2,7 +2,10 @@
 #include <Beard/detail/gr_ceformat.hpp>
 #include <Beard/ui/Defs.hpp>
 #include <Beard/ui/Context.hpp>
-#include <Beard/ui/Widget.hpp>
+#include <Beard/ui/Root.hpp>
+#include <Beard/ui/Widget/Defs.hpp>
+#include <Beard/ui/Widget/Base.hpp>
+#include <Beard/ui/Container.hpp>
 
 #include <utility>
 
@@ -28,13 +31,12 @@ Context::Context(
 	: m_terminal(std::move(term_info))
 	, m_event()
 	, m_root()
-	, m_focused()
 {}
 
 bool
 Context::push_event(
 	ui::Event const& event,
-	ui::WidgetSPtr widget
+	ui::Widget::SPtr widget
 ) noexcept {
 	while (widget) {
 		if (widget->handle_event(event)) {
@@ -43,6 +45,94 @@ Context::push_event(
 		widget = widget->get_parent();
 	}
 	return false;
+}
+
+// update queue
+
+ui::UpdateActions
+Context::run_actions(
+	ui::Widget::SPtr widget,
+	ui::UpdateActions const mask
+) {
+	auto actions = widget->get_queued_actions();
+	if (
+		enum_bitand(actions, ui::UpdateActions::flag_parent) &&
+		widget->has_parent()
+	) {
+		widget = widget->get_parent();
+	}
+	actions = static_cast<ui::UpdateActions>(enum_bitand(actions, mask));
+	if (enum_bitand(actions, ui::UpdateActions::reflow)) {
+		widget->reflow(
+			(widget == m_root)
+				? Rect{{0, 0}, m_terminal.get_size()}
+				: widget->get_geometry().get_area()
+			,
+			true
+		);
+	}
+	if (enum_bitand(actions, ui::UpdateActions::render)) {
+		m_terminal.clear_back(widget->get_geometry().get_area());
+		widget->render(m_terminal);
+	}
+	return actions;
+}
+
+void
+Context::run_all_actions() {
+	auto const sub = static_cast<ui::UpdateActions>(
+		~ enum_cast(m_root->get_queued_actions())
+	);
+	if (enum_bitand(sub, ui::UpdateActions::reflow)) {
+		for (auto wp : m_action_queue) {
+			if (!wp.expired()) {
+				run_actions(wp.lock(), ui::UpdateActions::reflow);
+			}
+		}
+	} else {
+		run_actions(m_root, ui::UpdateActions::reflow);
+	}
+	if (enum_bitand(sub, ui::UpdateActions::render)) {
+		for (auto wp : m_action_queue) {
+			if (!wp.expired()) {
+				run_actions(wp.lock(), ui::UpdateActions::render);
+			}
+		}
+	} else {
+		run_actions(m_root, ui::UpdateActions::render);
+	}
+	clear_actions();
+}
+
+void
+Context::enqueue_widget(
+	ui::Widget::SPtr const& widget
+) {
+	if (!widget->is_action_queued()) {
+		m_action_queue.emplace(widget);
+	}
+}
+
+void
+Context::dequeue_widget(
+	ui::Widget::SPtr const& widget
+) {
+	auto it = m_action_queue.find(widget);
+	if (m_action_queue.cend() != it) {
+		m_action_queue.erase(it);
+	}
+}
+
+void
+Context::clear_actions() {
+	action_queue_set_type q{std::move(m_action_queue)};
+	m_action_queue.clear();
+	for (auto& wp : q) {
+		auto widget = wp.lock();
+		if (widget) {
+			widget->clear_actions();
+		}
+	}
 }
 
 // operations
@@ -65,12 +155,15 @@ Context::open(
 
 void
 Context::close() noexcept {
+	clear_actions();
 	m_terminal.close();
 }
 
 static KeyInputMatch const
-s_kim_quit[]{
-	{KeyMod::ctrl, KeyCode::none, 'c', false}
+s_kim_root[]{
+	{KeyMod::shift, KeyCode::none, '\t', false},
+	{KeyMod::none , KeyCode::none, '\t', false},
+	{KeyMod::ctrl , KeyCode::none,  'c', false},
 };
 
 bool
@@ -86,10 +179,22 @@ Context::update(
 	case tty::EventType::key_input:
 		m_event.type = ui::EventType::key_input;
 		m_event.key_input = tty_event.key_input;
-		if (!push_event(m_event, get_focused())) {
+		if (!push_event(m_event, get_root()->get_focus())) {
 			// TODO: Remove ^C hack and add handlers
-			if (key_input_match(tty_event.key_input, s_kim_quit)) {
-				return true;
+			auto const kim = key_input_match(m_event.key_input, s_kim_root);
+			if (kim) {
+				switch (kim->cp) {
+				case '\t':
+					get_root()->focus_dir(
+						(KeyMod::shift == m_event.key_input.mod)
+						? ui::FocusDir::prev
+						: ui::FocusDir::next
+					);
+					break;
+
+				case 'c':
+					return true;
+				}
 			}
 		}
 		break;
@@ -97,28 +202,31 @@ Context::update(
 	case tty::EventType::none:
 		break;
 	}
+
+	if (!m_action_queue.empty()) {
+		run_all_actions();
+		m_terminal.present();
+	}
 	return false;
 }
 
 void
 Context::reflow() noexcept {
-	if (m_root) {
-		Rect const area{{0, 0}, m_terminal.get_size()};
-		m_root->reflow(area, true);
-	}
+	Rect const area{{0, 0}, m_terminal.get_size()};
+	m_root->reflow(area, true);
 }
 
 void
 Context::render(
 	bool const reflow
 ) {
-	// TODO: Propagate cleared state to m_root->render()
-	if (reflow) {
-		this->reflow();
-	}
-	if (m_root) {
-		m_root->render();
-	}
+	m_root->queue_actions(enum_combine(
+		ui::UpdateActions::render,
+		reflow
+			? ui::UpdateActions::reflow
+			: ui::UpdateActions::none
+	));
+	run_all_actions();
 	m_terminal.present();
 }
 

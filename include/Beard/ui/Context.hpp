@@ -11,8 +11,10 @@ see @ref index or the accompanying LICENSE file for full text.
 #define BEARD_UI_CONTEXT_HPP_
 
 #include <Beard/config.hpp>
+#include <Beard/aux.hpp>
 #include <Beard/tty/Terminal.hpp>
 #include <Beard/ui/Defs.hpp>
+#include <Beard/ui/Widget/Defs.hpp>
 
 #include <utility>
 
@@ -31,12 +33,19 @@ class Context;
 	UI context.
 */
 class Context final {
+	friend class ui::Widget::Base;
+
 private:
+	using action_queue_set_type = aux::set<
+		ui::Widget::WPtr,
+		aux::owner_less<ui::Widget::WPtr>
+	>;
+
 	tty::Terminal m_terminal;
 	ui::Event m_event;
 
-	ui::WidgetSPtr m_root;
-	ui::WidgetWPtr m_focused;
+	action_queue_set_type m_action_queue;
+	ui::RootSPtr m_root;
 
 	Context(Context const&) = delete;
 	Context& operator=(Context const&) = delete;
@@ -44,7 +53,7 @@ private:
 	bool
 	push_event(
 		ui::Event const& event,
-		ui::WidgetSPtr widget
+		ui::Widget::SPtr widget
 	) noexcept;
 
 public:
@@ -91,47 +100,23 @@ public:
 	}
 
 	/**
-		Set root widget.
+		Set root.
 
-		@param root New root widget.
+		@param root New root.
 	*/
 	void
 	set_root(
-		ui::WidgetSPtr root
+		ui::RootSPtr root
 	) noexcept {
 		m_root = std::move(root);
 	}
 
 	/**
-		Get root widget (mutable).
+		Get root.
 	*/
-	ui::WidgetSPtr&
-	get_root() noexcept {
-		return m_root;
-	}
-
-	/**
-		Get root widget.
-	*/
-	ui::WidgetSPtr const&
+	ui::RootSPtr const&
 	get_root() const noexcept {
 		return m_root;
-	}
-
-	/**
-		Get focused widget.
-	*/
-	ui::WidgetSPtr
-	get_focused() noexcept {
-		return m_focused.lock();
-	}
-
-	/**
-		Check if there is a focused widget.
-	*/
-	bool
-	has_focused() const noexcept {
-		return !m_focused.expired();
 	}
 /// @}
 
@@ -180,6 +165,35 @@ public:
 	render(
 		bool const reflow
 	);
+/// @}
+
+/** @name Update queue */ /// @{
+private:
+	ui::UpdateActions
+	run_actions(
+		ui::Widget::SPtr widget,
+		ui::UpdateActions const mask
+	);
+
+	void
+	run_all_actions();
+
+	void
+	enqueue_widget(
+		ui::Widget::SPtr const& widget
+	);
+
+	void
+	dequeue_widget(
+		ui::Widget::SPtr const& widget
+	);
+
+public:
+	/**
+		Unqueue and clear all update actions.
+	*/
+	void
+	clear_actions();
 /// @}
 };
 

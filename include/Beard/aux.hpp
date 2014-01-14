@@ -12,10 +12,14 @@ see @ref index or the accompanying LICENSE file for full text.
 
 #include <Beard/config.hpp>
 
+#include <memory>
 #include <string>
 #include <vector>
 #include <forward_list>
+#include <map>
 #include <unordered_map>
+#include <set>
+#include <unordered_set>
 
 namespace Beard {
 namespace aux {
@@ -28,6 +32,31 @@ namespace aux {
 	@addtogroup aux
 	@{
 */
+
+/**
+	@c std::shared_ptr<T>.
+*/
+template<
+	typename T
+>
+using shared_ptr = std::shared_ptr<T>;
+
+/**
+	@c std::shared_ptr<T>.
+*/
+template<
+	typename T
+>
+using weak_ptr = std::weak_ptr<T>;
+
+/** Alias for @c std::make_shared(). */
+using std::make_shared;
+
+/** Alias for @c std::owner_less<T>. */
+using std::owner_less;
+
+/** Alias for @c std::enable_shared_from_this<T>. */
+using std::enable_shared_from_this;
 
 /**
 	@c std::basic_string<CharT, Traits>.
@@ -67,6 +96,20 @@ using forward_list
 >;
 
 /**
+	@c std::multimap<Key, T, Compare>.
+*/
+template<
+	typename Key,
+	typename T,
+	class Compare = std::less<Key>
+>
+using multimap
+= std::multimap<
+	Key, T, Compare,
+	BEARD_AUX_ALLOCATOR<std::pair<Key const, T> >
+>;
+
+/**
 	@c std::unordered_map<Key, T, Hash, KeyEqual>.
 */
 template<
@@ -79,6 +122,33 @@ using unordered_map
 = std::unordered_map<
 	Key, T, Hash, KeyEqual,
 	BEARD_AUX_ALLOCATOR<std::pair<Key const, T> >
+>;
+
+/**
+	@c std::unordered_set<Key, Hash, KeyEqual>.
+*/
+template<
+	typename Key,
+	class Hash = std::hash<Key>,
+	class KeyEqual = std::equal_to<Key>
+>
+using unordered_set
+= std::unordered_set<
+	Key, Hash, KeyEqual,
+	BEARD_AUX_ALLOCATOR<Key>
+>;
+
+/**
+	@c std::set<Key, Compare>.
+*/
+template<
+	typename Key,
+	class Compare = std::equal_to<Key>
+>
+using set
+= std::set<
+	Key, Compare,
+	BEARD_AUX_ALLOCATOR<Key>
 >;
 
 /** @} */ // end of doc-group aux

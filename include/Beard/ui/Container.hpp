@@ -15,7 +15,9 @@ see @ref index or the accompanying LICENSE file for full text.
 #include <Beard/utility.hpp>
 #include <Beard/geometry.hpp>
 #include <Beard/ui/Defs.hpp>
-#include <Beard/ui/Widget.hpp>
+#include <Beard/ui/Widget/Defs.hpp>
+#include <Beard/ui/Widget/Base.hpp>
+#include <Beard/ui/ProtoSlotContainer.hpp>
 
 #include <utility>
 #include <memory>
@@ -35,27 +37,20 @@ class Container;
 	%Widget container.
 */
 class Container final
-	: public ui::Widget
+	: public ui::ProtoSlotContainer
 {
 private:
-	Axis m_orientation;
-	ui::slot_vector_type m_slots;
+	using base_type = ui::ProtoSlotContainer;
+
+private:
+	enum class ctor_priv {};
 
 	Container() noexcept = delete;
 	Container(Container const&) = delete;
 	Container& operator=(Container const&) = delete;
 
-	void
-	cache_geometry_impl() noexcept override;
-
-	void
-	reflow_impl(
-		Rect const& area,
-		bool const cache
-	) noexcept override;
-
-	void
-	render_impl() noexcept override;
+	ui::Widget::type_info const&
+	get_type_info_impl() const noexcept override;
 
 public:
 /** @name Constructors and destructor */ /// @{
@@ -65,20 +60,20 @@ public:
 	/** @cond INTERNAL */
 	/* Required for visibility in make_shared; do not use directly. */
 	Container(
-		ui::Context& context,
+		ctor_priv const,
+		ui::RootWPtr&& root,
 		Axis const orientation,
 		std::size_t const slot_count,
-		ui::WidgetWPtr&& parent
+		ui::Widget::WPtr&& parent
 	) noexcept
-		: Widget(
-			ui::WidgetType::Container,
+		: base_type(
+			std::move(root),
 			enum_combine(ui::Widget::Flags::visible),
-			context,
+			{{0, 0}, true, Axis::both, Axis::both},
 			std::move(parent),
-			{{0, 0}, true, Axis::both, Axis::both}
+			orientation,
+			slot_count
 		)
-		, m_orientation(orientation)
-		, m_slots(slot_count)
 	{}
 	/** @endcond */ // INTERNAL
 
@@ -88,20 +83,21 @@ public:
 		@throws std::bad_alloc
 		If allocation fails.
 
-		@param context Context.
+		@param root %Root.
 		@param orientation Orientation.
 		@param slot_count Number of slots to reserve.
 		@param parent Parent.
 	*/
-	static std::shared_ptr<ui::Container>
+	static aux::shared_ptr<ui::Container>
 	make(
-		ui::Context& context,
+		ui::RootWPtr root,
 		Axis const orientation,
 		std::size_t const slot_count = 0u,
-		ui::WidgetWPtr parent = ui::WidgetWPtr()
+		ui::Widget::WPtr parent = ui::Widget::WPtr()
 	) {
-		return std::make_shared<ui::Container>(
-			context, orientation, slot_count, std::move(parent)
+		return aux::make_shared<ui::Container>(
+			ctor_priv{},
+			std::move(root), orientation, slot_count, std::move(parent)
 		);
 	}
 
@@ -112,109 +108,6 @@ public:
 /** @name Operators */ /// @{
 	/** Move assignment operator. */
 	Container& operator=(Container&&) = default;
-/// @}
-
-/** @name Properties */ /// @{
-	/**
-		Set orientation.
-
-		@param orientation Orientation.
-	*/
-	void
-	set_orientation(
-		Axis const orientation
-	) noexcept {
-		m_orientation = orientation;
-	}
-
-	/**
-		Get orientation.
-	*/
-	Axis
-	get_orientation() const noexcept {
-		return m_orientation;
-	}
-
-	/**
-		Get slots (mutable).
-	*/
-	ui::slot_vector_type&
-	get_slots() noexcept {
-		return m_slots;
-	}
-
-	/**
-		Get slots.
-	*/
-	ui::slot_vector_type const&
-	get_slots() const noexcept {
-		return m_slots;
-	}
-
-	/**
-		Get slot count.
-	*/
-	ui::slot_vector_type::size_type
-	get_slot_count() const noexcept {
-		return m_slots.size();
-	}
-/// @}
-
-/** @name Slots */ /// @{
-	/**
-		Remove all slots.
-	*/
-	void
-	clear() {
-		m_slots.clear();
-	}
-
-	/**
-		Set slot widget by index.
-
-		@throws std::out_of_range
-		If @a idx is out of bounds.
-
-		@param idx %Slot index.
-		@param widget %Widget.
-	*/
-	void
-	set_slot_widget(
-		ui::slot_vector_type::size_type const idx,
-		ui::WidgetSPtr widget
-	) {
-		m_slots.at(idx).widget = std::move(widget);
-	}
-
-	/**
-		Get slot widget by index.
-
-		@throws std::out_of_range
-		If @a idx is out of bounds.
-
-		@param idx %Slot index.
-	*/
-	ui::WidgetSPtr
-	get_slot_widget(
-		ui::slot_vector_type::size_type const idx
-	) {
-		return m_slots.at(idx).widget;
-	}
-
-	/**
-		Add a slot to the end of the container.
-
-		@param widget %Widget to add.
-	*/
-	void
-	push_back(
-		ui::WidgetSPtr widget
-	) {
-		if (widget) {
-			widget->set_parent(this->shared_from_this());
-		}
-		m_slots.push_back(ui::Slot{std::move(widget), {}});
-	}
 /// @}
 };
 

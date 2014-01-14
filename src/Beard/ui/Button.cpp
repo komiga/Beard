@@ -3,17 +3,35 @@
 #include <Beard/keys.hpp>
 #include <Beard/geometry.hpp>
 #include <Beard/tty/Defs.hpp>
-#include <Beard/ui/Context.hpp>
+#include <Beard/tty/Terminal.hpp>
+#include <Beard/ui/Root.hpp>
 #include <Beard/ui/Button.hpp>
+
+#include <iostream>
 
 namespace Beard {
 namespace ui {
 
 // class Button implementation
 
+namespace {
+static ui::Widget::type_info const
+s_type_info{
+	ui::Widget::Type::Button,
+	enum_combine(
+		ui::Widget::TypeFlags::focusable
+	)
+};
+} // anonymous namespace
+
 Button::~Button() noexcept = default;
 
 // implementation
+
+ui::Widget::type_info const&
+Button::get_type_info_impl() const noexcept {
+	return s_type_info;
+}
 
 void
 Button::cache_geometry_impl() noexcept {
@@ -31,7 +49,7 @@ Button::reflow_impl(
 	Rect const& area,
 	bool const cache
 ) noexcept {
-	Widget::reflow_impl(area, cache);
+	base_type::reflow_impl(area, cache);
 
 	auto const& geom = get_geometry();
 	auto const& fr = geom.get_frame();
@@ -66,7 +84,11 @@ Button::handle_event_impl(
 	switch (event.type) {
 	case ui::EventType::key_input:
 		if (key_input_match(event.key_input, s_kim_pressed)) {
-			signal_pressed();
+			signal_pressed(
+				std::move(std::static_pointer_cast<ui::Button>(
+					shared_from_this()
+				))
+			);
 			return true;
 		}
 		break;
@@ -78,16 +100,35 @@ Button::handle_event_impl(
 }
 
 void
-Button::render_impl() noexcept {
-	auto& term = get_context().get_terminal();
+Button::render_impl(
+	tty::Terminal& terminal
+) noexcept {
 	auto const& frame = get_geometry().get_frame();
-	term.put_sequence(
+	terminal.put_sequence(
 		m_gc_pos.x + (static_cast<signed>(m_text.size()) < frame.size.width),
 		m_gc_pos.y,
-		tty::Sequence{m_text, static_cast<unsigned>(max_ce(0, frame.size.width))},
+		tty::Sequence{
+			m_text,
+			static_cast<unsigned>(max_ce(0, frame.size.width))
+		},
 		tty::Color::term_default,
-		tty::Color::term_default | tty::Attr::inverted
+		tty::Color::term_default |
+		is_focused() ? tty::Attr::inverted : 0
 	);
+}
+
+// properties
+
+void
+Button::set_text(
+	String text
+) {
+	m_text.assign(std::move(text));
+	queue_actions(enum_combine(
+		ui::UpdateActions::flag_parent,
+		ui::UpdateActions::reflow,
+		ui::UpdateActions::render
+	));
 }
 
 } // namespace ui

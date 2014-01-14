@@ -13,6 +13,7 @@ see @ref index or the accompanying LICENSE file for full text.
 #include <Beard/config.hpp>
 #include <Beard/geometry.hpp>
 #include <Beard/ui/Defs.hpp>
+#include <Beard/ui/Widget/Defs.hpp>
 #include <Beard/ui/Geom.hpp>
 
 namespace Beard {
@@ -48,7 +49,7 @@ reflow(
 void
 reflow_slots(
 	Rect const& area,
-	ui::slot_vector_type& slots,
+	ui::Widget::slot_vector_type& slots,
 	Axis const axis,
 	bool const cache_geometry
 ) noexcept;

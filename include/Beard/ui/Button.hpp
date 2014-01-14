@@ -16,7 +16,7 @@ see @ref index or the accompanying LICENSE file for full text.
 #include <Beard/geometry.hpp>
 #include <Beard/ui/Defs.hpp>
 #include <Beard/ui/Signal.hpp>
-#include <Beard/ui/Widget.hpp>
+#include <Beard/ui/Widget/Base.hpp>
 
 #include <utility>
 #include <memory>
@@ -36,21 +36,29 @@ class Button;
 	%Widget button.
 */
 class Button final
-	: public ui::Widget
+	: public ui::Widget::Base
 {
+private:
+	using base_type = ui::Widget::Base;
+
 public:
 	/**
 		Signal for the button "pressed" event.
 	*/
-	ui::Signal<void()> signal_pressed;
+	ui::Signal<void(aux::shared_ptr<ui::Button>)> signal_pressed;
 
 private:
+	enum class ctor_priv {};
+
 	Vec2 m_gc_pos{0, 0};
 	String m_text;
 
 	Button() noexcept = delete;
 	Button(Button const&) = delete;
 	Button& operator=(Button const&) = delete;
+
+	ui::Widget::type_info const&
+	get_type_info_impl() const noexcept override;
 
 	void
 	cache_geometry_impl() noexcept override;
@@ -67,7 +75,9 @@ private:
 	) noexcept override;
 
 	void
-	render_impl() noexcept override;
+	render_impl(
+		tty::Terminal& terminal
+	) noexcept override;
 
 public:
 /** @name Constructors and destructor */ /// @{
@@ -77,16 +87,18 @@ public:
 	/** @cond INTERNAL */
 	/* Required for visibility in make_shared; do not use directly. */
 	Button(
-		ui::Context& context,
+		ctor_priv const,
+		ui::RootWPtr&& root,
 		String text,
-		ui::WidgetWPtr&& parent
+		ui::Widget::WPtr&& parent
 	) noexcept
-		: Widget(
-			ui::WidgetType::Button,
-			enum_combine(ui::Widget::Flags::visible),
-			context,
-			std::move(parent),
-			{{1, 1}, false, Axis::none, Axis::none}
+		: base_type(
+			std::move(root),
+			enum_combine(
+				ui::Widget::Flags::visible
+			),
+			{{1, 1}, false, Axis::none, Axis::none},
+			std::move(parent)
 		)
 		, signal_pressed()
 		, m_text(std::move(text))
@@ -99,19 +111,24 @@ public:
 		@throws std::bad_alloc
 		If allocation fails.
 
-		@param context Context.
-		@param parent Parent.
+		@param root %Root.
 		@param text Text.
+		@param focus_index Focus index.
+		@param parent Parent.
 	*/
 	static std::shared_ptr<ui::Button>
 	make(
-		ui::Context& context,
+		ui::RootWPtr root,
 		String text,
-		ui::WidgetWPtr parent = ui::WidgetWPtr()
+		ui::focus_index_type const focus_index = ui::focus_index_lazy,
+		ui::Widget::WPtr parent = ui::Widget::WPtr()
 	) {
-		return std::make_shared<ui::Button>(
-			context, std::move(text), std::move(parent)
+		auto p = std::make_shared<ui::Button>(
+			ctor_priv{},
+			std::move(root), std::move(text), std::move(parent)
 		);
+		p->set_focus_index(focus_index);
+		return p;
 	}
 
 	/** Move constructor. */
@@ -132,10 +149,7 @@ public:
 	void
 	set_text(
 		String text
-	) noexcept {
-		// TODO: Trigger/queue re-render
-		m_text.assign(std::move(text));
-	}
+	);
 
 	/**
 		Get text.

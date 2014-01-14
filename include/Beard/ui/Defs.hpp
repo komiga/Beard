@@ -23,9 +23,9 @@ namespace Beard {
 namespace ui {
 
 // Forward declarations
-class Widget; // external
-enum class WidgetType : unsigned;
-struct Slot;
+class Root; // external
+enum class FocusDir : unsigned;
+enum class UpdateActions : unsigned;
 enum class EventType : unsigned;
 struct Event;
 
@@ -35,53 +35,80 @@ struct Event;
 */
 
 /**
-	%Widget shared pointer.
+	Shared root pointer.
 */
-using WidgetSPtr = std::shared_ptr<ui::Widget>;
+using RootSPtr = aux::shared_ptr<ui::Root>;
 
 /**
-	%Widget weak pointer.
+	Weak root pointer.
 */
-using WidgetWPtr = std::weak_ptr<ui::Widget>;
+using RootWPtr = aux::weak_ptr<ui::Root>;
 
-// TODO: Userspace
 /**
-	%Widget type.
-*/
-enum class WidgetType : unsigned {
-	/** ui::Container. */
-	Container = 0u,
-	/** ui::Button. */
-	Button,
+	Focus index.
 
-/** @cond INTERNAL */
-	LAST
-/** @endcond */
+	@note Only @c focus_index_none will be ignored in focus maps.
+*/
+using focus_index_type = signed;
+
+enum : focus_index_type {
+	/** Non-participating focus index. */
+	focus_index_none = focus_index_type(-1),
+	/** Default lazy index for focusable widgets. */
+	focus_index_lazy = focus_index_type(0)
 };
 
 /**
-	%Widget slot.
+	Focus direction.
 */
-struct Slot final {
-/** @name Properties */ /// @{
-	/** %Widget. */
-	ui::WidgetSPtr widget;
-
-	/** Calculated area. */
-	Rect area;
-/// @}
+enum class FocusDir : unsigned {
+	/** Previous widget. */
+	prev,
+	/** Next widget. */
+	next
 };
 
 /**
-	%Slot vector.
+	%Widget context-update actions.
+
+	%Widget actions to perform on a context update.
 */
-using slot_vector_type = aux::vector<ui::Slot>;
+enum class UpdateActions : unsigned {
+	/**
+		No actions.
+	*/
+	none			= 0x00,
+	/**
+		Whether to perform actions on the parent.
+	*/
+	flag_parent		= 1u << 0,
+	/**
+		Reflow.
+	*/
+	reflow			= 1u << 1,
+	/**
+		Render (after reflowing, if set).
+	*/
+	render			= 1u << 2,
+
+	/**
+		Mask with all actions.
+	*/
+	mask_all
+		= reflow
+		| render
+	,
+};
 
 /**
 	%Event type.
+
+	@sa ui::Event
 */
 enum class EventType : unsigned {
+	/** No-event type. */
 	none = 0u,
+	/** Key input event type. */
 	key_input,
 };
 

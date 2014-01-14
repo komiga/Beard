@@ -7,6 +7,7 @@
 #include <Beard/tty/Terminal.hpp>
 #include <Beard/ui/Geom.hpp>
 #include <Beard/ui/Context.hpp>
+#include <Beard/ui/Root.hpp>
 #include <Beard/ui/Container.hpp>
 #include <Beard/ui/Button.hpp>
 #include <Beard/ui/packing.hpp>
@@ -113,33 +114,42 @@ main(
 		report_error(ex);
 	}
 
-	auto root = ui::Container::make(ctx, Axis::vertical);
+	auto root = ui::Root::make(ctx, Axis::vertical);
 	ctx.set_root(root);
 
-	auto hcont1 = ui::Container::make(ctx, Axis::horizontal);
+	auto hcont1 = ui::Container::make(root, Axis::horizontal);
 	{
-		auto btn = ui::Button::make(ctx, "button text");
+		auto btn = ui::Button::make(root, "button text");
 		btn->get_geometry().set_expand(Axis::both);
 		hcont1->push_back(std::move(btn));
 
-		btn = ui::Button::make(ctx, "abacabadabacaba");
+		btn = ui::Button::make(root, "abacabadabacaba");
 		hcont1->push_back(std::move(btn));
 
-		btn = ui::Button::make(ctx, "xyzzyzzyx");
+		btn = ui::Button::make(root, "xyzzyzzyx");
 		btn->get_geometry().set_sizing(Axis::both, Axis::both);
+		btn->signal_pressed.bind([](
+			aux::shared_ptr<ui::Button> b
+		) {
+			if ('x' == b->get_text()[0u]) {
+				b->set_text("blblblblblblblblblbl");
+			} else {
+				b->set_text("xyzzyzzyx");
+			}
+		});
 		hcont1->push_back(std::move(btn));
 	}
 
-	auto hcont2 = ui::Container::make(ctx, Axis::horizontal);
+	auto hcont2 = ui::Container::make(root, Axis::horizontal);
 	hcont2->get_geometry().set_request_size(Vec2{0, 3});
 	hcont2->get_geometry().set_static(true);
 	hcont2->get_geometry().set_sizing(Axis::x, Axis::x);
 	{
-		hcont2->push_back(ui::Button::make(ctx, "[a]"));
-		hcont2->push_back(ui::Button::make(ctx, "[b]"));
+		hcont2->push_back(ui::Button::make(root, "[a]"));
+		hcont2->push_back(ui::Button::make(root, "[b]"));
 		hcont2->push_back(nullptr);
-		hcont2->push_back(ui::Button::make(ctx, "[c]"));
-		hcont2->push_back(ui::Button::make(ctx, "[d]"));
+		hcont2->push_back(ui::Button::make(root, "[c]"));
+		hcont2->push_back(ui::Button::make(root, "[d]"));
 		for (auto& s : hcont2->get_slots()) {
 			if (s.widget) {
 				s.widget->get_geometry().set_sizing(Axis::both, Axis::none);
