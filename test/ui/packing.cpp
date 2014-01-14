@@ -9,6 +9,7 @@
 #include <Beard/ui/Context.hpp>
 #include <Beard/ui/Root.hpp>
 #include <Beard/ui/Container.hpp>
+#include <Beard/ui/Label.hpp>
 #include <Beard/ui/Button.hpp>
 #include <Beard/ui/packing.hpp>
 
@@ -123,8 +124,7 @@ main(
 		btn->get_geometry().set_expand(Axis::both);
 		hcont1->push_back(std::move(btn));
 
-		btn = ui::Button::make(root, "abacabadabacaba");
-		hcont1->push_back(std::move(btn));
+		hcont1->push_back(ui::Label::make(root, "abacabadabacaba"));
 
 		btn = ui::Button::make(root, "xyzzyzzyx");
 		btn->get_geometry().set_sizing(Axis::both, Axis::both);

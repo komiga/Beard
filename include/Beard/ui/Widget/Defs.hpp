@@ -76,6 +76,8 @@ enum class Type : unsigned {
 	Root = STANDARD_BASE,
 	/** ui::Container. */
 	Container,
+	/** ui::Label. */
+	Label,
 	/** ui::Button. */
 	Button,
 /** @} */
