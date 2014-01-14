@@ -5,32 +5,6 @@
 namespace Beard {
 namespace ui {
 
-namespace {
-static tty::UTF8Block const
-s_frame_single[]{
-	{U'┏'},
-	{U'━'},
-	{U'┓'},
-	{U'┃'},
-	{U'┛'},
-	{U'━'},
-	{U'┗'},
-	{U'┃'}
-};
-
-static tty::UTF8Block const
-s_frame_double[]{
-	{U'╔'},
-	{U'═'},
-	{U'╗'},
-	{U'║'},
-	{U'╝'},
-	{U'═'},
-	{U'╚'},
-	{U'║'}
-};
-} // anonymous namespace
-
 void
 geom_debug_render(
 	tty::Terminal& term,
@@ -40,7 +14,10 @@ geom_debug_render(
 ) noexcept {
 	term.put_rect(
 		geometry.get_area(),
-		s_frame_single,
+		focused
+			? tty::s_frame_single_heavy
+			: tty::s_frame_single
+		,
 		focused
 			? tty::Color::white
 			: tty::Color::red
@@ -49,7 +26,10 @@ geom_debug_render(
 	);
 	term.put_rect(
 		geometry.get_frame(),
-		s_frame_single,
+		focused
+			? tty::s_frame_single_heavy
+			: tty::s_frame_single
+		,
 		focused
 			? tty::Color::white
 			: tty::Color::blue

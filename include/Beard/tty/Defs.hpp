@@ -384,7 +384,7 @@ make_cell(
 	};
 }
 
-/** @name Pre-defined cells */ /// @{
+/** @name Pre-defined cells and frames */ /// @{
 
 static constexpr Cell const
 	/**
@@ -395,6 +395,48 @@ static constexpr Cell const
 		tty::Color::term_default,
 		tty::Color::term_default
 	)
+;
+
+static tty::UTF8Block const
+	/**
+		Single-lined frame.
+	*/
+	s_frame_single[]{
+		{U'┌'},
+		{U'─'},
+		{U'┐'},
+		{U'│'},
+		{U'┘'},
+		{U'─'},
+		{U'└'},
+		{U'│'}
+	},
+	/**
+		Heavy single-lined frame.
+	*/
+	s_frame_single_heavy[]{
+		{U'┏'},
+		{U'━'},
+		{U'┓'},
+		{U'┃'},
+		{U'┛'},
+		{U'━'},
+		{U'┗'},
+		{U'┃'}
+	},
+	/**
+		Double-lined frame.
+	*/
+	s_frame_double[]{
+		{U'╔'},
+		{U'═'},
+		{U'╗'},
+		{U'║'},
+		{U'╝'},
+		{U'═'},
+		{U'╚'},
+		{U'║'}
+	}
 ;
 
 /// @}
