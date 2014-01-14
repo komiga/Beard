@@ -41,7 +41,10 @@ geom_debug_render(
 	term.put_rect(
 		geometry.get_area(),
 		s_frame_single,
-		tty::Color::red,
+		focused
+			? tty::Color::white
+			: tty::Color::red
+		,
 		attr_bg
 	);
 	term.put_rect(

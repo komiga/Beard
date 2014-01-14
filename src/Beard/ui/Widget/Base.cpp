@@ -51,6 +51,7 @@ Base::render(
 	ui::geom_debug_render(
 		terminal,
 		get_geometry(),
+		tty::Color::term_default,
 		is_focused()
 	);
 	render_impl(terminal);
