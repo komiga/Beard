@@ -35,7 +35,8 @@ void
 geom_debug_render(
 	tty::Terminal& term,
 	ui::Geom const& geometry,
-	uint16_t const attr_bg
+	uint16_t const attr_bg,
+	bool const focused
 ) noexcept {
 	term.put_rect(
 		geometry.get_area(),
@@ -46,7 +47,10 @@ geom_debug_render(
 	term.put_rect(
 		geometry.get_frame(),
 		s_frame_single,
-		tty::Color::blue,
+		focused
+			? tty::Color::white
+			: tty::Color::blue
+		,
 		attr_bg
 	);
 }

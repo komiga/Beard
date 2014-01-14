@@ -32,12 +32,14 @@ namespace ui {
 	@param term %Terminal.
 	@param geometry Geometry.
 	@param attr_bg Background attributes.
+	@param focused Whether to highlight the frame.
 */
 void
 geom_debug_render(
 	tty::Terminal& term,
 	ui::Geom const& geometry,
-	uint16_t const attr_bg = tty::Color::term_default
+	uint16_t const attr_bg = tty::Color::term_default,
+	bool const focused = false
 ) noexcept;
 
 /** @} */ // end of doc-group ui
