@@ -126,10 +126,12 @@ public:
 	>
 	return_type
 	operator()(
-		CArgP... args
+		CArgP&&... args
 	) {
 		if (is_bound()) {
 			return m_func(std::forward<CArgP>(args)...);
+		} else {
+			return return_type();
 		}
 	}
 /// @}
