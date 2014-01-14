@@ -108,9 +108,7 @@ void
 Context::enqueue_widget(
 	ui::Widget::SPtr const& widget
 ) {
-	if (!widget->is_action_queued()) {
-		m_action_queue.emplace(widget);
-	}
+	m_action_queue.emplace(widget);
 }
 
 void
@@ -125,14 +123,13 @@ Context::dequeue_widget(
 
 void
 Context::clear_actions() {
-	action_queue_set_type q{std::move(m_action_queue)};
-	m_action_queue.clear();
-	for (auto& wp : q) {
+	for (auto& wp : m_action_queue) {
 		auto widget = wp.lock();
 		if (widget) {
-			widget->clear_actions();
+			widget->clear_actions(false);
 		}
 	}
+	m_action_queue.clear();
 }
 
 // operations

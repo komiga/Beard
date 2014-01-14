@@ -33,7 +33,7 @@ class Button;
 */
 
 /**
-	%Widget button.
+	%Button widget.
 */
 class Button final
 	: public ui::Widget::Base

@@ -99,8 +99,12 @@ Base::queue_actions(
 }
 
 void
-Base::clear_actions() {
-	get_root()->get_context().dequeue_widget(shared_from_this());
+Base::clear_actions(
+	bool const dequeue
+) {
+	if (dequeue) {
+		get_root()->get_context().dequeue_widget(shared_from_this());
+	}
 	m_flags.remove(mask_ua);
 	set_action_queued(false);
 }

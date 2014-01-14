@@ -60,7 +60,7 @@ private:
 		shift_ua = 4u
 	};
 
-	constexpr static ui::Widget::Flags const
+	static constexpr ui::Widget::Flags const
 	mask_ua = static_cast<ui::Widget::Flags>(0x07 << shift_ua);
 
 	ui::RootWPtr m_root;
@@ -393,9 +393,13 @@ public:
 		Clear all update actions.
 
 		@note This will also clear the @c queued_action flag.
+
+		@param dequeue Whether to dequeue the widget from its context.
 	*/
 	void
-	clear_actions();
+	clear_actions(
+		bool const dequeue = true
+	);
 
 	/**
 		Cache dynamic geometry.
