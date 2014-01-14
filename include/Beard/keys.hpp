@@ -138,7 +138,7 @@ key_input_match(
 			match.mod_any ||
 			data.mod == match.mod
 		) && (
-			data.code == match.code ||
+			data.code == match.code &&
 			data.cp == match.cp
 		)
 	;
