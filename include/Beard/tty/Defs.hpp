@@ -226,7 +226,7 @@ struct UTF8Block final {
 		@param cp Code point to decode.
 	*/
 	UTF8Block(
-		duct::char32 const cp
+		char32 const cp
 	) noexcept
 		: units{}
 	{
@@ -275,7 +275,7 @@ struct UTF8Block final {
 	*/
 	UTF8Block&
 	operator=(
-		duct::char32 const cp
+		char32 const cp
 	) noexcept {
 		assign(cp);
 		return *this;
@@ -308,7 +308,7 @@ struct UTF8Block final {
 	*/
 	inline void
 	assign(
-		duct::char32 const cp
+		char32 const cp
 	) noexcept {
 		tty::EncUtils::encode(
 			cp,

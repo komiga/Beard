@@ -13,6 +13,7 @@ see @ref index or the accompanying LICENSE file for full text.
 #include <Beard/config.hpp>
 
 #include <memory>
+#include <functional>
 #include <string>
 #include <vector>
 #include <forward_list>
@@ -42,7 +43,7 @@ template<
 using shared_ptr = std::shared_ptr<T>;
 
 /**
-	@c std::shared_ptr<T>.
+	@c std::weak_ptr<T>.
 */
 template<
 	typename T
@@ -57,6 +58,9 @@ using std::owner_less;
 
 /** Alias for @c std::enable_shared_from_this<T>. */
 using std::enable_shared_from_this;
+
+/** Alias for @c std::function<R(Args...)>. */
+using std::function;
 
 /**
 	@c std::basic_string<CharT, Traits>.

@@ -1,4 +1,5 @@
 
+#include <Beard/String.hpp>
 #include <Beard/keys.hpp>
 #include <Beard/utility.hpp>
 #include <Beard/detail/gr_ceformat.hpp>
@@ -9,7 +10,6 @@
 
 #include <duct/traits.hpp>
 #include <duct/debug.hpp>
-#include <duct/char.hpp>
 #include <duct/EncodingUtils.hpp>
 
 #include <sys/types.h>
@@ -84,7 +84,7 @@ s_cap_cache_table[]{
 static struct {
 	KeyMod const mod;
 	KeyCode const code;
-	duct::char32 const cp;
+	char32 const cp;
 	tty::CapString const cap;
 	tty::Sequence seq;
 } const s_input_keymap[]{
@@ -543,7 +543,7 @@ add_key_cap(
 	char const* const end,
 	KeyMod const mod,
 	KeyCode const code,
-	duct::char32 const cp
+	char32 const cp
 ) {
 	// On termination by for condition, branch already exists
 	for (
@@ -584,7 +584,7 @@ decode_key(
 	char const* const end,
 	KeyMod& mod,
 	KeyCode& code,
-	duct::char32& cp
+	char32& cp
 ) {
 	// NB: Root in the graph is just a dummy
 	std::size_t seq_size = 0u;
@@ -978,7 +978,7 @@ Terminal::parse_input() {
 		// Else hopefully a sequence of UTF-8 units
 		seq_size = tty::EncUtils::required_first_whole(buffer[0u]);
 		if (m_streambuf_in.get_remaining() >= seq_size) {
-			duct::char32 cp = codepoint_none;
+			char32 cp = codepoint_none;
 			tty::EncUtils::decode(
 				buffer,
 				buffer + seq_size,

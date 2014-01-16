@@ -11,6 +11,7 @@ see @ref index or the accompanying LICENSE file for full text.
 #define BEARD_KEYS_HPP_
 
 #include <Beard/config.hpp>
+#include <Beard/String.hpp>
 
 #include <duct/char.hpp>
 
@@ -83,7 +84,7 @@ enum class KeyCode : unsigned {
 	f12
 };
 
-enum : duct::char32 {
+enum : char32 {
 	/**
 		Non-Unicode value used to represent a "none" state.
 	*/
@@ -101,7 +102,7 @@ struct KeyInputData final {
 	/** Key code. */
 	KeyCode code;
 	/** Code point. */
-	duct::char32 cp;
+	char32 cp;
 };
 
 /**
@@ -113,7 +114,7 @@ struct KeyInputMatch final {
 	/** Key code. */
 	KeyCode code;
 	/** Code point. */
-	duct::char32 cp;
+	char32 cp;
 
 	/**
 		Whether to match any modifiers or only the specified

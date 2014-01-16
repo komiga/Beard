@@ -3,6 +3,7 @@
 // Redirect stdout and stderr to a file.
 
 #include <Beard/config.hpp>
+#include <Beard/String.hpp>
 #include <Beard/utility.hpp>
 #include <Beard/Error.hpp>
 #include <Beard/tty/Defs.hpp>
@@ -11,9 +12,6 @@
 #include <Beard/tty/Terminal.hpp>
 
 #include <duct/char.hpp>
-
-#include <signal.h>
-#include <sched.h>
 
 #include <chrono>
 #include <iostream>

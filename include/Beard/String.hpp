@@ -13,6 +13,8 @@ see @ref index or the accompanying LICENSE file for full text.
 #include <Beard/config.hpp>
 #include <Beard/aux.hpp>
 
+#include <duct/char.hpp>
+
 namespace Beard {
 
 /**
@@ -37,6 +39,11 @@ namespace Beard {
 	@note Contents must be UTF-8.
 */
 using String = aux::basic_string<char>;
+
+/**
+	32-bit character type (Unicode code point).
+*/
+using char32 = duct::char32;
 
 /** @} */ // end of doc-group string
 /** @} */ // end of doc-group etc

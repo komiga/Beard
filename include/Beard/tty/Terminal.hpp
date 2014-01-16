@@ -12,13 +12,13 @@ see @ref index or the accompanying LICENSE file for full text.
 
 #include <Beard/config.hpp>
 #include <Beard/aux.hpp>
+#include <Beard/String.hpp>
 #include <Beard/keys.hpp>
 #include <Beard/geometry.hpp>
 #include <Beard/utility.hpp>
 #include <Beard/tty/Defs.hpp>
 #include <Beard/tty/TerminalInfo.hpp>
 
-#include <duct/char.hpp>
 #include <duct/cc_unique_ptr.hpp>
 #include <duct/StateStore.hpp>
 #include <duct/IO/dynamic_streambuf.hpp>
@@ -171,14 +171,14 @@ private:
 		char ch;
 		KeyMod mod;
 		KeyCode code;
-		duct::char32 cp;
+		char32 cp;
 		list_type next;
 
 		KeyDecodeNode(
 			char ch,
 			KeyMod mod,
 			KeyCode code,
-			duct::char32 cp
+			char32 cp
 		) noexcept
 			: ch(ch)
 			, mod(mod)
@@ -276,7 +276,7 @@ private:
 			bool escaped{false};
 			KeyMod mod{KeyMod::none};
 			KeyCode code{KeyCode::none};
-			duct::char32 cp{codepoint_none};
+			char32 cp{codepoint_none};
 
 			void
 			reset() noexcept {

@@ -11,9 +11,10 @@ see @ref index or the accompanying LICENSE file for full text.
 #define BEARD_UI_SIGNAL_HPP_
 
 #include <Beard/config.hpp>
+#include <Beard/aux.hpp>
 #include <Beard/ui/Defs.hpp>
 
-#include <functional>
+#include <utility>
 
 namespace Beard {
 namespace ui {
@@ -40,12 +41,13 @@ template<
 	typename R,
 	typename... ArgP
 >
-class Signal<R(ArgP...)> {
+class Signal<R(ArgP...)> final {
 public:
 	/** Return type. */
 	using return_type = R;
+
 	/** Function type. */
-	using function_type = std::function<R(ArgP...)>;
+	using function_type = aux::function<R(ArgP...)>;
 
 private:
 	function_type m_func;
