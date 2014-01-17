@@ -66,6 +66,9 @@ protected:
 		ui::Widget::SPtr widget
 	) = 0;
 
+	/**
+		get_widget() implementation.
+	*/
 	virtual ui::Widget::SPtr
 	get_widget_impl(
 		std::size_t const idx

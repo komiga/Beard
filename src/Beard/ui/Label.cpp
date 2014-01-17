@@ -78,6 +78,7 @@ Label::render_impl(
 		m_gc_pos.y,
 		tty::Sequence{
 			m_text,
+			0u,
 			static_cast<unsigned>(max_ce(0, frame.size.width))
 		},
 		tty::Color::term_default,

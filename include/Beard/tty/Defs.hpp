@@ -157,15 +157,19 @@ struct Sequence final {
 		change beforehand.
 
 		@param str %String.
-		@param size Size of sequence. Clamped to str.size().
+		@param pos Position in string. Clamped to
+		<code>str.size()</code>.
+		@param size Size of sequence. Clamped to
+		<code>str.size() - pos</code>.
 	*/
 	constexpr
 	Sequence(
 		String const& str,
+		String::size_type const pos = 0u,
 		String::size_type const size = String::npos
 	) noexcept
-		: data(str.data())
-		, size(str.size() < size ? str.size() : size)
+		: data(str.data() + min_ce(pos, str.size()))
+		, size(min_ce(size, str.size() - min_ce(pos, str.size())))
 	{}
 /// @}
 

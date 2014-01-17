@@ -97,7 +97,10 @@ public:
 	) {
 		return aux::make_shared<ui::Container>(
 			ctor_priv{},
-			std::move(root), orientation, slot_count, std::move(parent)
+			std::move(root),
+			orientation,
+			slot_count,
+			std::move(parent)
 		);
 	}
 

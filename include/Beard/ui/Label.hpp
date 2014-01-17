@@ -77,7 +77,7 @@ public:
 	Label(
 		ctor_priv const,
 		ui::RootWPtr&& root,
-		String text,
+		String&& text,
 		ui::Widget::WPtr&& parent
 	) noexcept
 		: base_type(
@@ -110,7 +110,9 @@ public:
 	) {
 		auto p = std::make_shared<ui::Label>(
 			ctor_priv{},
-			std::move(root), std::move(text), std::move(parent)
+			std::move(root),
+			std::move(text),
+			std::move(parent)
 		);
 		return p;
 	}

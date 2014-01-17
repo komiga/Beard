@@ -43,7 +43,11 @@ private:
 
 public:
 	/**
-		Signal for the button "pressed" event.
+		Signal for the <em>pressed</em> event.
+
+		Parameters:
+
+		-# The actuated button.
 	*/
 	ui::Signal<void(aux::shared_ptr<ui::Button>)> signal_pressed;
 
@@ -89,7 +93,7 @@ public:
 	Button(
 		ctor_priv const,
 		ui::RootWPtr&& root,
-		String text,
+		String&& text,
 		ui::Widget::WPtr&& parent
 	) noexcept
 		: base_type(
@@ -125,7 +129,9 @@ public:
 	) {
 		auto p = std::make_shared<ui::Button>(
 			ctor_priv{},
-			std::move(root), std::move(text), std::move(parent)
+			std::move(root),
+			std::move(text),
+			std::move(parent)
 		);
 		p->set_focus_index(focus_index);
 		return p;

@@ -109,7 +109,9 @@ public:
 	) {
 		auto p = aux::make_shared<ui::Root>(
 			ctor_priv{},
-			context, orientation, slot_count
+			context,
+			orientation,
+			slot_count
 		);
 		p->m_root = ui::RootWPtr(p);
 		return std::move(p);
