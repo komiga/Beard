@@ -80,6 +80,8 @@ enum class Type : unsigned {
 	Label,
 	/** ui::Button. */
 	Button,
+	/** ui::Field. */
+	Field,
 /** @} */
 
 /** @cond INTERNAL */

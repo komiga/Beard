@@ -11,6 +11,7 @@
 #include <Beard/ui/Container.hpp>
 #include <Beard/ui/Label.hpp>
 #include <Beard/ui/Button.hpp>
+#include <Beard/ui/Field.hpp>
 #include <Beard/ui/packing.hpp>
 
 #include <cassert>
@@ -120,15 +121,19 @@ main(
 
 	auto hcont1 = ui::Container::make(root, Axis::horizontal);
 	{
-		auto btn = ui::Button::make(root, "button text");
-		btn->get_geometry().set_expand(Axis::both);
-		hcont1->push_back(std::move(btn));
+		auto field = ui::Field::make(
+			root,
+			""
+		);
+		field->set_text("X_111_222_333_444_555_666_777_888_999_Y");
+		field->get_geometry().set_sizing(Axis::both, Axis::horizontal);
+		hcont1->push_back(std::move(field));
 
 		hcont1->push_back(ui::Label::make(root, "abacabadabacaba"));
 
-		btn = ui::Button::make(root, "xyzzyzzyx");
-		btn->get_geometry().set_sizing(Axis::both, Axis::both);
-		btn->signal_pressed.bind([](
+		auto button = ui::Button::make(root, "xyzzyzzyx");
+		button->get_geometry().set_sizing(Axis::both, Axis::both);
+		button->signal_pressed.bind([](
 			aux::shared_ptr<ui::Button> b
 		) {
 			if ('x' == b->get_text()[0u]) {
@@ -137,7 +142,7 @@ main(
 				b->set_text("xyzzyzzyx");
 			}
 		});
-		hcont1->push_back(std::move(btn));
+		hcont1->push_back(std::move(button));
 	}
 
 	auto hcont2 = ui::Container::make(root, Axis::horizontal);
@@ -145,12 +150,32 @@ main(
 	hcont2->get_geometry().set_static(true);
 	hcont2->get_geometry().set_sizing(Axis::x, Axis::x);
 	{
-		hcont2->push_back(ui::Button::make(root, "[a]"));
-		hcont2->push_back(ui::Button::make(root, "[b]"));
+		hcont2->push_back(ui::Field::make(root, "hi I am a field"));
 		hcont2->push_back(nullptr);
-		hcont2->push_back(ui::Button::make(root, "[c]"));
-		hcont2->push_back(ui::Button::make(root, "[d]"));
+		hcont2->push_back(ui::Field::make(
+			root,
+			"that is not a field, I am a field!"
+		));
 		for (auto& s : hcont2->get_slots()) {
+			if (s.widget) {
+				s.widget->get_geometry().set_sizing(
+					Axis::both, Axis::horizontal
+				);
+			}
+		}
+	}
+
+	auto hcont3 = ui::Container::make(root, Axis::horizontal);
+	hcont3->get_geometry().set_request_size(Vec2{0, 3});
+	hcont3->get_geometry().set_static(true);
+	hcont3->get_geometry().set_sizing(Axis::x, Axis::x);
+	{
+		hcont3->push_back(ui::Button::make(root, "aaa"));
+		hcont3->push_back(ui::Button::make(root, "bbb"));
+		hcont3->push_back(nullptr);
+		hcont3->push_back(ui::Button::make(root, "ccc"));
+		hcont3->push_back(ui::Button::make(root, "ddd"));
+		for (auto& s : hcont3->get_slots()) {
 			if (s.widget) {
 				s.widget->get_geometry().set_sizing(Axis::both, Axis::none);
 			}
@@ -159,6 +184,7 @@ main(
 
 	root->push_back(hcont1);
 	root->push_back(hcont2);
+	root->push_back(hcont3);
 	ctx.render(true);
 
 	std::cout
