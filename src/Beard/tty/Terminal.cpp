@@ -4,6 +4,7 @@
 #include <Beard/utility.hpp>
 #include <Beard/detail/gr_ceformat.hpp>
 #include <Beard/detail/debug.hpp>
+#include <Beard/txt/Defs.hpp>
 #include <Beard/tty/Defs.hpp>
 #include <Beard/tty/Caps.hpp>
 #include <Beard/tty/Terminal.hpp>
@@ -86,7 +87,7 @@ static struct {
 	KeyCode const code;
 	char32 const cp;
 	tty::CapString const cap;
-	tty::Sequence seq;
+	txt::Sequence seq;
 } const s_input_keymap[]{
 // cap input
 	{KeyMod::none , KeyCode::insert, codepoint_none, tty::CapString::key_ic, {nullptr, 0u}},
@@ -976,10 +977,10 @@ Terminal::parse_input() {
 		}
 	} else {
 		// Else hopefully a sequence of UTF-8 units
-		seq_size = tty::EncUtils::required_first_whole(buffer[0u]);
+		seq_size = txt::EncUtils::required_first_whole(buffer[0u]);
 		if (m_streambuf_in.get_remaining() >= seq_size) {
 			char32 cp = codepoint_none;
-			tty::EncUtils::decode(
+			txt::EncUtils::decode(
 				buffer,
 				buffer + seq_size,
 				cp,
@@ -1070,12 +1071,17 @@ void
 Terminal::put_sequence(
 	geom_value_type x,
 	geom_value_type const y,
-	tty::Sequence const& seq,
+	txt::Sequence const& seq,
+	std::size_t const points,
 	uint16_t const attr_fg,
 	uint16_t const attr_bg
 ) noexcept {
 	// TODO: Handle \n and clipping
 	if (0 <= x && x < m_tty_size.width && 0 <= y && y < m_tty_size.height) {
+		auto const range = min_ce(
+			points + unsigned_cast(x),
+			static_cast<std::size_t>(m_tty_size.width)
+		);
 		bool dirtied = false;
 		std::size_t ss_size = 0u;
 		tty::Cell cell{{}, attr_fg, attr_bg};
@@ -1083,12 +1089,12 @@ Terminal::put_sequence(
 		auto it_seq = seq.data;
 		auto const seq_end = seq.data + seq.size;
 		for (
-			; seq_end > it_seq && x < m_tty_size.width;
+			; seq_end > it_seq && range > unsigned_cast(x);
 			++x,
 			++it_put,
 			it_seq += ss_size
 		) {
-			ss_size = tty::EncUtils::required_first_whole(
+			ss_size = txt::EncUtils::required_first_whole(
 				*it_seq
 			);
 			if (seq_end < seq.data + ss_size) {
@@ -1174,7 +1180,7 @@ Terminal::put_line(
 void
 Terminal::put_rect(
 	Rect const& rect,
-	tty::UTF8Block const (&frame)[8u],
+	txt::UTF8Block const (&frame)[8u],
 	uint16_t const attr_fg,
 	uint16_t const attr_bg
 ) noexcept {

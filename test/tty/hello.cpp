@@ -6,6 +6,7 @@
 #include <Beard/String.hpp>
 #include <Beard/utility.hpp>
 #include <Beard/Error.hpp>
+#include <Beard/txt/Defs.hpp>
 #include <Beard/tty/Defs.hpp>
 #include <Beard/tty/Ops.hpp>
 #include <Beard/tty/TerminalInfo.hpp>
@@ -40,18 +41,21 @@ render(
 	term.put_sequence(
 		2u, 0u,
 		{BEARD_STR_LIT("bold")},
+		4u,
 		Beard::tty::Attr::bold
 	);
 	term.put_sequence(
 		7u, 0u,
 		{BEARD_STR_LIT("blink")},
+		5u,
 		Beard::tty::Color::white,
 		Beard::tty::Color::green | Beard::tty::Attr::blink
 	);
 
 	term.put_sequence(
 		4u, 4u,
-		{BEARD_STR_LIT("Hello, terminal overlord! 元気ですか？")}
+		{BEARD_STR_LIT("Hello, terminal overlord! 元気ですか？")},
+		32u
 	);
 	term.present();
 }
@@ -119,7 +123,7 @@ main(
 	term.set_caret_visible(false);
 	render(term);
 
-	Beard::tty::UTF8Block cpblock{};
+	Beard::txt::UTF8Block cpblock{};
 	Beard::tty::Event ev{};
 	while (!s_close) {
 		switch (term.poll(ev, 5u)) {

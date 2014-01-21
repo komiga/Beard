@@ -16,6 +16,7 @@ see @ref index or the accompanying LICENSE file for full text.
 #include <Beard/keys.hpp>
 #include <Beard/geometry.hpp>
 #include <Beard/utility.hpp>
+#include <Beard/txt/Defs.hpp>
 #include <Beard/tty/Defs.hpp>
 #include <Beard/tty/TerminalInfo.hpp>
 
@@ -480,6 +481,7 @@ public:
 		@param x X position.
 		@param y Y position.
 		@param seq %Sequence to put.
+		@param points Number of code points to put.
 		@param attr_fg Foreground attributes.
 		@param attr_bg Background attributes.
 	*/
@@ -487,7 +489,8 @@ public:
 	put_sequence(
 		geom_value_type x,
 		geom_value_type const y,
-		tty::Sequence const& seq,
+		txt::Sequence const& seq,
+		std::size_t const points,
 		uint16_t const attr_fg = tty::Color::term_default,
 		uint16_t const attr_bg = tty::Color::term_default
 	) noexcept;
@@ -531,7 +534,7 @@ public:
 	void
 	put_rect(
 		Rect const& rect,
-		tty::UTF8Block const (&frame)[8u],
+		txt::UTF8Block const (&frame)[8u],
 		uint16_t const attr_fg = tty::Color::term_default,
 		uint16_t const attr_bg = tty::Color::term_default
 	) noexcept;

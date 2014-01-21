@@ -2,6 +2,7 @@
 #include <Beard/utility.hpp>
 #include <Beard/keys.hpp>
 #include <Beard/geometry.hpp>
+#include <Beard/txt/Defs.hpp>
 #include <Beard/tty/Defs.hpp>
 #include <Beard/tty/Terminal.hpp>
 #include <Beard/ui/Root.hpp>
@@ -105,13 +106,10 @@ Button::render_impl(
 ) noexcept {
 	auto const& frame = get_geometry().get_frame();
 	terminal.put_sequence(
-		m_gc_pos.x + (static_cast<signed>(m_text.size()) < frame.size.width),
+		m_gc_pos.x + (signed_cast(m_text.size()) < frame.size.width),
 		m_gc_pos.y,
-		tty::Sequence{
-			m_text,
-			0u,
-			static_cast<unsigned>(max_ce(0, frame.size.width))
-		},
+		txt::Sequence{m_text, 0u, m_text.size()},
+		unsigned_cast(max_ce(0, frame.size.width)),
 		tty::Color::term_default,
 		tty::Color::term_default |
 		is_focused() ? tty::Attr::inverted : 0

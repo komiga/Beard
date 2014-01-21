@@ -19,6 +19,7 @@ precore.make_solution(
 
 include("general")
 include("tty")
+include("txt")
 include("ui")
 
 action_clean()
