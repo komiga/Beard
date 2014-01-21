@@ -41,6 +41,11 @@ namespace Beard {
 using String = aux::basic_string<char>;
 
 /**
+	8-bit character (UTF-8 code unit).
+*/
+using char8 = duct::char8;
+
+/**
 	32-bit character type (Unicode code point).
 */
 using char32 = duct::char32;
