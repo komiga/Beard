@@ -122,6 +122,9 @@ struct type_info final {
 	%Widget flags.
 */
 enum class Flags : unsigned {
+	// NB: If flags are added/changed, remember to update shift_ua
+	// in ui::Widget::Base
+
 	/**
 		No flags.
 	*/
@@ -139,9 +142,13 @@ enum class Flags : unsigned {
 	*/
 	focused			= 1u << 2,
 	/**
+		%Widget is in input control mode.
+	*/
+	input_control	= 1u << 3,
+	/**
 		One or more queued update actions.
 	*/
-	queued_actions	= 1u << 3,
+	queued_actions	= 1u << 4,
 };
 
 /**

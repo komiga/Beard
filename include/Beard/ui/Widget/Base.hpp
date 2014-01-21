@@ -57,7 +57,7 @@ protected:
 
 private:
 	enum : unsigned {
-		shift_ua = 4u
+		shift_ua = 5u
 	};
 
 	static constexpr ui::Widget::Flags const
@@ -351,6 +351,24 @@ public:
 	bool
 	is_focused() const noexcept {
 		return m_flags.test(ui::Widget::Flags::focused);
+	}
+
+	/**
+		Set input-control mode.
+	*/
+	void
+	set_input_control(
+		bool const enabled
+	) noexcept {
+		m_flags.set(ui::Widget::Flags::input_control, enabled);
+	}
+
+	/**
+		Check if the widget is in input-control mode.
+	*/
+	bool
+	has_input_control() const noexcept {
+		return m_flags.test(ui::Widget::Flags::input_control);
 	}
 
 public:
