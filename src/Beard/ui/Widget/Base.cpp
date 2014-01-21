@@ -48,12 +48,14 @@ void
 Base::render(
 	tty::Terminal& terminal
 ) noexcept {
+#ifndef NDEBUG
 	ui::geom_debug_render(
 		terminal,
 		get_geometry(),
 		tty::Color::term_default,
 		is_focused()
 	);
+#endif
 	render_impl(terminal);
 }
 
