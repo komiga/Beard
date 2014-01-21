@@ -24,6 +24,8 @@ namespace Beard {
 */
 
 using duct::make_const;
+using duct::signed_cast;
+using duct::unsigned_cast;
 using duct::enum_cast;
 using duct::enum_bitor;
 using duct::enum_bitand;
