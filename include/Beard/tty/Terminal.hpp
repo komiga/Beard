@@ -491,8 +491,8 @@ public:
 		geom_value_type const y,
 		txt::Sequence const& seq,
 		std::size_t const points,
-		uint16_t const attr_fg = tty::Color::term_default,
-		uint16_t const attr_bg = tty::Color::term_default
+		tty::attr_type const attr_fg = tty::Color::term_default,
+		tty::attr_type const attr_bg = tty::Color::term_default
 	) noexcept;
 
 	/**
@@ -535,8 +535,8 @@ public:
 	put_rect(
 		Rect const& rect,
 		txt::UTF8Block const (&frame)[8u],
-		uint16_t const attr_fg = tty::Color::term_default,
-		uint16_t const attr_bg = tty::Color::term_default
+		tty::attr_type const attr_fg = tty::Color::term_default,
+		tty::attr_type const attr_bg = tty::Color::term_default
 	) noexcept;
 
 	/**

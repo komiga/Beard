@@ -42,10 +42,15 @@ enum : tty::fd_type {
 };
 
 /**
+	Color + attribute type.
+*/
+using attr_type = std::uint16_t;
+
+/**
 	%Attributes.
 */
 namespace Attr {
-enum enum_type : unsigned {
+enum enum_type : tty::attr_type {
 	bold		= 0x0100,
 	underline	= 0x0200,
 	inverted	= 0x0400,
@@ -57,7 +62,7 @@ enum enum_type : unsigned {
 	%Colors.
 */
 namespace Color {
-enum enum_type : unsigned {
+enum enum_type : tty::attr_type {
 	// NB: Unless c == term_default, c - 1 for actual digit in
 	// terminal color (3<c>, 4<c>)
 
@@ -89,9 +94,9 @@ struct Cell final {
 	txt::UTF8Block u8block;
 
 	/** Foreground color and attributes. */
-	uint16_t attr_fg;
+	tty::attr_type attr_fg;
 	/** Background color and attributes. */
-	uint16_t attr_bg;
+	tty::attr_type attr_bg;
 /// @}
 };
 
@@ -105,8 +110,8 @@ struct Cell final {
 inline constexpr tty::Cell
 make_cell(
 	txt::UTF8Block&& u8block,
-	uint16_t attr_fg = tty::Color::term_default,
-	uint16_t attr_bg = tty::Color::term_default
+	tty::attr_type attr_fg = tty::Color::term_default,
+	tty::attr_type attr_bg = tty::Color::term_default
 ) noexcept {
 	return tty::Cell{
 		u8block,

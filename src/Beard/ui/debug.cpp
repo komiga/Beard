@@ -9,7 +9,7 @@ void
 geom_debug_render(
 	tty::Terminal& term,
 	ui::Geom const& geometry,
-	uint16_t const attr_bg,
+	tty::attr_type const attr_bg,
 	bool const focused
 ) noexcept {
 	term.put_rect(

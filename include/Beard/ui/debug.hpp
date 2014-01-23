@@ -38,7 +38,7 @@ void
 geom_debug_render(
 	tty::Terminal& term,
 	ui::Geom const& geometry,
-	uint16_t const attr_bg = tty::Color::term_default,
+	tty::attr_type const attr_bg = tty::Color::term_default,
 	bool const focused = false
 ) noexcept;
 

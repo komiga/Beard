@@ -1073,8 +1073,8 @@ Terminal::put_sequence(
 	geom_value_type const y,
 	txt::Sequence const& seq,
 	std::size_t const points,
-	uint16_t const attr_fg,
-	uint16_t const attr_bg
+	tty::attr_type const attr_fg,
+	tty::attr_type const attr_bg
 ) noexcept {
 	// TODO: Handle \n and clipping
 	if (0 <= x && x < m_tty_size.width && 0 <= y && y < m_tty_size.height) {
@@ -1181,8 +1181,8 @@ void
 Terminal::put_rect(
 	Rect const& rect,
 	txt::UTF8Block const (&frame)[8u],
-	uint16_t const attr_fg,
-	uint16_t const attr_bg
+	tty::attr_type const attr_fg,
+	tty::attr_type const attr_bg
 ) noexcept {
 	enum : unsigned {
 		corner_top_left = 0u,
