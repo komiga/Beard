@@ -102,17 +102,22 @@ Button::handle_event_impl(
 
 void
 Button::render_impl(
-	tty::Terminal& terminal
+	ui::Widget::RenderData& rd
 ) noexcept {
 	auto const& frame = get_geometry().get_frame();
-	terminal.put_sequence(
+	rd.terminal.put_sequence(
 		m_gc_pos.x + (signed_cast(m_text.size()) < frame.size.width),
 		m_gc_pos.y,
 		txt::Sequence{m_text, 0u, m_text.size()},
 		unsigned_cast(max_ce(0, frame.size.width)),
-		tty::Color::term_default,
-		tty::Color::term_default |
-		is_focused() ? tty::Attr::inverted : 0
+		rd.get_attr(is_focused()
+			? ui::property_primary_fg_active
+			: ui::property_primary_fg_inactive
+		),
+		rd.get_attr(is_focused()
+			? ui::property_primary_bg_active
+			: ui::property_primary_bg_inactive
+		)
 	);
 }
 

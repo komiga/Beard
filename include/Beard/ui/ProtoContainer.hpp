@@ -92,18 +92,21 @@ protected:
 
 		@param root %Root.
 		@param flags Flags.
-		@param parent Parent.
+		@param group %Property group.
 		@param geometry Geometry.
+		@param parent Parent.
 	*/
 	ProtoContainer(
 		ui::RootWPtr&& root,
 		ui::Widget::Flags const flags,
+		ui::group_hash_type const group,
 		ui::Geom&& geometry,
 		ui::Widget::WPtr&& parent
 	) noexcept
 		: base_type(
 			std::move(root),
 			flags,
+			group,
 			std::move(geometry),
 			std::move(parent)
 		)

@@ -65,6 +65,7 @@ private:
 
 	ui::RootWPtr m_root;
 	flag_store_type m_flags;
+	ui::group_hash_type m_group;
 	ui::focus_index_type m_focus_index;
 	ui::Geom m_geometry;
 	ui::Widget::WPtr m_parent;
@@ -136,7 +137,7 @@ protected:
 	*/
 	virtual void
 	render_impl(
-		tty::Terminal& terminal
+		ui::Widget::RenderData& rd
 	) noexcept;
 /// @}
 
@@ -155,6 +156,7 @@ protected:
 
 		@param root %Root.
 		@param flags Flags.
+		@param group Property group name.
 		@param parent Parent.
 		@param geometry Geometry.
 	*/
@@ -162,11 +164,13 @@ protected:
 	Base(
 		ui::RootWPtr&& root,
 		ui::Widget::Flags const flags,
+		ui::group_hash_type const group,
 		ui::Geom&& geometry,
 		ui::Widget::WPtr&& parent
 	) noexcept
 		: m_root(std::move(root))
 		, m_flags(flags)
+		, m_group(group)
 		, m_focus_index(ui::focus_index_none)
 		, m_geometry(std::move(geometry))
 		, m_parent(std::move(parent))
@@ -203,6 +207,24 @@ public:
 	bool
 	is_root_valid() const noexcept {
 		return !m_root.expired();
+	}
+
+	/**
+		Set property group.
+	*/
+	void
+	set_group(
+		ui::group_hash_type const group
+	) noexcept {
+		m_group = group;
+	}
+
+	/**
+		Get property group.
+	*/
+	ui::group_hash_type
+	get_group() const noexcept {
+		return m_group;
 	}
 
 	/**
@@ -458,11 +480,11 @@ public:
 	/**
 		Render the widget.
 
-		@param terminal Terminal to render to.
+		@param rd Render data.
 	*/
 	void
 	render(
-		tty::Terminal& terminal
+		ui::Widget::RenderData& rd
 	) noexcept;
 /// @}
 };

@@ -39,24 +39,24 @@ Base::handle_event_impl(
 
 void
 Base::render_impl(
-	tty::Terminal& /*terminal*/
+	ui::Widget::RenderData& /*rd*/
 ) noexcept {
 	/* Do nothing. */
 }
 
 void
 Base::render(
-	tty::Terminal& terminal
+	ui::Widget::RenderData& rd
 ) noexcept {
-#ifndef NDEBUG
-	ui::geom_debug_render(
-		terminal,
-		get_geometry(),
-		tty::Color::term_default,
-		is_focused()
-	);
-#endif
-	render_impl(terminal);
+	if (rd.get_boolean(ui::property_frame_debug_enabled)) {
+		ui::geom_debug_render(
+			rd.terminal,
+			get_geometry(),
+			tty::Color::term_default,
+			is_focused()
+		);
+	}
+	render_impl(rd);
 }
 
 // properties

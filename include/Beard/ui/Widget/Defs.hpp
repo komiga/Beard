@@ -12,6 +12,9 @@ see @ref index or the accompanying LICENSE file for full text.
 
 #include <Beard/config.hpp>
 #include <Beard/aux.hpp>
+#include <Beard/tty/Terminal.hpp>
+#include <Beard/ui/Defs.hpp>
+#include <Beard/ui/PropertyMap.hpp>
 
 #include <duct/StateStore.hpp>
 
@@ -19,6 +22,10 @@ see @ref index or the accompanying LICENSE file for full text.
 
 namespace Beard {
 namespace ui {
+
+// Forward declarations
+class Context; // external
+
 namespace Widget {
 
 // Forward declarations
@@ -28,6 +35,7 @@ enum class TypeFlags : unsigned;
 struct type_info;
 enum class Flags : unsigned;
 struct Slot;
+struct RenderData;
 
 /**
 	@addtogroup ui
@@ -170,6 +178,96 @@ struct Slot final {
 	%Slot vector.
 */
 using slot_vector_type = aux::vector<ui::Widget::Slot>;
+
+/**
+	%Widget render data.
+*/
+struct RenderData final {
+	/** Context. */
+	ui::Context& context;
+	/** %Terminal. */
+	tty::Terminal& terminal;
+	/** %Property map. */
+	ui::PropertyMap& property_map;
+
+	/** Name of current group. */
+	ui::group_hash_type group_name;
+	/** Iterator to property group. */
+	ui::PropertyMap::const_iterator it_group;
+	/** Iterator to fallback property group. */
+	ui::PropertyMap::const_iterator it_fallback;
+
+	/**
+		Update group.
+
+		@param widget %Widget to fetch.
+	*/
+	void
+	update_group(
+		ui::group_hash_type const name
+	) {
+		if (name != this->group_name) {
+			this->it_group = property_map.find(name, ui::group_null);
+			this->group_name = name;
+		}
+	}
+
+	/**
+		See ui::PropertyMap::get_number().
+	*/
+	ui::property_number_type
+	get_number(
+		ui::property_hash_type const name
+	) const {
+		return this->property_map.get_number(
+			name,
+			this->it_group,
+			this->it_fallback
+		);
+	}
+
+	/**
+		See ui::PropertyMap::get_attr().
+	*/
+	ui::property_attr_type
+	get_attr(
+		ui::property_hash_type const name
+	) const {
+		return this->property_map.get_attr(
+			name,
+			this->it_group,
+			this->it_fallback
+		);
+	}
+
+	/**
+		See ui::PropertyMap::get_boolean().
+	*/
+	ui::property_boolean_type
+	get_boolean(
+		ui::property_hash_type const name
+	) const {
+		return this->property_map.get_boolean(
+			name,
+			this->it_group,
+			this->it_fallback
+		);
+	}
+
+	/**
+		See ui::PropertyMap::get_boolean().
+	*/
+	ui::property_string_type const&
+	get_string(
+		ui::property_hash_type const name
+	) const {
+		return this->property_map.get_string(
+			name,
+			this->it_group,
+			this->it_fallback
+		);
+	}
+};
 
 /** @} */ // end of doc-group ui
 

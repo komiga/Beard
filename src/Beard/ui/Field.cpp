@@ -138,17 +138,39 @@ Field::handle_event_impl(
 
 void
 Field::render_impl(
-	tty::Terminal& terminal
+	ui::Widget::RenderData& rd
 ) noexcept {
 	auto const& frame = get_geometry().get_frame();
 	auto const& node = m_cursor.get_node();
+
+	bool const use_underline = rd.get_boolean(
+		ui::property_field_content_underline
+	);
+	tty::attr_type const
+		content_fg
+		= (use_underline) ? tty::Attr::underline : 0
+		| rd.get_attr(is_focused()
+			? ui::property_content_fg_active
+			: ui::property_content_fg_inactive
+		),
+		content_bg
+		= rd.get_attr(is_focused()
+			? ui::property_content_bg_active
+			: ui::property_content_bg_inactive
+		)
+	;
 	tty::Cell cell_end = tty::make_cell(
 		'[',
-		tty::Color::term_default,
-		tty::Color::term_default |
-		is_focused() ? tty::Attr::inverted : 0
+		rd.get_attr(is_focused()
+			? ui::property_primary_fg_active
+			: ui::property_primary_fg_inactive
+		),
+		rd.get_attr(is_focused()
+			? ui::property_primary_bg_active
+			: ui::property_primary_bg_inactive
+		)
 	);
-	terminal.put_cell(frame.pos.x, frame.pos.y, cell_end);
+	rd.terminal.put_cell(frame.pos.x, frame.pos.y, cell_end);
 	auto const inner_width = max_ce(geom_value_type{0}, frame.size.width - 2);
 	auto const put_count = min_ce(
 		static_cast<txt::Cursor::difference_type>(inner_width),
@@ -157,7 +179,7 @@ Field::render_impl(
 			signed_cast(node.points()) - m_view.col()
 		)
 	);
-	terminal.put_sequence(
+	rd.terminal.put_sequence(
 		frame.pos.x + 1,
 		frame.pos.y,
 		txt::Sequence{
@@ -168,27 +190,28 @@ Field::render_impl(
 			))
 		},
 		put_count,
-		tty::Color::term_default | tty::Attr::underline,
-		tty::Color::term_default
+		content_fg,
+		content_bg
 	);
 	tty::Cell const cell_ul = tty::make_cell(
 		' ',
-		tty::Color::term_default | tty::Attr::underline
+		content_fg,
+		content_bg
 	);
-	terminal.put_line(
+	rd.terminal.put_line(
 		{static_cast<geom_value_type>(frame.pos.x + 1 + put_count), frame.pos.y},
 		inner_width - put_count,
 		Axis::horizontal,
 		cell_ul
 	);
 	cell_end.u8block.assign(']');
-	terminal.put_cell(
+	rd.terminal.put_cell(
 		frame.pos.x + frame.size.width - 1,
 		frame.pos.y,
 		cell_end
 	);
 	if (has_input_control()) {
-		terminal.set_caret_pos(
+		rd.terminal.set_caret_pos(
 			frame.pos.x
 			+ min_ce(
 				inner_width,

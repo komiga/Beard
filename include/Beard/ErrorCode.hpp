@@ -85,6 +85,19 @@ enum class ErrorCode : unsigned {
 
 /** @name UI */ /// @{
 	/**
+		%Property name is invalid.
+	*/
+	ui_invalid_property,
+	/**
+		Group name is invalid.
+	*/
+	ui_invalid_group,
+	/**
+		%Property name does not exist.
+	*/
+	ui_property_not_found,
+
+	/**
 		Context is already open.
 	*/
 	ui_context_already_open,

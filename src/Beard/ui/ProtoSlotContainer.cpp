@@ -42,11 +42,12 @@ ProtoSlotContainer::reflow_impl(
 
 void
 ProtoSlotContainer::render_impl(
-	tty::Terminal& terminal
+	ui::Widget::RenderData& rd
 ) noexcept {
 	for (auto& slot : m_slots) {
 		if (slot.widget) {
-			slot.widget->render(terminal);
+			rd.update_group(slot.widget->get_group());
+			slot.widget->render(rd);
 		}
 	}
 }

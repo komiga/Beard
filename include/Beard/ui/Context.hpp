@@ -15,6 +15,8 @@ see @ref index or the accompanying LICENSE file for full text.
 #include <Beard/tty/Terminal.hpp>
 #include <Beard/ui/Defs.hpp>
 #include <Beard/ui/Widget/Defs.hpp>
+#include <Beard/ui/PropertyGroup.hpp>
+#include <Beard/ui/PropertyMap.hpp>
 
 #include <utility>
 
@@ -44,6 +46,8 @@ private:
 	tty::Terminal m_terminal;
 	ui::Event m_event;
 
+	ui::PropertyMap m_property_map;
+	ui::group_hash_type m_fallback_group;
 	action_queue_set_type m_action_queue;
 	ui::RootSPtr m_root;
 
@@ -65,12 +69,23 @@ public:
 	Context();
 
 	/**
-		Constructor with terminal info.
+		Constructor with property map.
 
-		@param term_info %Terminal info.
+		@param property_map %Property map.
 	*/
 	Context(
-		tty::TerminalInfo term_info
+		ui::PropertyMap property_map
+	);
+
+	/**
+		Constructor with terminal info and property map.
+
+		@param term_info %Terminal info.
+		@param property_map %Property map.
+	*/
+	Context(
+		tty::TerminalInfo term_info,
+		ui::PropertyMap property_map = ui::PropertyMap{true}
 	);
 
 	/** Move constructor. */
@@ -100,9 +115,51 @@ public:
 	}
 
 	/**
-		Set root.
+		Set property map.
+	*/
+	void
+	set_property_map(
+		ui::PropertyMap property_map
+	) {
+		m_property_map = std::move(property_map);
+	}
 
-		@param root New root.
+	/**
+		Get property map (mutable).
+	*/
+	ui::PropertyMap&
+	get_property_map() noexcept {
+		return m_property_map;
+	}
+
+	/**
+		Get property map.
+	*/
+	ui::PropertyMap const&
+	get_property_map() const noexcept {
+		return m_property_map;
+	}
+
+	/**
+		Set fallback property group.
+	*/
+	void
+	set_fallback_group(
+		ui::group_hash_type const fallback_group
+	) noexcept {
+		m_fallback_group = fallback_group;
+	}
+
+	/**
+		Get fallback property group.
+	*/
+	ui::group_hash_type
+	get_fallback_group() const noexcept {
+		return m_fallback_group;
+	}
+
+	/**
+		Set root.
 	*/
 	void
 	set_root(
@@ -171,6 +228,7 @@ public:
 private:
 	ui::UpdateActions
 	run_actions(
+		ui::Widget::RenderData& rd,
 		ui::Widget::SPtr widget,
 		ui::UpdateActions const mask
 	);

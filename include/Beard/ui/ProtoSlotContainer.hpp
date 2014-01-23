@@ -63,7 +63,7 @@ protected:
 
 	virtual void
 	render_impl(
-		tty::Terminal& terminal
+		ui::Widget::RenderData& rd
 	) noexcept override;
 
 	/**
@@ -131,14 +131,16 @@ protected:
 
 		@param root %Root.
 		@param flags Flags.
-		@param parent Parent.
+		@param group %Property group.
 		@param geometry Geometry.
+		@param parent Parent.
 		@param orientation Orientation.
 		@param slot_count Number of slots to reserve.
 	*/
 	ProtoSlotContainer(
 		ui::RootWPtr&& root,
 		ui::Widget::Flags const flags,
+		ui::group_hash_type const group,
 		ui::Geom&& geometry,
 		ui::Widget::WPtr&& parent,
 		Axis const orientation,
@@ -147,6 +149,7 @@ protected:
 		: base_type(
 			std::move(root),
 			flags,
+			group,
 			std::move(geometry),
 			std::move(parent)
 		)

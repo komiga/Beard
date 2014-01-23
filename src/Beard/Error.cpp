@@ -30,6 +30,10 @@ s_error_invalid[]{BEARD_STR_LIT("INVALID")},
 	BEARD_STR_LIT("tty_init_failed"),
 
 // ui
+	BEARD_STR_LIT("ui_invalid_property"),
+	BEARD_STR_LIT("ui_invalid_group"),
+	BEARD_STR_LIT("ui_property_not_found"),
+
 	BEARD_STR_LIT("ui_context_already_open"),
 };
 } // anonymous namespace

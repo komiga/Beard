@@ -26,10 +26,25 @@ Context::Context(Context&&) = default;
 Context& Context::operator=(Context&&) = default;
 
 Context::Context(
-	tty::TerminalInfo term_info
+	ui::PropertyMap property_map
+)
+	: m_terminal()
+	, m_event()
+	, m_property_map(std::move(property_map))
+	, m_fallback_group(ui::group_default)
+	, m_action_queue()
+	, m_root()
+{}
+
+Context::Context(
+	tty::TerminalInfo term_info,
+	ui::PropertyMap property_map
 )
 	: m_terminal(std::move(term_info))
 	, m_event()
+	, m_property_map(std::move(property_map))
+	, m_fallback_group(ui::group_default)
+	, m_action_queue()
 	, m_root()
 {}
 
@@ -51,6 +66,7 @@ Context::push_event(
 
 ui::UpdateActions
 Context::run_actions(
+	ui::Widget::RenderData& rd,
 	ui::Widget::SPtr widget,
 	ui::UpdateActions const mask
 ) {
@@ -72,34 +88,45 @@ Context::run_actions(
 		);
 	}
 	if (enum_bitand(actions, ui::UpdateActions::render)) {
+		// TODO: Optimization: only clear if the terminal hasn't been
+		// cleared entirely?
 		m_terminal.clear_back(widget->get_geometry().get_area());
-		widget->render(m_terminal);
+		rd.update_group(widget->get_group());
+		widget->render(rd);
 	}
 	return actions;
 }
 
 void
 Context::run_all_actions() {
+	ui::Widget::RenderData rd{
+		*this,
+		m_terminal,
+		m_property_map,
+		ui::group_null,
+		m_property_map.cend(),
+		m_property_map.find(m_fallback_group)
+	};
 	auto const sub = static_cast<ui::UpdateActions>(
 		~ enum_cast(m_root->get_queued_actions())
 	);
 	if (enum_bitand(sub, ui::UpdateActions::reflow)) {
 		for (auto wp : m_action_queue) {
 			if (!wp.expired()) {
-				run_actions(wp.lock(), ui::UpdateActions::reflow);
+				run_actions(rd, wp.lock(), ui::UpdateActions::reflow);
 			}
 		}
 	} else {
-		run_actions(m_root, ui::UpdateActions::reflow);
+		run_actions(rd, m_root, ui::UpdateActions::reflow);
 	}
 	if (enum_bitand(sub, ui::UpdateActions::render)) {
 		for (auto wp : m_action_queue) {
 			if (!wp.expired()) {
-				run_actions(wp.lock(), ui::UpdateActions::render);
+				run_actions(rd, wp.lock(), ui::UpdateActions::render);
 			}
 		}
 	} else {
-		run_actions(m_root, ui::UpdateActions::render);
+		run_actions(rd, m_root, ui::UpdateActions::render);
 	}
 	clear_actions();
 }

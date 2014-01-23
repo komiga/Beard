@@ -64,7 +64,7 @@ private:
 
 	void
 	render_impl(
-		tty::Terminal& terminal
+		ui::Widget::RenderData& rd
 	) noexcept override;
 
 public:
@@ -78,6 +78,7 @@ public:
 		ctor_priv const,
 		ui::RootWPtr&& root,
 		String&& text,
+		ui::group_hash_type const group,
 		ui::Widget::WPtr&& parent
 	) noexcept
 		: base_type(
@@ -85,6 +86,7 @@ public:
 			enum_combine(
 				ui::Widget::Flags::visible
 			),
+			group,
 			{{1, 1}, false, Axis::none, Axis::none},
 			std::move(parent)
 		)
@@ -100,18 +102,21 @@ public:
 
 		@param root %Root.
 		@param text Text.
+		@param group %Property group.
 		@param parent Parent.
 	*/
 	static std::shared_ptr<ui::Label>
 	make(
 		ui::RootWPtr root,
 		String text,
+		ui::group_hash_type const group = ui::group_label,
 		ui::Widget::WPtr parent = ui::Widget::WPtr()
 	) {
 		auto p = std::make_shared<ui::Label>(
 			ctor_priv{},
 			std::move(root),
 			std::move(text),
+			group,
 			std::move(parent)
 		);
 		return p;

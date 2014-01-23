@@ -81,6 +81,7 @@ public:
 		: base_type(
 			{},
 			enum_combine(ui::Widget::Flags::visible),
+			ui::group_null,
 			{{0, 0}, true, Axis::both, Axis::both},
 			{},
 			orientation,

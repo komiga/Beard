@@ -101,7 +101,7 @@ private:
 
 	void
 	render_impl(
-		tty::Terminal& terminal
+		ui::Widget::RenderData& rd
 	) noexcept override;
 
 public:
@@ -116,6 +116,7 @@ public:
 		ui::RootWPtr&& root,
 		String&& text,
 		filter_type&& filter,
+		ui::group_hash_type const group,
 		ui::Widget::WPtr&& parent
 	) noexcept
 		: base_type(
@@ -123,6 +124,7 @@ public:
 			enum_combine(
 				ui::Widget::Flags::visible
 			),
+			group,
 			{{2, 1}, false, Axis::none, Axis::none},
 			std::move(parent)
 		)
@@ -148,6 +150,7 @@ public:
 		@param root %Root.
 		@param text Text.
 		@param filter Input filter.
+		@param group %Property group.
 		@param focus_index Focus index.
 		@param parent Parent.
 	*/
@@ -156,6 +159,7 @@ public:
 		ui::RootWPtr root,
 		String text,
 		filter_type filter = nullptr,
+		ui::group_hash_type const group = ui::group_field,
 		ui::focus_index_type const focus_index = ui::focus_index_lazy,
 		ui::Widget::WPtr parent = ui::Widget::WPtr()
 	) {
@@ -164,6 +168,7 @@ public:
 			std::move(root),
 			std::move(text),
 			std::move(filter),
+			group,
 			std::move(parent)
 		);
 		p->set_focus_index(focus_index);
