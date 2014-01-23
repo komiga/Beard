@@ -97,7 +97,8 @@ project = function()
 	configuration {}
 		includedirs {
 			precore.subst("${ROOT}/dep/duct/"),
-			precore.subst("${ROOT}/dep/ceformat/")
+			precore.subst("${ROOT}/dep/ceformat/"),
+			precore.subst("${ROOT}/dep/am/")
 		}
 end}})
 
