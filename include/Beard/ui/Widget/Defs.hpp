@@ -132,9 +132,6 @@ struct type_info final {
 	%Widget flags.
 */
 enum class Flags : unsigned {
-	// NB: If flags are added/changed, remember to update shift_ua
-	// in ui::Widget::Base
-
 	/**
 		No flags.
 	*/
@@ -159,6 +156,10 @@ enum class Flags : unsigned {
 		One or more queued update actions.
 	*/
 	queued_actions	= 1u << 4,
+
+/** @cond INTERNAL */
+	COUNT = 5u
+/** @endcond */
 };
 
 /**

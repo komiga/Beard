@@ -249,25 +249,50 @@ enum class UpdateActions : unsigned {
 	*/
 	none			= 0x00,
 	/**
-		Whether to perform actions on the parent.
+		Perform actions on the parent.
 	*/
 	flag_parent		= 1u << 0,
 	/**
+		Do not clear the back buffer for the widget's area.
+	*/
+	flag_noclear	= 1u << 1,
+
+	/**
 		Reflow.
 	*/
-	reflow			= 1u << 1,
+	reflow			= 1u << 2,
 	/**
 		Render (after reflowing, if set).
 	*/
-	render			= 1u << 2,
+	render			= 1u << 3,
+
+	/**
+		Mask with all flags.
+	*/
+	mask_flags
+		= flag_parent
+		| flag_noclear
+	,
 
 	/**
 		Mask with all actions.
 	*/
-	mask_all
+	mask_actions
 		= reflow
 		| render
 	,
+
+	/**
+		Mask with all members.
+	*/
+	mask_all
+		= mask_flags
+		| mask_actions
+	,
+
+/** @cond INTERNAL */
+	COUNT = 4u
+/** @endcond */
 };
 
 /**

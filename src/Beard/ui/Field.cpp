@@ -102,7 +102,10 @@ Field::handle_event_impl(
 				: txt::Extent::head
 			);*/
 			update_view();
-			queue_actions(ui::UpdateActions::render);
+			queue_actions(enum_combine(
+				ui::UpdateActions::render,
+				ui::UpdateActions::flag_noclear
+			));
 			return true;
 		} else if (has_input_control()) {
 			switch (event.key_input.code) {
@@ -125,7 +128,10 @@ Field::handle_event_impl(
 				break;
 			}
 			update_view();
-			queue_actions(ui::UpdateActions::render);
+			queue_actions(enum_combine(
+				ui::UpdateActions::render,
+				ui::UpdateActions::flag_noclear
+			));
 			return true;
 		}
 		break;

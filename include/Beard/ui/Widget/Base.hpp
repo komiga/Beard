@@ -57,11 +57,13 @@ protected:
 
 private:
 	enum : unsigned {
-		shift_ua = 5u
+		shift_ua = enum_cast(ui::Widget::Flags::COUNT)
 	};
 
 	static constexpr ui::Widget::Flags const
-	mask_ua = static_cast<ui::Widget::Flags>(0x07 << shift_ua);
+	mask_ua = static_cast<ui::Widget::Flags>(
+		enum_cast(ui::UpdateActions::mask_all) << shift_ua
+	);
 
 	ui::RootWPtr m_root;
 	flag_store_type m_flags;

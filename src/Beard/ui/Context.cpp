@@ -70,14 +70,19 @@ Context::run_actions(
 	ui::Widget::SPtr widget,
 	ui::UpdateActions const mask
 ) {
-	auto actions = widget->get_queued_actions();
+	auto const actions = static_cast<ui::UpdateActions>(
+		enum_bitand(
+			widget->get_queued_actions(),
+			enum_combine(mask, ui::UpdateActions::mask_flags)
+		)
+	);
+
 	if (
 		enum_bitand(actions, ui::UpdateActions::flag_parent) &&
 		widget->has_parent()
 	) {
 		widget = widget->get_parent();
 	}
-	actions = static_cast<ui::UpdateActions>(enum_bitand(actions, mask));
 	if (enum_bitand(actions, ui::UpdateActions::reflow)) {
 		widget->reflow(
 			(widget == m_root)
@@ -90,7 +95,9 @@ Context::run_actions(
 	if (enum_bitand(actions, ui::UpdateActions::render)) {
 		// TODO: Optimization: only clear if the terminal hasn't been
 		// cleared entirely?
-		m_terminal.clear_back(widget->get_geometry().get_area());
+		if (!enum_bitand(actions, ui::UpdateActions::flag_noclear)) {
+			m_terminal.clear_back(widget->get_geometry().get_area());
+		}
 		rd.update_group(widget->get_group());
 		widget->render(rd);
 	}
@@ -107,26 +114,25 @@ Context::run_all_actions() {
 		m_property_map.cend(),
 		m_property_map.find(m_fallback_group)
 	};
-	auto const sub = static_cast<ui::UpdateActions>(
-		~ enum_cast(m_root->get_queued_actions())
-	);
-	if (enum_bitand(sub, ui::UpdateActions::reflow)) {
+	auto const root_actions = m_root->get_queued_actions();
+
+	if (enum_bitand(root_actions, ui::UpdateActions::reflow)) {
+		run_actions(rd, m_root, ui::UpdateActions::reflow);
+	} else {
 		for (auto wp : m_action_queue) {
 			if (!wp.expired()) {
 				run_actions(rd, wp.lock(), ui::UpdateActions::reflow);
 			}
 		}
-	} else {
-		run_actions(rd, m_root, ui::UpdateActions::reflow);
 	}
-	if (enum_bitand(sub, ui::UpdateActions::render)) {
+	if (enum_bitand(root_actions, ui::UpdateActions::render)) {
+		run_actions(rd, m_root, ui::UpdateActions::render);
+	} else {
 		for (auto wp : m_action_queue) {
 			if (!wp.expired()) {
 				run_actions(rd, wp.lock(), ui::UpdateActions::render);
 			}
 		}
-	} else {
-		run_actions(rd, m_root, ui::UpdateActions::render);
 	}
 	clear_actions();
 }
@@ -151,9 +157,8 @@ Context::dequeue_widget(
 void
 Context::clear_actions() {
 	for (auto& wp : m_action_queue) {
-		auto widget = wp.lock();
-		if (widget) {
-			widget->clear_actions(false);
+		if (!wp.expired()) {
+			wp.lock()->clear_actions(false);
 		}
 	}
 	m_action_queue.clear();
