@@ -44,7 +44,16 @@ enum class KeyMod : unsigned {
 		@note This will only ever be used for KeyCodes -- not
 		code points.
 	*/
-	shift = 1u << 2
+	shift = 1u << 2,
+
+	/** Escape and control. */
+	esc_ctrl  = esc | ctrl,
+	/** Escape and shift. */
+	esc_shift = esc | shift,
+	/** Escape and control and shift. */
+	esc_ctrl_shift  = esc | ctrl | shift,
+	/** Control and shift. */
+	ctrl_shift  = ctrl | shift,
 };
 
 /**
