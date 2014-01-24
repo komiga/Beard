@@ -82,6 +82,19 @@ s_cap_cache_table[]{
 	tty::CapString::keypad_xmit,
 };
 
+// D:
+// For arrow keys with modifiers, see parm_*_cursor caps
+#define BEARD_TTY_IKM_CURSOR_(name_, shift_name_, cap_id_) \
+	{KeyMod::none          , KeyCode:: name_, codepoint_none, tty::CapString::key_ ## name_, {nullptr, 0u}}, \
+	{KeyMod::shift         , KeyCode:: name_, codepoint_none, tty::CapString::key_ ## shift_name_, {nullptr, 0u}}, \
+	{KeyMod::esc           , KeyCode:: name_, codepoint_none, static_cast<tty::CapString>(-1), "[1;3" cap_id_}, \
+	{KeyMod::esc_shift     , KeyCode:: name_, codepoint_none, static_cast<tty::CapString>(-1), "[1;4" cap_id_}, \
+	{KeyMod::ctrl          , KeyCode:: name_, codepoint_none, static_cast<tty::CapString>(-1), "[1;5" cap_id_}, \
+	{KeyMod::ctrl_shift    , KeyCode:: name_, codepoint_none, static_cast<tty::CapString>(-1), "[1;6" cap_id_}, \
+	{KeyMod::esc_ctrl      , KeyCode:: name_, codepoint_none, static_cast<tty::CapString>(-1), "[1;7" cap_id_}, \
+	{KeyMod::esc_ctrl_shift, KeyCode:: name_, codepoint_none, static_cast<tty::CapString>(-1), "[1;8" cap_id_}
+//
+
 static struct {
 	KeyMod const mod;
 	KeyCode const code;
@@ -101,14 +114,10 @@ static struct {
 	{KeyMod::none, KeyCode::pgup, codepoint_none, tty::CapString::key_ppage, {nullptr, 0u}},
 	{KeyMod::none, KeyCode::pgdn, codepoint_none, tty::CapString::key_npage, {nullptr, 0u}},
 
-	{KeyMod::none , KeyCode::up, codepoint_none, tty::CapString::key_up, {nullptr, 0u}},
-	{KeyMod::shift, KeyCode::up, codepoint_none, tty::CapString::key_sr, {nullptr, 0u}},
-	{KeyMod::none , KeyCode::down, codepoint_none, tty::CapString::key_down, {nullptr, 0u}},
-	{KeyMod::shift, KeyCode::down, codepoint_none, tty::CapString::key_sf, {nullptr, 0u}},
-	{KeyMod::none , KeyCode::left, codepoint_none, tty::CapString::key_left, {nullptr, 0u}},
-	{KeyMod::shift, KeyCode::left, codepoint_none, tty::CapString::key_sleft, {nullptr, 0u}},
-	{KeyMod::none , KeyCode::right, codepoint_none, tty::CapString::key_right, {nullptr, 0u}},
-	{KeyMod::shift, KeyCode::right, codepoint_none, tty::CapString::key_sright, {nullptr, 0u}},
+	BEARD_TTY_IKM_CURSOR_(up   , sr    , "A"),
+	BEARD_TTY_IKM_CURSOR_(down , sf    , "B"),
+	BEARD_TTY_IKM_CURSOR_(left , sleft , "D"),
+	BEARD_TTY_IKM_CURSOR_(right, sright, "C"),
 
 	{KeyMod::none, KeyCode::f1, codepoint_none, tty::CapString::key_f1, {nullptr, 0u}},
 	{KeyMod::none, KeyCode::f2, codepoint_none, tty::CapString::key_f2, {nullptr, 0u}},
@@ -161,6 +170,8 @@ static struct {
 	{KeyMod::none, KeyCode::none, ' ', static_cast<tty::CapString>(-1), "\x20"},
 	{KeyMod::none, KeyCode::backspace, codepoint_none, static_cast<tty::CapString>(-1), "\x7F"},
 };
+
+#undef BEARD_TTY_IKM_CURSOR_
 } // anonymous namespace
 
 struct terminal_internal final
