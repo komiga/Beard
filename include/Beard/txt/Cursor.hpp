@@ -215,7 +215,9 @@ public:
 	void
 	col_abs(
 		position_type const col
-	) noexcept;
+	) noexcept {
+		col_step(col - m_col);
+	}
 
 	/**
 		Move to column extent.
@@ -228,11 +230,14 @@ public:
 	) noexcept {
 		switch (extent) {
 		case txt::Extent::head:
-			col_abs(0u);
+			m_col = 0;
+			m_index = 0;
 			break;
 
 		case txt::Extent::tail:
-			col_abs(std::numeric_limits<position_type>::max());
+			auto const& node = get_node();
+			m_col = signed_cast(node.points());
+			m_index = signed_cast(node.units());
 			break;
 		}
 	}

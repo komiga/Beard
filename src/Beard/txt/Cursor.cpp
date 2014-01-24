@@ -59,27 +59,6 @@ Cursor::col_recalc() noexcept {
 }
 
 void
-Cursor::col_abs(
-	position_type col
-) noexcept {
-	if (col != m_col) {
-		auto const& node = get_node();
-		if (0 >= col) {
-			DUCT_DEBUG("col_abs: to head");
-			m_col = 0;
-			m_index = 0;
-		} else if (node.points() <= unsigned_cast(col)) {
-			DUCT_DEBUG("col_abs: to tail");
-			m_col = node.points();
-			m_index = node.units();
-		} else {
-			DUCT_DEBUG("col_abs: stepping");
-			col_step(col - m_col);
-		}
-	}
-}
-
-void
 Cursor::col_step(
 	difference_type const n
 ) noexcept {
@@ -88,7 +67,7 @@ Cursor::col_step(
 	}
 
 	auto const& node = get_node();
-	auto const dest = max_ce(difference_type{0}, m_col + n);
+	difference_type const dest = m_col + n;
 	DUCT_DEBUGF(
 		"col_step: m_col = %zd, m_index = %zd, dest = %ld, n = %ld, "
 		"diff = %zd, abs = %zd",
@@ -99,7 +78,15 @@ Cursor::col_step(
 
 	// Recalculate (i.e., count from the beginning) or step
 	// depending on the distance from the current column
-	if (node.singular()) {
+	if (0 >= dest) {
+		DUCT_DEBUG("  to head");
+		m_col = 0;
+		m_index = 0;
+	} else if (node.points() <= unsigned_cast(dest)) {
+		DUCT_DEBUG("  to tail");
+		m_col = signed_cast(node.points());
+		m_index = signed_cast(node.units());
+	} else if (node.singular()) {
 		DUCT_DEBUG("  singular");
 		m_col = dest;
 		m_index = dest;
