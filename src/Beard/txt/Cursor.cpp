@@ -43,19 +43,30 @@ Cursor::row_abs(
 
 void
 Cursor::col_recalc() noexcept {
-	position_type col = 0;
 	auto const& node = get_node();
-	auto const end = node.cend();
-	auto step = node.cbegin(), from = step;
-	while (
-		from < (step = txt::EncUtils::next(from, end)) &&
-		col > m_col
-	) {
-		from = step;
-		++col;
+	if (0 >= m_col) {
+		m_col = 0;
+		m_index = 0;
+	} else if (node.points() <= unsigned_cast(m_col)) {
+		m_col = signed_cast(node.points());
+		m_index = signed_cast(node.units());
+	} else if (node.singular()) {
+		m_col = dest;
+		m_index = dest;
+	} else {
+		position_type col = 0;
+		auto const end = node.cend();
+		auto step = node.cbegin(), from = step;
+		while (
+			from < (step = txt::EncUtils::next(from, end)) &&
+			col > m_col
+		) {
+			from = step;
+			++col;
+		}
+		m_col = col;
+		m_index = std::distance(node.cbegin(), from);
 	}
-	m_col = col;
-	m_index = std::distance(node.cbegin(), from);
 }
 
 void
