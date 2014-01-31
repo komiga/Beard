@@ -62,6 +62,24 @@ Base::render(
 // properties
 
 void
+Base::set_focused(
+	bool const focused
+) noexcept {
+	if (is_focused() != focused) {
+		ui::Event event;
+		event.type = ui::EventType::focus_changed;
+		event.focus_changed.previous = is_focused();
+		m_flags.set(ui::Widget::Flags::focused, focused);
+		if (!handle_event(event)) {
+			queue_actions(enum_combine(
+				ui::UpdateActions::render,
+				ui::UpdateActions::flag_noclear
+			));
+		}
+	}
+}
+
+void
 Base::set_focus_index(
 	ui::focus_index_type const index
 ) noexcept {

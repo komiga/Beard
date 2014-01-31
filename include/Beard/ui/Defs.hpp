@@ -303,8 +303,10 @@ enum class UpdateActions : unsigned {
 enum class EventType : unsigned {
 	/** No-event type. */
 	none = 0u,
-	/** Key input event type. */
+	/** Key input. */
 	key_input,
+	/** Focus changed to/from widget. */
+	focus_changed,
 };
 
 /**
@@ -325,6 +327,17 @@ struct Event final {
 		This is triggered by a tty::EventType::key_input event.
 	*/
 	KeyInputData key_input;
+
+	/**
+		%Event data for ui::EventType::focus_changed.
+
+		This event occurs immediately as the focus is changed on a
+		widget. If focus was moved from one widget to another, one
+		event is emitted for each of the involved widgets.
+	*/
+	struct {
+		bool previous;
+	} focus_changed;
 /// @}
 };
 

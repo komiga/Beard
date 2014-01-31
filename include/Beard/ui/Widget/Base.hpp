@@ -358,16 +358,16 @@ public:
 
 	/**
 		Set focused.
+
+		@note This will call handle_event() with a
+		ui::EventType::focus_changed if @a focused differs from the
+		current value. If handle_event() returns @c false, a no-clear
+		render will be queued.
 	*/
 	void
 	set_focused(
 		bool const focused
-	) noexcept {
-		if (is_focused() != focused) {
-			queue_actions(ui::UpdateActions::render);
-		}
-		m_flags.set(ui::Widget::Flags::focused, focused);
-	}
+	) noexcept;
 
 	/**
 		Check if the widget is focused.

@@ -65,7 +65,6 @@ Root::set_focus(
 	if (current == widget) {
 		return;
 	}
-	// TODO: Queue these actions
 	if (current) {
 		current->set_focused(false);
 	}
