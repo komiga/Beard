@@ -188,9 +188,7 @@ main(
 	root->push_back(hcont3);
 	ctx.render(true);
 
-	std::cout
-		<< "root: " << root->get_geometry() << '\n'
-	;
+	std::cout << "root: " << root->get_geometry() << '\n';
 	std::cout.flush();
 	for (auto const& s1 : root->get_slots()) {
 		std::cout << "top-level child: " << s1.widget->get_geometry() << '\n';
