@@ -19,6 +19,7 @@ namespace Beard {
 enum class Axis : unsigned;
 struct Vec2;
 struct Rect;
+struct Quad;
 
 /**
 	@addtogroup geometry
@@ -227,14 +228,13 @@ value_in_bounds(
 	@param v Vector to clamp.
 	@param min Minimum value.
 */
-inline Vec2&
+inline void
 vec2_clamp_min(
 	Vec2& v,
 	Vec2 const& min
 ) noexcept {
 	v.x = max_ce(v.x, min.x);
 	v.y = max_ce(v.y, min.y);
-	return v;
 }
 
 /**
@@ -243,14 +243,13 @@ vec2_clamp_min(
 	@param v Vector to clamp.
 	@param max Maximum value.
 */
-inline Vec2&
+inline void
 vec2_clamp_max(
 	Vec2& v,
 	Vec2 const& max
 ) noexcept {
 	v.x = min_ce(v.x, max.x);
 	v.y = min_ce(v.y, max.y);
-	return v;
 }
 
 /**
@@ -260,7 +259,7 @@ vec2_clamp_max(
 	@param min Minimum value.
 	@param max Maximum value.
 */
-inline Vec2&
+inline void
 vec2_clamp(
 	Vec2& v,
 	Vec2 const& min,
@@ -268,7 +267,6 @@ vec2_clamp(
 ) noexcept {
 	v.x = max_ce(min_ce(v.x, max.x), min.x);
 	v.y = max_ce(min_ce(v.y, max.y), min.y);
-	return v;
 }
 
 /**
@@ -278,7 +276,7 @@ vec2_clamp(
 	@param min Minimum value.
 	@param axis Axis to clamp.
 */
-inline Vec2&
+inline void
 vec2_clamp_min(
 	Vec2& v,
 	Vec2 const& min,
@@ -286,7 +284,6 @@ vec2_clamp_min(
 ) noexcept {
 	auto& value = vec2_axis_ref(v, axis);
 	value = max_ce(value, vec2_axis_value(min, axis));
-	return v;
 }
 
 /**
@@ -296,7 +293,7 @@ vec2_clamp_min(
 	@param max Maximum value.
 	@param axis Axis to clamp.
 */
-inline Vec2&
+inline void
 vec2_clamp_max(
 	Vec2& v,
 	Vec2 const& max,
@@ -304,7 +301,6 @@ vec2_clamp_max(
 ) noexcept {
 	auto& value = vec2_axis_ref(v, axis);
 	value = min_ce(value, vec2_axis_value(max, axis));
-	return v;
 }
 
 /**
@@ -315,7 +311,7 @@ vec2_clamp_max(
 	@param max Maximum value.
 	@param axis Axis to clamp.
 */
-inline Vec2&
+inline void
 vec2_clamp(
 	Vec2& v,
 	Vec2 const& min,
@@ -327,7 +323,6 @@ vec2_clamp(
 		min_ce(value, vec2_axis_value(max, axis)),
 		vec2_axis_value(min, axis)
 	);
-	return v;
 }
 
 /**
