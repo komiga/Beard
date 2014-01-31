@@ -420,15 +420,18 @@ public:
 	/**
 		Queue update actions.
 
-		@note This has no effect if
-		<code>actions == ui::UpdateActions::none</code>.
+		@note This has no effect if @a actions does not contain an
+		action. See ui::UpdateActions::mask_actions.
+
+		@note If a clearing render is already queued,
+		ui::UpdateActions::flag_noclear will be stripped from
+		@a actions.
 
 		@param actions Actions to queue.
-		@sa ui::UpdateActions
 	*/
 	void
 	queue_actions(
-		ui::UpdateActions const actions
+		ui::UpdateActions actions
 	);
 
 	/**
