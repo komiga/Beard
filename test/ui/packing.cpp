@@ -114,6 +114,7 @@ main(
 		ctx.open(tty_path, use_sigwinch);
 	} catch (Error const& ex) {
 		report_error(ex);
+		return 1;
 	}
 
 	auto root = ui::Root::make(ctx, Axis::vertical);
