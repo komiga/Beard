@@ -17,6 +17,7 @@ namespace Beard {
 
 // Forward declarations
 enum class Axis : unsigned;
+enum class RangeRel : unsigned;
 struct Vec2;
 struct Rect;
 struct Quad;
@@ -49,6 +50,25 @@ enum class Axis : unsigned {
 	/** Both axes. */
 	both = x | y
 };
+
+/**
+	Range relationships.
+*/
+enum class RangeRel : unsigned {
+	/** Ranges are equivalent. */
+	equal = 0u,
+	/** Ranges are disjoint. */
+	disjoint,
+	/** Range is a subset of the other. */
+	subset,
+	/** Range is a superset of the other. */
+	superset,
+	/** Range intersects the other at its head. */
+	intersection_before,
+	/** Range intersects the other at its tail. */
+	intersection_after
+};
+
 
 /**
 	Geometry element type.
@@ -575,6 +595,48 @@ vec2_in_bounds(
 		rect.pos.x <= v.x && rect.pos.x + rect.size.width  > v.x &&
 		rect.pos.y <= v.y && rect.pos.y + rect.size.height > v.y
 	;
+}
+
+/**
+	Check if a range intersects with another range.
+
+	@param a,b Vectors to test.
+*/
+inline constexpr bool
+range_intersects(
+	Vec2 const& a,
+	Vec2 const& b
+) noexcept {
+	return !(
+		a.x >= b.y ||
+		a.y <= b.x
+	);
+}
+
+/**
+	Classify relationship between two ranges.
+
+	@param a Basis range.
+	@param b Range to compare with.
+*/
+inline RangeRel
+range_rel(
+	Vec2 const& a,
+	Vec2 const& b
+) noexcept {
+	if (a == b) {
+		return RangeRel::equal;
+	} else if (a.x >= b.x && a.y <= b.y) {
+		return RangeRel::subset;
+	} else if (a.x <= b.x && a.y >= b.y) {
+		return RangeRel::superset;
+	} else if (b.x < a.y && b.x >= a.x) {
+		return RangeRel::intersection_before;
+	} else if (a.x < b.y && a.x >= b.x) {
+		return RangeRel::intersection_after;
+	} else {
+		return RangeRel::disjoint;
+	}
 }
 
 /**
