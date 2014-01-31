@@ -45,6 +45,7 @@ private:
 	ProtoContainer& operator=(ProtoContainer const&) = delete;
 
 protected:
+/** @name Implementation */ /// @{
 	/**
 		size() implementation.
 	*/
@@ -81,10 +82,12 @@ protected:
 	push_back_impl(
 		ui::Widget::SPtr widget
 	) = 0;
+/// @}
 
 protected:
 /** @name Constructors and destructor */ /// @{
 	/** Destructor. */
+	virtual
 	~ProtoContainer() noexcept override = 0;
 
 	/**

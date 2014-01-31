@@ -124,6 +124,7 @@ protected:
 
 		@note This will explicitly @c clear() the container.
 	*/
+	virtual
 	~ProtoSlotContainer() noexcept override = 0;
 
 	/**
