@@ -8,4 +8,6 @@ general/headers
 tty/info
 tty/hello
 
+txt/ops
+
 ui/packing
