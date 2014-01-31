@@ -423,15 +423,15 @@ public:
 		@note This has no effect if @a actions does not contain an
 		action. See ui::UpdateActions::mask_actions.
 
-		@note If a clearing render is already queued,
-		ui::UpdateActions::flag_noclear will be stripped from
-		@a actions.
+		@note If a clearing render is either already queued or
+		is being requested, ui::UpdateActions::flag_noclear is
+		elided.
 
 		@param actions Actions to queue.
 	*/
 	void
 	queue_actions(
-		ui::UpdateActions actions
+		ui::UpdateActions const actions
 	);
 
 	/**

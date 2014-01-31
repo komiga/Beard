@@ -81,35 +81,43 @@ Base::set_focus_index(
 
 // operations
 
+constexpr bool
+is_clearing_render(
+	ui::UpdateActions const actions
+) noexcept {
+	return
+		enum_cast(ui::UpdateActions::render)
+		== enum_bitand(
+			actions,
+			enum_combine(
+				ui::UpdateActions::render,
+				ui::UpdateActions::flag_noclear
+			)
+		)
+	;
+}
+
 void
 Base::queue_actions(
-	ui::UpdateActions actions
+	ui::UpdateActions const actions
 ) {
 	if (enum_bitand(actions, ui::UpdateActions::mask_actions)) {
 		if (!is_action_queued()) {
 			get_root()->get_context().enqueue_widget(shared_from_this());
 		}
-		constexpr auto const
-		render_noclear = enum_combine(
-			ui::UpdateActions::render,
-			ui::UpdateActions::flag_noclear
-		);
+
 		auto const current = get_queued_actions();
+		auto new_actions = enum_cast(current) | enum_cast(actions);
 		if (
-			enum_cast(ui::UpdateActions::render)
-			== enum_bitand(current, render_noclear)
+			is_clearing_render(current) ||
+			is_clearing_render(actions)
 		) {
-			// If a clearing render is already queued, retain it
-			actions = static_cast<ui::UpdateActions>(
-				enum_cast(actions)
-				& ~ enum_cast(ui::UpdateActions::flag_noclear)
-			);
+			new_actions &= ~ enum_cast(ui::UpdateActions::flag_noclear);
 		}
 		m_flags.set_masked(
-			ui::Widget::Flags::none,
+			mask_ua,
 			static_cast<ui::Widget::Flags>(
-				enum_cast(current) |
-				(enum_cast(actions) << shift_ua)
+				new_actions << shift_ua
 			)
 		);
 		set_action_queued(true);
