@@ -78,7 +78,7 @@ cout_string(
 
 signed
 main(
-	int argc,
+	signed argc,
 	char* argv[]
 ) {
 	if (2 > argc || 3 < argc) {
