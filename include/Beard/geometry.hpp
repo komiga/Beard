@@ -102,6 +102,193 @@ struct Quad final {
 	Vec2 v2;
 };
 
+/** @name Operators */ /// @{
+
+/**
+	Vector equality comparison operator.
+
+	@param lhs Left-hand side.
+	@param rhs Right-hand side.
+*/
+inline constexpr bool
+operator==(
+	Vec2 const& lhs,
+	Vec2 const& rhs
+) noexcept {
+	return
+		lhs.x == rhs.x &&
+		lhs.y == rhs.y
+	;
+}
+
+/**
+	Vector addition operator.
+
+	@param lhs Left-hand side.
+	@param rhs Right-hand side.
+*/
+inline constexpr Vec2
+operator+(
+	Vec2 const& lhs,
+	Vec2 const& rhs
+) noexcept {
+	return Vec2{
+		lhs.x + rhs.x,
+		lhs.y + rhs.y
+	};
+}
+
+/**
+	Vector addition assignment operator.
+
+	@param lhs Left-hand side.
+	@param rhs Right-hand side.
+*/
+inline /*constexpr*/ Vec2&
+operator+=(
+	Vec2& lhs,
+	Vec2 const& rhs
+) noexcept {
+	lhs.x += rhs.x;
+	lhs.y += rhs.y;
+	return lhs;
+}
+
+/**
+	Vector subtraction operator.
+
+	@param lhs Left-hand side.
+	@param rhs Right-hand side.
+*/
+inline constexpr Vec2
+operator-(
+	Vec2 const& lhs,
+	Vec2 const& rhs
+) noexcept {
+	return Vec2{
+		lhs.x - rhs.x,
+		lhs.y - rhs.y
+	};
+}
+
+/**
+	Vector subtraction assignment operator.
+
+	@param lhs Left-hand side.
+	@param rhs Right-hand side.
+*/
+inline /*constexpr*/ Vec2&
+operator-=(
+	Vec2& lhs,
+	Vec2 const& rhs
+) noexcept {
+	lhs.x -= rhs.x;
+	lhs.y -= rhs.y;
+	return lhs;
+}
+
+/**
+	Vector multiplication operator.
+
+	@param lhs Left-hand side.
+	@param rhs Right-hand side.
+*/
+inline constexpr Vec2
+operator*(
+	Vec2 const& lhs,
+	Vec2 const& rhs
+) noexcept {
+	return Vec2{
+		lhs.x * rhs.x,
+		lhs.y * rhs.y
+	};
+}
+
+/**
+	Vector multiplication assignment operator.
+
+	@param lhs Left-hand side.
+	@param rhs Right-hand side.
+*/
+inline /*constexpr*/ Vec2&
+operator*=(
+	Vec2& lhs,
+	Vec2 const& rhs
+) noexcept {
+	lhs.x *= rhs.x;
+	lhs.y *= rhs.y;
+	return lhs;
+}
+
+/**
+	Vector division operator.
+
+	@param lhs Left-hand side.
+	@param rhs Right-hand side.
+*/
+inline constexpr Vec2
+operator/(
+	Vec2 const& lhs,
+	Vec2 const& rhs
+) noexcept {
+	return Vec2{
+		lhs.x / rhs.x,
+		lhs.y / rhs.y
+	};
+}
+
+/**
+	Vector division assignment operator.
+
+	@param lhs Left-hand side.
+	@param rhs Right-hand side.
+*/
+inline /*constexpr*/ Vec2&
+operator/=(
+	Vec2& lhs,
+	Vec2 const& rhs
+) noexcept {
+	lhs.x /= rhs.x;
+	lhs.y /= rhs.y;
+	return lhs;
+}
+
+/**
+	Rectangle equality comparison operator.
+
+	@param lhs Left-hand side.
+	@param rhs Right-hand side.
+*/
+inline constexpr bool
+operator==(
+	Rect const& lhs,
+	Rect const& rhs
+) noexcept {
+	return
+		lhs.pos == rhs.pos &&
+		lhs.size == rhs.size
+	;
+}
+
+/**
+	%Quad equality comparison operator.
+
+	@param lhs Left-hand side.
+	@param rhs Right-hand side.
+*/
+inline constexpr bool
+operator==(
+	Quad const& lhs,
+	Quad const& rhs
+) noexcept {
+	return
+		lhs.v1 == rhs.v1 &&
+		lhs.v2 == rhs.v2
+	;
+}
+
+/// @} // end of name-group Operators
+
 /**
 	Get an axis's transpose-axis.
 
@@ -464,193 +651,6 @@ quad_intersects(
 		a.v1.y > b.v2.y
 	);
 }
-
-/** @name Operators */ /// @{
-
-/**
-	Vector equality comparison operator.
-
-	@param lhs Left-hand side.
-	@param rhs Right-hand side.
-*/
-inline constexpr bool
-operator==(
-	Vec2 const& lhs,
-	Vec2 const& rhs
-) noexcept {
-	return
-		lhs.x == rhs.x &&
-		lhs.y == rhs.y
-	;
-}
-
-/**
-	Vector addition operator.
-
-	@param lhs Left-hand side.
-	@param rhs Right-hand side.
-*/
-inline constexpr Vec2
-operator+(
-	Vec2 const& lhs,
-	Vec2 const& rhs
-) noexcept {
-	return Vec2{
-		lhs.x + rhs.x,
-		lhs.y + rhs.y
-	};
-}
-
-/**
-	Vector addition assignment operator.
-
-	@param lhs Left-hand side.
-	@param rhs Right-hand side.
-*/
-inline /*constexpr*/ Vec2&
-operator+=(
-	Vec2& lhs,
-	Vec2 const& rhs
-) noexcept {
-	lhs.x += rhs.x;
-	lhs.y += rhs.y;
-	return lhs;
-}
-
-/**
-	Vector subtraction operator.
-
-	@param lhs Left-hand side.
-	@param rhs Right-hand side.
-*/
-inline constexpr Vec2
-operator-(
-	Vec2 const& lhs,
-	Vec2 const& rhs
-) noexcept {
-	return Vec2{
-		lhs.x - rhs.x,
-		lhs.y - rhs.y
-	};
-}
-
-/**
-	Vector subtraction assignment operator.
-
-	@param lhs Left-hand side.
-	@param rhs Right-hand side.
-*/
-inline /*constexpr*/ Vec2&
-operator-=(
-	Vec2& lhs,
-	Vec2 const& rhs
-) noexcept {
-	lhs.x -= rhs.x;
-	lhs.y -= rhs.y;
-	return lhs;
-}
-
-/**
-	Vector multiplication operator.
-
-	@param lhs Left-hand side.
-	@param rhs Right-hand side.
-*/
-inline constexpr Vec2
-operator*(
-	Vec2 const& lhs,
-	Vec2 const& rhs
-) noexcept {
-	return Vec2{
-		lhs.x * rhs.x,
-		lhs.y * rhs.y
-	};
-}
-
-/**
-	Vector multiplication assignment operator.
-
-	@param lhs Left-hand side.
-	@param rhs Right-hand side.
-*/
-inline /*constexpr*/ Vec2&
-operator*=(
-	Vec2& lhs,
-	Vec2 const& rhs
-) noexcept {
-	lhs.x *= rhs.x;
-	lhs.y *= rhs.y;
-	return lhs;
-}
-
-/**
-	Vector division operator.
-
-	@param lhs Left-hand side.
-	@param rhs Right-hand side.
-*/
-inline constexpr Vec2
-operator/(
-	Vec2 const& lhs,
-	Vec2 const& rhs
-) noexcept {
-	return Vec2{
-		lhs.x / rhs.x,
-		lhs.y / rhs.y
-	};
-}
-
-/**
-	Vector division assignment operator.
-
-	@param lhs Left-hand side.
-	@param rhs Right-hand side.
-*/
-inline /*constexpr*/ Vec2&
-operator/=(
-	Vec2& lhs,
-	Vec2 const& rhs
-) noexcept {
-	lhs.x /= rhs.x;
-	lhs.y /= rhs.y;
-	return lhs;
-}
-
-/**
-	Rectangle equality comparison operator.
-
-	@param lhs Left-hand side.
-	@param rhs Right-hand side.
-*/
-inline constexpr bool
-operator==(
-	Rect const& lhs,
-	Rect const& rhs
-) noexcept {
-	return
-		lhs.pos == rhs.pos &&
-		lhs.size == rhs.size
-	;
-}
-
-/**
-	%Quad equality comparison operator.
-
-	@param lhs Left-hand side.
-	@param rhs Right-hand side.
-*/
-inline constexpr bool
-operator==(
-	Quad const& lhs,
-	Quad const& rhs
-) noexcept {
-	return
-		lhs.v1 == rhs.v1 &&
-		lhs.v2 == rhs.v2
-	;
-}
-
-/// @} // end of name-group Operators
 
 /** @} */ // end of doc-group geometry
 
