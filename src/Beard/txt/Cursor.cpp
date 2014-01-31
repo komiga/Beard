@@ -51,8 +51,7 @@ Cursor::col_recalc() noexcept {
 		m_col = signed_cast(node.points());
 		m_index = signed_cast(node.units());
 	} else if (node.singular()) {
-		m_col = dest;
-		m_index = dest;
+		m_index = m_col;
 	} else {
 		position_type col = 0;
 		auto const end = node.cend();
