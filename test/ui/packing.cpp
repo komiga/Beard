@@ -16,68 +16,11 @@
 
 #include <cassert>
 #include <iostream>
-#include <iomanip>
 
 #include "../common/common.hpp"
 
 using namespace Beard;
 using Beard::tty::make_cell;
-
-std::ostream&
-operator<<(
-	std::ostream& stream,
-	Axis const axis
-) {
-	static char const* const
-	axis_names[]{"none", "x", "y", "both"};
-
-	return stream
-		<< axis_names[enum_cast(axis)]
-	;
-}
-
-std::ostream&
-operator<<(
-	std::ostream& stream,
-	Vec2 const& v
-) {
-	return stream
-		<< '{' << std::dec
-		<< std::setw(4u) << v.x << ','
-		<< std::setw(4u) << v.y
-		<< '}'
-	;
-}
-
-std::ostream&
-operator<<(
-	std::ostream& stream,
-	Rect const& rect
-) {
-	return stream
-		<< '{'
-		<< rect.pos << ", "
-		<< rect.size
-		<< '}'
-	;
-}
-
-std::ostream&
-operator<<(
-	std::ostream& stream,
-	ui::Geom const& geom
-) {
-	return stream
-		<< "{\n"
-		<< "  area  = " << geom.get_area() << ",\n"
-		<< "  frame = " << geom.get_frame() << ",\n"
-		<< "  request_size = " << geom.get_request_size() << ",\n"
-		<< std::boolalpha
-		<< "  expand = " << geom.get_expand() << ",\n"
-		<< "  fill   = " << geom.get_fill()
-		<< "\n}"
-	;
-}
 
 signed
 main(

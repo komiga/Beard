@@ -2,12 +2,74 @@
 #ifndef BEARD_TEST_COMMON_COMMON_HPP_
 #define BEARD_TEST_COMMON_COMMON_HPP_
 
+#include <Beard/geometry.hpp>
 #include <Beard/String.hpp>
 #include <Beard/Error.hpp>
 #include <Beard/tty/TerminalInfo.hpp>
+#include <Beard/ui/Geom.hpp>
 
 #include <iostream>
+#include <iomanip>
 #include <fstream>
+#include <cassert>
+
+#include "../common/common.hpp"
+
+std::ostream&
+operator<<(
+	std::ostream& stream,
+	Beard::Axis const axis
+) {
+	static char const* const
+	axis_names[]{"none", "x", "y", "both"};
+
+	return stream
+		<< axis_names[enum_cast(axis)]
+	;
+}
+
+std::ostream&
+operator<<(
+	std::ostream& stream,
+	Beard::Vec2 const& v
+) {
+	return stream
+		<< '{' << std::dec
+		<< std::setw(4u) << v.x << ','
+		<< std::setw(4u) << v.y
+		<< '}'
+	;
+}
+
+std::ostream&
+operator<<(
+	std::ostream& stream,
+	Beard::Rect const& rect
+) {
+	return stream
+		<< '{'
+		<< rect.pos << ", "
+		<< rect.size
+		<< '}'
+	;
+}
+
+std::ostream&
+operator<<(
+	std::ostream& stream,
+	Beard::ui::Geom const& geom
+) {
+	return stream
+		<< "{\n"
+		<< "  area  = " << geom.get_area() << ",\n"
+		<< "  frame = " << geom.get_frame() << ",\n"
+		<< "  request_size = " << geom.get_request_size() << ",\n"
+		<< std::boolalpha
+		<< "  expand = " << geom.get_expand() << ",\n"
+		<< "  fill   = " << geom.get_fill()
+		<< "\n}"
+	;
+}
 
 void
 report_error(
