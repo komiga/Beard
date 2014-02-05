@@ -197,7 +197,7 @@ struct Event final {
 	/**
 		Type.
 	*/
-	tty::EventType type;
+	tty::EventType type{tty::EventType::none};
 
 	/**
 		%Event data for tty::EventType::resize.
@@ -206,13 +206,13 @@ struct Event final {
 	*/
 	struct {
 		/** Old size of terminal. */
-		Vec2 old_size;
-	} resize;
+		Vec2 old_size{0, 0};
+	} resize{};
 
 	/**
 		%Event data for tty::EventType::key_input.
 	*/
-	KeyInputData key_input;
+	KeyInputData key_input{};
 };
 
 /** @} */ // end of doc-group tty
