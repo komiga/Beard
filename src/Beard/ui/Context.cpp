@@ -31,7 +31,6 @@ Context::Context(
 	: m_terminal()
 	, m_event()
 	, m_property_map(std::move(property_map))
-	, m_fallback_group(ui::group_default)
 	, m_action_queue()
 	, m_root()
 {}
@@ -43,7 +42,6 @@ Context::Context(
 	: m_terminal(std::move(term_info))
 	, m_event()
 	, m_property_map(std::move(property_map))
-	, m_fallback_group(ui::group_default)
 	, m_action_queue()
 	, m_root()
 {}

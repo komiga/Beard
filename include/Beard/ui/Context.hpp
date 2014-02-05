@@ -47,7 +47,7 @@ private:
 	ui::Event m_event;
 
 	ui::PropertyMap m_property_map;
-	ui::group_hash_type m_fallback_group;
+	ui::group_hash_type m_fallback_group{ui::group_default};
 	action_queue_set_type m_action_queue;
 	ui::RootSPtr m_root;
 
