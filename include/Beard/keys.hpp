@@ -107,11 +107,11 @@ enum : char32 {
 */
 struct KeyInputData final {
 	/** Key modifier. */
-	KeyMod mod;
+	KeyMod mod{KeyMod::none};
 	/** Key code. */
-	KeyCode code;
+	KeyCode code{KeyCode::none};
 	/** Code point. */
-	char32 cp;
+	char32 cp{codepoint_none};
 };
 
 /**
