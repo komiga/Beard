@@ -412,6 +412,20 @@ value_clamp(
 }
 
 /**
+	Clamp a value to a range.
+
+	@param value Value to clamp.
+	@param range Range to clamp to (x-min, y-max).
+*/
+inline geom_value_type
+value_clamp(
+	geom_value_type const value,
+	Vec2 const& range
+) noexcept {
+	return max_ce(min_ce(value, range.y), range.x);
+}
+
+/**
 	Check if value is within a bound.
 
 	@note This is non-max-inclusive: <code>[min; max)</code>.
