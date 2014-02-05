@@ -41,7 +41,7 @@ Field::update_view() noexcept {
 			m_view.col() + inner_width < m_cursor.col()
 		) {
 			m_view.col_abs(
-				m_cursor.col() - (inner_width * 0.5)
+				m_cursor.col() - (inner_width / 2)
 			);
 		}
 	}
