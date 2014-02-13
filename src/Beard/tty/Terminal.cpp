@@ -424,9 +424,9 @@ write_colors(
 		color16_max = 0x09
 	};
 
-	unsigned const def = 
-		(tty::Color::term_default != color_fg) |
-		(tty::Color::term_default != color_bg) << 1u
+	unsigned const def
+		= (tty::Color::term_default != color_fg)
+		| (tty::Color::term_default != color_bg) << 1u
 	;
 	if (!def) {
 		return;

@@ -126,7 +126,7 @@ static constexpr Cell const
 	/**
 		Default buffer cell.
 	*/
-	s_cell_default = make_cell(
+	s_cell_default = tty::make_cell(
 		' ',
 		tty::Color::term_default,
 		tty::Color::term_default
