@@ -612,6 +612,19 @@ vec2_in_bounds(
 }
 
 /**
+	Calculate the length of a range.
+
+	@returns <code>max(0, range.y - range.x)</code>.
+	@param range Range.
+*/
+inline constexpr geom_value_type
+range_length(
+	Vec2 const& range
+) noexcept {
+	return max_ce(geom_value_type{0}, range.y - range.x);
+}
+
+/**
 	Check if a range intersects with another range.
 
 	@param a,b Vectors to test.
