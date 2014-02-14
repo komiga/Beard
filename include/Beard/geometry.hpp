@@ -57,8 +57,10 @@ enum class Axis : unsigned {
 enum class RangeRel : unsigned {
 	/** Ranges are equivalent. */
 	equal = 0u,
-	/** Ranges are disjoint. */
-	disjoint,
+	/** Range comes before the other. */
+	disjoint_before,
+	/** Range comes after the other. */
+	disjoint_after,
 	/** Range is a subset of the other. */
 	subset,
 	/** Range is a superset of the other. */
@@ -661,8 +663,10 @@ range_rel(
 		return RangeRel::intersection_before;
 	} else if (a.x < b.y && a.x >= b.x) {
 		return RangeRel::intersection_after;
+	} else if (a.y <= b.x) {
+		return RangeRel::disjoint_before;
 	} else {
-		return RangeRel::disjoint;
+		return RangeRel::disjoint_after;
 	}
 }
 
