@@ -61,7 +61,7 @@ using WPtr = aux::weak_ptr<ui::Widget::Base>;
 */
 enum class Type : unsigned {
 /** @name Standard range */ /// @{
-	/** Base standard type. */
+	/** %Base standard type. */
 	STANDARD_BASE = 0x01,
 	/** Maximum standard type. */
 	STANDARD_LIMIT = 0xFF,
@@ -70,7 +70,7 @@ enum class Type : unsigned {
 /// @}
 
 /** @name Userspace range */ /// @{
-	/** Base userspace type. */
+	/** %Base userspace type. */
 	USERSPACE_BASE = 0x00000100,
 	/** Maximum userspace type. */
 	USERSPACE_LIMIT = 0xFFFFFFFF,
@@ -201,7 +201,10 @@ struct RenderData final {
 	/**
 		Update group.
 
-		@param widget %Widget to fetch.
+		This will update the current group iterator iff @a name
+		differs from the current group name.
+
+		@param name Group to use.
 	*/
 	void
 	update_group(

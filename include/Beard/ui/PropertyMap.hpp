@@ -97,6 +97,8 @@ public:
 		Constructor with initializer list.
 
 		@param ilist Initializer list.
+		@param emplace_default Whether to emplace the default group
+		as @c ui::group_default.
 	*/
 	PropertyMap(
 		std::initializer_list<pair_type> ilist,
@@ -295,14 +297,19 @@ public:
 		Args&&... args
 	) {
 		if (ui::group_null == name) {
+			// ... Doxygen ¬_¬
+			/** @cond INTERNAL */
 			#define BEARD_SCOPE_CLASS ui::PropertyMap
 			#define BEARD_SCOPE_FUNC emplace
+			/** @endcond */
 			BEARD_THROW_FQN(
 				ErrorCode::ui_invalid_group,
 				"cannot emplace null group"
 			);
+			/** @cond INTERNAL */
 			#undef BEARD_SCOPE_CLASS
 			#undef BEARD_SCOPE_FUNC
+			/** @endcond */
 		}
 
 		return m_groups.emplace(name, std::forward<Args>(args)...);

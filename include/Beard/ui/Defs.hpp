@@ -336,6 +336,7 @@ struct Event final {
 		event is emitted for each of the involved widgets.
 	*/
 	struct {
+		/** Previous focus. */
 		bool previous;
 	} focus_changed;
 /// @}
