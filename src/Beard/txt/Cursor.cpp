@@ -3,7 +3,6 @@
 #include <Beard/txt/Cursor.hpp>
 
 #include <duct/char.hpp>
-#include <duct/debug.hpp>
 
 #include <cmath>
 #include <iterator>
@@ -78,30 +77,26 @@ Cursor::col_step(
 
 	auto const& node = get_node();
 	difference_type const dest = m_col + n;
-	DUCT_DEBUGF(
+	/*DUCT_DEBUGF(
 		"col_step: m_col = %zd, m_index = %zd, dest = %ld, n = %ld, "
 		"diff = %zd, abs = %zd",
 		m_col, m_index, dest, n,
 		dest - m_col,
 		std::abs(dest - m_col)
-	);
+	);*/
 
 	// Recalculate (i.e., count from the beginning) or step
 	// depending on the distance from the current column
 	if (0 >= dest) {
-		DUCT_DEBUG("  to head");
 		m_col = 0;
 		m_index = 0;
 	} else if (node.points() <= unsigned_cast(dest)) {
-		DUCT_DEBUG("  to tail");
 		m_col = signed_cast(node.points());
 		m_index = signed_cast(node.units());
 	} else if (node.singular()) {
-		DUCT_DEBUG("  singular");
 		m_col = dest;
 		m_index = dest;
 	} else if (dest < std::abs(dest - m_col)) {
-		DUCT_DEBUG("  recalculating");
 		m_col = dest;
 		col_recalc();
 	} else {
@@ -109,34 +104,30 @@ Cursor::col_step(
 		auto step = begin + m_index, from = step;
 		if (0 > n) {
 			// Step backward
-			DUCT_DEBUG("  stepping backward");
 			while (
 				from > (step = txt::EncUtils::prev(from, begin)) &&
 				dest < m_col
 			) {
 				from = step;
 				--m_col;
-				DUCT_DEBUG("  --");
 			}
 		} else {
 			// Step forward
-			DUCT_DEBUG("  stepping forward");
 			while (
 				from < (step = txt::EncUtils::next(from, end)) &&
 				dest > m_col
 			) {
 				from = step;
 				++m_col;
-				DUCT_DEBUG("  ++");
 			}
 		}
 		m_index = std::distance(begin, from);
-		DUCT_DEBUGF(
+		/*DUCT_DEBUGF(
 			"  m_col = %zd, m_index = %zd, dist = %ld",
 			m_col,
 			m_index,
 			std::distance(begin, from)
-		);
+		);*/
 	}
 }
 
@@ -189,10 +180,10 @@ Cursor::insert_step(
 ) {
 	auto const size = insert(cp);
 	if (0u < size) {
-		DUCT_DEBUGF(
+		/*DUCT_DEBUGF(
 			"insert_step: m_col = %zd, m_index = %zd, size = %zu",
 			m_col, m_index, size
-		);
+		);*/
 		++m_col;
 		m_index += size;
 	}
@@ -202,35 +193,33 @@ Cursor::insert_step(
 std::size_t
 Cursor::erase() {
 	auto& node = get_node();
-	DUCT_DEBUGF(
+	/*DUCT_DEBUGF(
 		"erase: m_col = %zd, m_index = %zd, ucount = %zu",
 		m_col, m_index, node.units()
-	);
+	);*/
 	if (signed_cast(node.units()) <= m_index) {
 		return 0u;
 	}
 
 	auto const it = node.cbegin() + m_index;
 	auto const size = txt::EncUtils::required_first_whole(*it);
-	DUCT_DEBUGF("  size = %u", size);
 	if (it + size <= node.cend()) {
-		DUCT_DEBUG("  erasing");
 		node.m_buffer.erase(it, it + size);
 		get_tree().update_counts(node, -size, -1);
 		return size;
 	} else {
 		// Incomplete sequence
-		DUCT_DEBUG("  ics");
+		//DUCT_DEBUG("Cursor::erase: ics");
 		return 0u;
 	}
 }
 
 std::size_t
 Cursor::erase_before() {
-	DUCT_DEBUGF(
+	/*DUCT_DEBUGF(
 		"erase_before: m_col = %zu, m_index = %zu",
 		m_col, m_index
-	);
+	);*/
 	if (0 < m_col) {
 		col_prev();
 		return erase();
