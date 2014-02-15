@@ -12,6 +12,7 @@
 #include <Beard/ui/Container.hpp>
 #include <Beard/ui/Label.hpp>
 #include <Beard/ui/Button.hpp>
+#include <Beard/ui/Field.hpp>
 #include <Beard/ui/ProtoGrid.hpp>
 #include <Beard/ui/packing.hpp>
 
@@ -90,6 +91,7 @@ private:
 	} m_cursor{};
 
 	row_vector_type m_rows;
+	aux::shared_ptr<ui::Field> m_field;
 
 private:
 // ui::Widget::Base implementation
@@ -141,6 +143,11 @@ private:
 	void
 	adjust_view() noexcept;
 
+	void
+	reflow_field(
+		bool const cache
+	) noexcept;
+
 public:
 	~TestGrid() noexcept override = default;
 
@@ -162,6 +169,7 @@ public:
 			row_count
 		)
 		, m_rows(row_count)
+		, m_field()
 	{
 		for (auto& row : m_rows) {
 			row.columns.resize(col_count);
@@ -186,6 +194,17 @@ public:
 			std::move(parent)
 		);
 		p->set_focus_index(focus_index);
+		p->m_field = ui::Field::make(
+			p->get_root(),
+			{},
+			nullptr,
+			ui::group_field,
+			ui::focus_index_none/*,
+			p*/
+		);
+		p->m_field->get_geometry().set_sizing(Axis::x, Axis::x);
+		p->m_field->set_focused(true);
+		p->m_field->clear_actions();
 		return p;
 	}
 
@@ -265,6 +284,13 @@ TestGrid::reflow_impl(
 	adjust_view();
 	queue_header_render();
 	queue_cell_render(0, get_row_count());
+
+	if (has_input_control()) {
+		reflow_field(cache);
+		m_field->queue_actions(
+			ui::UpdateActions::render
+		);
+	}
 }
 
 bool
@@ -273,42 +299,73 @@ TestGrid::handle_event_impl(
 ) noexcept {
 	switch (event.type) {
 	case ui::EventType::key_input:
-		switch (event.key_input.code) {
-		case KeyCode::up   : row_step(-1); break;
-		case KeyCode::down : row_step(+1); break;
-		case KeyCode::left : col_step(-1); break;
-		case KeyCode::right: col_step(+1); break;
-		case KeyCode::home: row_abs(0); break;
-		case KeyCode::pgup: row_step(min_ce(0, -get_view().fit_count - 1)); break;
-		case KeyCode::pgdn: row_step(max_ce(0, +get_view().fit_count - 1)); break;
-		case KeyCode::end : row_abs(max_ce(0, get_row_count() - 1)); break;
-
-		case KeyCode::f1:
-			set_header_enabled(!is_header_enabled());
-			queue_actions(enum_combine(
-				ui::UpdateActions::reflow,
-				ui::UpdateActions::render
-			));
-			break;
-
-		case KeyCode::del: erase(m_cursor.row, 1); break;
-
-		case KeyCode::insert:
-			if (KeyMod::shift == event.key_input.mod) {
-				insert_before(m_cursor.row, 1);
-			} else {
-				insert_after(m_cursor.row, 1);
+		if (has_input_control()) {
+			bool const handled = m_field->handle_event(event);
+			if (handled && !m_field->has_input_control()) {
+				set_input_control(false);
+				m_rows[m_cursor.row][m_cursor.col].value = m_field->get_text();
+				m_field->clear_actions();
+				queue_cell_render(
+					m_cursor.row, m_cursor.row + 1,
+					m_cursor.col, m_cursor.col + 1
+				);
+				queue_actions(enum_combine(
+					ui::UpdateActions::render,
+					ui::UpdateActions::flag_noclear
+				));
 			}
-			break;
+			return handled;
+		} else {
+			bool handled = true;
+			switch (event.key_input.code) {
+			case KeyCode::enter:
+				set_input_control(true);
+				reflow_field(true);
+				m_field->set_text(m_rows[m_cursor.row][m_cursor.col].value);
+				m_field->handle_event(event);
+				m_field->queue_actions(enum_combine(
+					ui::UpdateActions::render
+				));
+				break;
 
-		default:
-			switch (event.key_input.cp) {
-			case 'a': select_all(); break;
-			case 'A': select_none(); break;
-			case ' ': select_toggle(m_cursor.row, 1); break;
-			case 'D': erase_selected(); break;
+			case KeyCode::up   : row_step(-1); break;
+			case KeyCode::down : row_step(+1); break;
+			case KeyCode::left : col_step(-1); break;
+			case KeyCode::right: col_step(+1); break;
+			case KeyCode::home: row_abs(0); break;
+			case KeyCode::end : row_abs(max_ce(0, get_row_count() - 1)); break;
+			case KeyCode::pgup:
+				row_step(min_ce(0, -get_view().fit_count - 1)); break;
+			case KeyCode::pgdn:
+				row_step(max_ce(0, +get_view().fit_count - 1)); break;
+
+			case KeyCode::f1:
+				set_header_enabled(!is_header_enabled());
+				queue_actions(enum_combine(
+					ui::UpdateActions::reflow,
+					ui::UpdateActions::render
+				));
+				break;
+
+			default:
+				switch (event.key_input.cp) {
+				case 'k': row_step(-1); break;
+				case 'j': row_step(+1); break;
+				case 'h': col_step(-1); break;
+				case 'l': col_step(+1); break;
+				case 'a': select_all(); break;
+				case 'A': select_none(); break;
+				case ' ': select_toggle(m_cursor.row, 1); break;
+				case 'e': erase(m_cursor.row, 1); break;
+				case 'E': erase_selected(); break;
+				case 'i': insert_after (m_cursor.row, 1); break;
+				case 'I': insert_before(m_cursor.row, 1); break;
+				default:
+					handled = false;
+					break;
+				}
 			}
-			break;
+			return handled;
 		}
 		break;
 
@@ -323,7 +380,7 @@ TestGrid::handle_event_impl(
 	default:
 		break;
 	}
-	return false; // TODO
+	return false;
 }
 
 void
@@ -352,6 +409,11 @@ TestGrid::render_impl(
 			ui::UpdateActions::flag_noclear
 		)
 	);
+
+	if (has_input_control()) {
+		grid_rd.rd.update_group(m_field->get_group());
+		m_field->render(grid_rd.rd);
+	}
 
 	Rect const empty_frame{
 		{view.content_frame.pos.x, view.content_frame.pos.y + view.row_count},
@@ -417,6 +479,11 @@ TestGrid::content_action(
 	// Insert
 	case ContentAction::insert_after: // fall-through
 	case ContentAction::insert_before:
+		if (row_begin <= m_cursor.row) {
+			m_rows[m_cursor.row][m_cursor.col].states.disable(
+				Column::Flags::focused
+			);
+		}
 		m_rows.insert(
 			m_rows.begin() + row_begin,
 			static_cast<std::size_t>(count),
@@ -429,10 +496,12 @@ TestGrid::content_action(
 		);
 		if (1 == get_row_count()) {
 			set_cursor(m_cursor.col, 0);
-			m_rows[m_cursor.row][m_cursor.col].states.enable(
-				Column::Flags::focused
-			);
+		} else if (row_begin <= m_cursor.row) {
+			set_cursor(m_cursor.col, m_cursor.row + count);
 		}
+		m_rows[m_cursor.row][m_cursor.col].states.enable(
+			Column::Flags::focused
+		);
 		adjust_view();
 		break;
 
@@ -628,6 +697,29 @@ TestGrid::adjust_view() noexcept {
 		);
 		queue_actions(ui::UpdateActions::render);
 	}
+}
+
+void
+TestGrid::reflow_field(
+	bool const cache
+) noexcept {
+	auto const& frame = get_view().content_frame;
+	Quad cell_quad{
+		{
+			frame.pos.x + (m_cursor.col * 10),
+			frame.pos.y + m_cursor.row - get_view().row_range.x
+		},
+		{0, 0}
+	};
+	cell_quad.v2.x = cell_quad.v1.x + 10;
+	cell_quad.v2.y = cell_quad.v1.y + 1;
+	Quad const fq = rect_abs_quad(frame);
+	vec2_clamp(cell_quad.v1, fq.v1, fq.v2);
+	vec2_clamp(cell_quad.v2, fq.v1, fq.v2);
+	m_field->reflow(
+		quad_rect(cell_quad),
+		cache
+	);
 }
 
 void
