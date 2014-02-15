@@ -194,16 +194,18 @@ std::size_t
 Cursor::erase() {
 	auto& node = get_node();
 	/*DUCT_DEBUGF(
-		"erase: m_col = %zd, m_index = %zd, ucount = %zu",
-		m_col, m_index, node.units()
+		"erase: m_col = %zd, m_index = %zd, ucount = %zu"
+		", tree units: %zu",
+		m_col, m_index, node.units(),
+		get_tree().units()
 	);*/
 	if (signed_cast(node.units()) <= m_index) {
 		return 0u;
 	}
 
 	auto const it = node.cbegin() + m_index;
-	auto const size = txt::EncUtils::required_first_whole(*it);
-	if (it + size <= node.cend()) {
+	auto const size = signed_cast(txt::EncUtils::required_first_whole(*it));
+	if (signed_cast(node.units()) >= m_index + size) {
 		node.m_buffer.erase(it, it + size);
 		get_tree().update_counts(node, -size, -1);
 		return size;
