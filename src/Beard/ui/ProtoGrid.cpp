@@ -146,17 +146,14 @@ ProtoGrid::content_action_internal(
 	auto const row_end = min_ce(row_begin + count, m_row_count);
 
 	RangeRel const rel = range_rel(Vec2{row_begin, row_end}, m_view.row_range);
-	if (RangeRel::disjoint_after == rel) {
-		// disjoint_after does not affect view
-		return;
-	}
+	bool const not_disjoint = RangeRel::disjoint_after != rel;
 
 	// For both erasure and insertion, queue everything from
 	// push_begin to the end of the view.
 	// Bound-checked for a tiny bit of optimization (don't need to
 	// mark anything outside the view itself)
 	auto const push_begin = max_ce(row_begin, m_view.row_range.x);
-	if (push_begin < m_view.row_range.y) {
+	if (not_disjoint && push_begin < m_view.row_range.y) {
 		std::fill(
 			m_dirty.rows.begin() + (push_begin - m_view.row_range.x),
 			m_dirty.rows.begin() + m_view.row_count,
@@ -172,13 +169,15 @@ ProtoGrid::content_action_internal(
 		// Insertion is unbound
 		set_row_count(m_row_count + count);
 	}
-	update_view(
-		m_view.row_range.x,
-		m_view.row_range.x + m_view.fit_count,
-		m_view.col_range.x,
-		m_view.col_range.y,
-		true
-	);
+	if (not_disjoint) {
+		update_view(
+			m_view.row_range.x,
+			m_view.row_range.x + m_view.fit_count,
+			m_view.col_range.x,
+			m_view.col_range.y,
+			true
+		);
+	}
 }
 
 void
