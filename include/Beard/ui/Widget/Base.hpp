@@ -1,6 +1,6 @@
 /**
 @file ui/Widget/Base.hpp
-@brief Base widget class.
+@brief %Base widget class.
 
 @author Tim Howard
 @copyright 2013 Tim Howard under the MIT license;
@@ -41,7 +41,7 @@ class Base;
 */
 
 /**
-	Base widget class.
+	%Base widget class.
 */
 class Base
 	: public aux::enable_shared_from_this<Base>
@@ -105,7 +105,7 @@ protected:
 	/**
 		cache_geometry() implementation.
 
-		Base definition does nothing.
+		%Base definition does nothing.
 	*/
 	virtual void
 	cache_geometry_impl() noexcept;
@@ -113,7 +113,7 @@ protected:
 	/**
 		reflow() implementation.
 
-		Base definition generically reflows geometry. If @a cache is
+		%Base definition generically reflows geometry. If @a cache is
 		@c true, cache_geometry() will be called before reflowing.
 	*/
 	virtual void
@@ -125,7 +125,7 @@ protected:
 	/**
 		handle_event() implementation.
 
-		Base definition returns @c false.
+		%Base definition returns @c false.
 	*/
 	virtual bool
 	handle_event_impl(
@@ -135,7 +135,7 @@ protected:
 	/**
 		render() implementation.
 
-		Base definition does nothing.
+		%Base definition does nothing.
 	*/
 	virtual void
 	render_impl(
@@ -201,6 +201,14 @@ public:
 	ui::RootSPtr
 	get_root() const noexcept {
 		return m_root.lock();
+	}
+
+	/**
+		Get root (weak).
+	*/
+	ui::RootWPtr
+	get_root_weak() const noexcept {
+		return m_root;
 	}
 
 	/**
