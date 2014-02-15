@@ -157,8 +157,6 @@ private:
 
 	ui::GridView m_view{};
 
-	aux::vector<geom_value_type> m_col_pos;
-
 	ProtoGrid() noexcept = delete;
 	ProtoGrid(ProtoGrid const&) = delete;
 	ProtoGrid& operator=(ProtoGrid const&) = delete;
@@ -223,6 +221,7 @@ protected:
 		@param row_begin Start of row range.
 		@param row_end End of row range (non-inclusive).
 		@param col_begin Start of column range.
+		@param col_end End of column range (non-inclusive).
 		@param retain_intersection Whether to retain the queued
 		intersection with the previous range.
 	*/
@@ -231,6 +230,7 @@ protected:
 		ui::ProtoGrid::index_type row_begin,
 		ui::ProtoGrid::index_type row_end,
 		ui::ProtoGrid::index_type col_begin,
+		ui::ProtoGrid::index_type col_end,
 		bool const retain_intersection
 	) noexcept;
 
@@ -417,7 +417,6 @@ protected:
 		)
 		, m_col_count(max_ce(ui::ProtoGrid::index_type{0}, col_count))
 		, m_row_count(max_ce(ui::ProtoGrid::index_type{0}, row_count))
-		, m_col_pos(unsigned_cast(m_col_count))
 	{}
 
 	/** Move constructor. */

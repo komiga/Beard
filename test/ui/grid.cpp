@@ -623,6 +623,7 @@ TestGrid::adjust_view() noexcept {
 			row_begin,
 			row_begin + view.fit_count,
 			0,
+			get_col_count(),
 			true
 		);
 		queue_actions(ui::UpdateActions::render);

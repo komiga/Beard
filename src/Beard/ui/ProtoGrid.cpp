@@ -38,6 +38,7 @@ ProtoGrid::update_view(
 	ui::ProtoGrid::index_type row_begin,
 	ui::ProtoGrid::index_type row_end,
 	ui::ProtoGrid::index_type col_begin,
+	ui::ProtoGrid::index_type col_end,
 	bool const retain_intersection
 ) noexcept {
 	row_begin = value_clamp(row_begin, 0, m_row_count);
@@ -46,12 +47,12 @@ ProtoGrid::update_view(
 		row_begin + m_view.fit_count
 	);
 	col_begin = value_clamp(col_begin, 0, m_col_count);
+	col_end = value_clamp(col_end, col_begin, m_col_count);
 
 	Vec2 const nrr{row_begin, row_end};
 	auto const orc = m_view.row_count;
 	Vec2 const orr = m_view.row_range;
 
-	// TODO: Calculate actual col_range by frame and m_col_pos
 	m_view.col_count = m_col_count - col_begin;
 	m_view.row_count = row_end - row_begin;
 	m_view.col_range = {col_begin, m_col_count};
@@ -175,6 +176,7 @@ ProtoGrid::content_action_internal(
 		m_view.row_range.x,
 		m_view.row_range.x + m_view.fit_count,
 		m_view.col_range.x,
+		m_view.col_range.y,
 		true
 	);
 }
@@ -283,6 +285,7 @@ ProtoGrid::reflow_view(
 		m_view.row_range.x,
 		m_view.row_range.x + m_view.fit_count,
 		m_view.col_range.x,
+		m_view.col_range.y,
 		false
 	);
 
