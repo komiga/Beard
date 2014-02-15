@@ -154,7 +154,7 @@ public:
 		@param focus_index Focus index.
 		@param parent Parent.
 	*/
-	static std::shared_ptr<ui::Field>
+	static aux::shared_ptr<ui::Field>
 	make(
 		ui::RootWPtr root,
 		String text,
@@ -163,7 +163,7 @@ public:
 		ui::focus_index_type const focus_index = ui::focus_index_lazy,
 		ui::Widget::WPtr parent = ui::Widget::WPtr()
 	) {
-		auto p = std::make_shared<ui::Field>(
+		auto p = aux::make_shared<ui::Field>(
 			ctor_priv{},
 			std::move(root),
 			std::move(text),

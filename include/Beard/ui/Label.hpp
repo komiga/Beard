@@ -105,14 +105,14 @@ public:
 		@param group %Property group.
 		@param parent Parent.
 	*/
-	static std::shared_ptr<ui::Label>
+	static aux::shared_ptr<ui::Label>
 	make(
 		ui::RootWPtr root,
 		String text,
 		ui::group_hash_type const group = ui::group_label,
 		ui::Widget::WPtr parent = ui::Widget::WPtr()
 	) {
-		auto p = std::make_shared<ui::Label>(
+		auto p = aux::make_shared<ui::Label>(
 			ctor_priv{},
 			std::move(root),
 			std::move(text),
