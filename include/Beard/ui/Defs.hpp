@@ -165,6 +165,8 @@ enum : property_hash_type {
 	BEARD_DPROP_(content_bg_inactive),
 	BEARD_DPROP_(content_fg_active),
 	BEARD_DPROP_(content_bg_active),
+	BEARD_DPROP_(content_fg_selected),
+	BEARD_DPROP_(content_bg_selected),
 /// @}
 
 /** @name Frame properties */ /// @{

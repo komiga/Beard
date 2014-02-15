@@ -21,6 +21,8 @@ s_default_group{{
 	{ui::property_content_bg_inactive, tty::attr_type{tty::Color::term_default}},
 	{ui::property_content_fg_active, tty::attr_type{tty::Color::term_default}},
 	{ui::property_content_bg_active, tty::attr_type{tty::Color::term_default}},
+	{ui::property_content_fg_selected, tty::attr_type{tty::Color::term_default | tty::Attr::bold}},
+	{ui::property_content_bg_selected, tty::attr_type{tty::Color::magenta}},
 
 // frame
 	{ui::property_frame_enabled, false},
