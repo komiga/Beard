@@ -85,8 +85,8 @@ private:
 	TestGrid& operator=(TestGrid const&) = delete;
 
 	struct {
-		ui::ProtoGrid::index_type col{-1};
-		ui::ProtoGrid::index_type row{-1};
+		ui::index_type col{-1};
+		ui::index_type row{-1};
 	} m_cursor{};
 
 	row_vector_type m_rows;
@@ -116,24 +116,24 @@ private:
 	void
 	content_action(
 		ui::ProtoGrid::ContentAction action,
-		ui::ProtoGrid::index_type row_begin,
-		ui::ProtoGrid::index_type count
+		ui::index_type row_begin,
+		ui::index_type count
 	) noexcept override;
 
 	void
 	render_header(
 		ui::GridRenderData& grid_rd,
-		ui::ProtoGrid::index_type const col_begin,
-		ui::ProtoGrid::index_type const col_end,
+		ui::index_type const col_begin,
+		ui::index_type const col_end,
 		Rect const& frame
 	) noexcept override;
 
 	void
 	render_content(
 		ui::GridRenderData& grid_rd,
-		ui::ProtoGrid::index_type const row,
-		ui::ProtoGrid::index_type const col_begin,
-		ui::ProtoGrid::index_type const col_end,
+		ui::index_type const row,
+		ui::index_type const col_begin,
+		ui::index_type const col_end,
 		Rect const& frame
 	) noexcept override;
 
@@ -147,8 +147,8 @@ public:
 	TestGrid(
 		ctor_priv const,
 		ui::RootWPtr&& root,
-		ui::ProtoGrid::index_type const col_count,
-		ui::ProtoGrid::index_type const row_count,
+		ui::index_type const col_count,
+		ui::index_type const row_count,
 		ui::group_hash_type const group,
 		ui::Widget::WPtr&& parent
 	) noexcept
@@ -171,8 +171,8 @@ public:
 	static aux::shared_ptr<TestGrid>
 	make(
 		ui::RootWPtr root,
-		ui::ProtoGrid::index_type const col_count,
-		ui::ProtoGrid::index_type const row_count,
+		ui::index_type const col_count,
+		ui::index_type const row_count,
 		ui::group_hash_type const group = ui::group_default,
 		ui::focus_index_type const focus_index = ui::focus_index_lazy,
 		ui::Widget::WPtr parent = ui::Widget::WPtr()
@@ -200,34 +200,34 @@ public:
 
 	void
 	set_cursor(
-		ui::ProtoGrid::index_type col,
-		ui::ProtoGrid::index_type row
+		ui::index_type col,
+		ui::index_type row
 	) noexcept;
 
 	void
 	col_abs(
-		ui::ProtoGrid::index_type const col
+		ui::index_type const col
 	) noexcept {
 		set_cursor(col, m_cursor.row);
 	}
 
 	void
 	col_step(
-		ui::ProtoGrid::index_type const amt
+		ui::index_type const amt
 	) noexcept {
 		col_abs(m_cursor.col + amt);
 	}
 
 	void
 	row_abs(
-		ui::ProtoGrid::index_type row
+		ui::index_type row
 	) noexcept {
 		set_cursor(m_cursor.col, row);
 	}
 
 	void
 	row_step(
-		ui::ProtoGrid::index_type const amt
+		ui::index_type const amt
 	) noexcept {
 		row_abs(m_cursor.row + amt);
 	}
@@ -374,8 +374,8 @@ TestGrid::render_impl(
 void
 TestGrid::content_action(
 	ui::ProtoGrid::ContentAction action,
-	ui::ProtoGrid::index_type row_begin,
-	ui::ProtoGrid::index_type count
+	ui::index_type row_begin,
+	ui::index_type count
 ) noexcept {
 	using ContentAction = ui::ProtoGrid::ContentAction;
 
@@ -450,7 +450,7 @@ TestGrid::content_action(
 		break;
 
 	case ContentAction::erase_selected:
-		ui::ProtoGrid::index_type
+		ui::index_type
 			head = 0,
 			tail = head,
 			rcount = 0
@@ -513,8 +513,8 @@ TestGrid::content_action(
 void
 TestGrid::render_header(
 	ui::GridRenderData& grid_rd,
-	ui::ProtoGrid::index_type const col_begin,
-	ui::ProtoGrid::index_type const col_end,
+	ui::index_type const col_begin,
+	ui::index_type const col_end,
 	Rect const& frame
 ) noexcept {
 	auto& rd = grid_rd.rd;
@@ -545,9 +545,9 @@ TestGrid::render_header(
 void
 TestGrid::render_content(
 	ui::GridRenderData& grid_rd,
-	ui::ProtoGrid::index_type const row,
-	ui::ProtoGrid::index_type const col_begin,
-	ui::ProtoGrid::index_type const col_end,
+	ui::index_type const row,
+	ui::index_type const col_begin,
+	ui::index_type const col_end,
 	Rect const& frame
 ) noexcept {
 	/*DUCT_DEBUGF(
@@ -632,8 +632,8 @@ TestGrid::adjust_view() noexcept {
 
 void
 TestGrid::set_cursor(
-	ui::ProtoGrid::index_type col,
-	ui::ProtoGrid::index_type row
+	ui::index_type col,
+	ui::index_type row
 ) noexcept {
 	col = value_clamp(col, 0, max_ce(0, get_col_count() - 1));
 	row = value_clamp(row, 0, max_ce(0, get_row_count() - 1));

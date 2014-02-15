@@ -214,7 +214,12 @@ enum : group_hash_type {
 /** @endcond */
 
 /**
-	Focus index.
+	General index type.
+*/
+using index_type = signed;
+
+/**
+	Focus index type.
 
 	@note Only @c ui::focus_index_none will be ignored in focus maps.
 */

@@ -31,7 +31,6 @@ class ProtoGrid;
 	@{
 */
 
-// FIXME: Geh, type alias dependency (see sketch note)
 /**
 	Grid view.
 */
@@ -43,11 +42,11 @@ struct GridView final {
 	/** Content frame (not including header). */
 	Rect content_frame{{0, 0}, {0, 0}};
 	/** Number of rows that fit in the content frame. */
-	geom_value_type fit_count{0};
+	ui::index_type fit_count{0};
 	/** Number of columns in the column range. */
-	geom_value_type col_count{0};
+	ui::index_type col_count{0};
 	/** Number of rows in the row range. */
-	geom_value_type row_count{0};
+	ui::index_type row_count{0};
 	/** Column range. */
 	Vec2 col_range{0, 0};
 	/** Row range (bound to fit_count). */
@@ -126,9 +125,6 @@ private:
 	using base_type = ui::Widget::Base;
 
 public:
-	/** Index type. */
-	using index_type = geom_value_type;
-
 	/** Content actions. */
 	enum class ContentAction : unsigned {
 		select = 0u,
@@ -147,8 +143,8 @@ protected:
 private:
 	bool m_header_enabled{true};
 	bool m_header_enabled_next{true};
-	ui::ProtoGrid::index_type m_col_count{0};
-	ui::ProtoGrid::index_type m_row_count{0};
+	ui::index_type m_col_count{0};
+	ui::index_type m_row_count{0};
 
 	struct {
 		Vec2 header{0, 0};
@@ -170,7 +166,7 @@ protected:
 	*/
 	void
 	set_col_count(
-		ui::ProtoGrid::index_type const col_count
+		ui::index_type const col_count
 	) noexcept {
 		m_col_count = max_ce(0, col_count);
 	}
@@ -182,7 +178,7 @@ protected:
 	*/
 	void
 	set_row_count(
-		ui::ProtoGrid::index_type const row_count
+		ui::index_type const row_count
 	) noexcept {
 		m_row_count = max_ce(0, row_count);
 	}
@@ -227,10 +223,10 @@ protected:
 	*/
 	void
 	update_view(
-		ui::ProtoGrid::index_type row_begin,
-		ui::ProtoGrid::index_type row_end,
-		ui::ProtoGrid::index_type col_begin,
-		ui::ProtoGrid::index_type col_end,
+		ui::index_type row_begin,
+		ui::index_type row_end,
+		ui::index_type col_begin,
+		ui::index_type col_end,
 		bool const retain_intersection
 	) noexcept;
 
@@ -254,8 +250,8 @@ protected:
 	void
 	content_action_internal(
 		ui::ProtoGrid::ContentAction const action,
-		ui::ProtoGrid::index_type row_begin,
-		ui::ProtoGrid::index_type count
+		ui::index_type row_begin,
+		ui::index_type count
 	) noexcept;
 
 	/**
@@ -269,8 +265,8 @@ protected:
 	*/
 	void
 	queue_header_render(
-		ui::ProtoGrid::index_type col_begin = -1,
-		ui::ProtoGrid::index_type col_end = -1
+		ui::index_type col_begin = -1,
+		ui::index_type col_end = -1
 	) noexcept;
 
 	/**
@@ -286,10 +282,10 @@ protected:
 	*/
 	void
 	queue_cell_render(
-		ui::ProtoGrid::index_type row_begin,
-		ui::ProtoGrid::index_type row_end,
-		ui::ProtoGrid::index_type col_begin = -1,
-		ui::ProtoGrid::index_type col_end = -1
+		ui::index_type row_begin,
+		ui::index_type row_end,
+		ui::index_type col_begin = -1,
+		ui::index_type col_end = -1
 	) noexcept;
 
 	/**
@@ -336,8 +332,8 @@ protected:
 	virtual void
 	content_action(
 		ui::ProtoGrid::ContentAction action,
-		ui::ProtoGrid::index_type row_begin,
-		ui::ProtoGrid::index_type count
+		ui::index_type row_begin,
+		ui::index_type count
 	) noexcept = 0;
 
 	/**
@@ -354,8 +350,8 @@ protected:
 	virtual void
 	render_header(
 		ui::GridRenderData& grid_rd,
-		ui::ProtoGrid::index_type const col_begin,
-		ui::ProtoGrid::index_type const col_end,
+		ui::index_type const col_begin,
+		ui::index_type const col_end,
 		Rect const& frame
 	) noexcept = 0;
 
@@ -374,9 +370,9 @@ protected:
 	virtual void
 	render_content(
 		ui::GridRenderData& grid_rd,
-		ui::ProtoGrid::index_type const row,
-		ui::ProtoGrid::index_type const col_begin,
-		ui::ProtoGrid::index_type const col_end,
+		ui::index_type const row,
+		ui::index_type const col_begin,
+		ui::index_type const col_end,
 		Rect const& frame
 	) noexcept = 0;
 /// @}
@@ -405,8 +401,8 @@ protected:
 		ui::Geom&& geometry,
 		ui::Widget::WPtr&& parent,
 
-		ui::ProtoGrid::index_type const col_count,
-		ui::ProtoGrid::index_type const row_count
+		ui::index_type const col_count,
+		ui::index_type const row_count
 	) noexcept
 		: base_type(
 			std::move(root),
@@ -415,8 +411,8 @@ protected:
 			std::move(geometry),
 			std::move(parent)
 		)
-		, m_col_count(max_ce(ui::ProtoGrid::index_type{0}, col_count))
-		, m_row_count(max_ce(ui::ProtoGrid::index_type{0}, row_count))
+		, m_col_count(max_ce(ui::index_type{0}, col_count))
+		, m_row_count(max_ce(ui::index_type{0}, row_count))
 	{}
 
 	/** Move constructor. */
@@ -443,7 +439,7 @@ public:
 	/**
 		Get the number of columns.
 	*/
-	ui::ProtoGrid::index_type
+	ui::index_type
 	get_col_count() const noexcept {
 		return m_col_count;
 	}
@@ -451,7 +447,7 @@ public:
 	/**
 		Get the number of rows.
 	*/
-	ui::ProtoGrid::index_type
+	ui::index_type
 	get_row_count() const noexcept {
 		return m_row_count;
 	}
@@ -492,8 +488,8 @@ public:
 	void
 	select(
 		bool const select,
-		ui::ProtoGrid::index_type row_begin,
-		ui::ProtoGrid::index_type const count
+		ui::index_type row_begin,
+		ui::index_type const count
 	) noexcept {
 		row_begin = value_clamp(row_begin, 0, get_row_count());
 		content_action(
@@ -514,8 +510,8 @@ public:
 	*/
 	void
 	select_toggle(
-		ui::ProtoGrid::index_type row_begin,
-		ui::ProtoGrid::index_type const count
+		ui::index_type row_begin,
+		ui::index_type const count
 	) noexcept {
 		row_begin = value_clamp(row_begin, 0, get_row_count());
 		content_action(ContentAction::select_toggle, row_begin, max_ce(0, count));
@@ -531,8 +527,8 @@ public:
 	*/
 	void
 	insert_before(
-		ui::ProtoGrid::index_type row_begin,
-		ui::ProtoGrid::index_type const count
+		ui::index_type row_begin,
+		ui::index_type const count
 	) noexcept {
 		row_begin = value_clamp(row_begin, 0, get_row_count());
 		content_action(ContentAction::insert_before, row_begin, max_ce(0, count));
@@ -548,8 +544,8 @@ public:
 	*/
 	void
 	insert_after(
-		ui::ProtoGrid::index_type row_begin,
-		ui::ProtoGrid::index_type const count
+		ui::index_type row_begin,
+		ui::index_type const count
 	) noexcept {
 		row_begin = value_clamp(row_begin, 0, get_row_count());
 		content_action(ContentAction::insert_after, row_begin, max_ce(0, count));
@@ -563,8 +559,8 @@ public:
 	*/
 	void
 	erase(
-		ui::ProtoGrid::index_type row_begin,
-		ui::ProtoGrid::index_type const count
+		ui::index_type row_begin,
+		ui::index_type const count
 	) noexcept {
 		row_begin = value_clamp(row_begin, 0, get_row_count());
 		content_action(ContentAction::erase, row_begin, max_ce(0, count));

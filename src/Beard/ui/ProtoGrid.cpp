@@ -15,8 +15,8 @@ namespace {
 inline void
 expand_range(
 	Vec2& range,
-	ui::ProtoGrid::index_type const begin,
-	ui::ProtoGrid::index_type const end
+	ui::index_type const begin,
+	ui::index_type const end
 ) noexcept {
 	if (-1 != range.x) {
 		if (range.x == range.y) {
@@ -35,10 +35,10 @@ expand_range(
 
 void
 ProtoGrid::update_view(
-	ui::ProtoGrid::index_type row_begin,
-	ui::ProtoGrid::index_type row_end,
-	ui::ProtoGrid::index_type col_begin,
-	ui::ProtoGrid::index_type col_end,
+	ui::index_type row_begin,
+	ui::index_type row_end,
+	ui::index_type col_begin,
+	ui::index_type col_end,
 	bool const retain_intersection
 ) noexcept {
 	row_begin = value_clamp(row_begin, 0, m_row_count);
@@ -118,8 +118,8 @@ ProtoGrid::update_view(
 void
 ProtoGrid::content_action_internal(
 	ui::ProtoGrid::ContentAction const action,
-	ui::ProtoGrid::index_type row_begin,
-	ui::ProtoGrid::index_type count
+	ui::index_type row_begin,
+	ui::index_type count
 ) noexcept {
 	if (0 >= count) {
 		return;
@@ -183,8 +183,8 @@ ProtoGrid::content_action_internal(
 
 void
 ProtoGrid::queue_header_render(
-	ui::ProtoGrid::index_type col_begin,
-	ui::ProtoGrid::index_type col_end
+	ui::index_type col_begin,
+	ui::index_type col_end
 ) noexcept {
 	if (is_header_enabled()) {
 		if (-1 == col_begin) {
@@ -202,10 +202,10 @@ ProtoGrid::queue_header_render(
 
 void
 ProtoGrid::queue_cell_render(
-	ui::ProtoGrid::index_type row_begin,
-	ui::ProtoGrid::index_type row_end,
-	ui::ProtoGrid::index_type col_begin,
-	ui::ProtoGrid::index_type col_end
+	ui::index_type row_begin,
+	ui::index_type row_end,
+	ui::index_type col_begin,
+	ui::index_type col_end
 ) noexcept {
 	// NB: row_begin will be clamped to the view range, which is
 	// already clamped to the number of rows. Also, row_begin needn't
