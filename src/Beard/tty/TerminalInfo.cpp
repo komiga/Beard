@@ -71,7 +71,7 @@ enum : unsigned {
 };
 
 constexpr auto const
-terminfo_endian = duct::Endian::LITTLE;
+terminfo_endian = duct::Endian::little;
 
 struct terminfo_header {
 	uint16_t magic{0};
