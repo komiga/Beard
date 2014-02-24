@@ -9,6 +9,7 @@ Beard uses:
 
 1. [duct++](https://github.com/komiga/duct-cpp) (HEAD)
 2. [ceformat](https://github.com/komiga/ceformat) (HEAD)
+3. [All the Maths‽](https://github.com/komiga/am) (HEAD)
 
 See `dep/README.md` for dependency setup.
 
