@@ -32,11 +32,11 @@ class TerminalInfo;
 /**
 	%Terminal information.
 
-	@note This class does not deserialize the ncurses' extended
+	@note This class does not deserialize the ncurses extended
 	storage format.
 
 	@par
-	@note See `man 5 term`
+	@note See `man 5 term`.
 */
 class TerminalInfo final {
 public:
