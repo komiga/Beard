@@ -224,7 +224,6 @@ public:
 	);
 /// @}
 
-/** @name Update queue */ /// @{
 private:
 	ui::UpdateActions
 	run_actions(
@@ -247,6 +246,7 @@ private:
 	);
 
 public:
+/** @name Update queue */ /// @{
 	/**
 		Unqueue and clear all update actions.
 	*/
