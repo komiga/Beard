@@ -27,7 +27,7 @@ namespace txt {
 class Cursor;
 
 /**
-	@addtogroup text
+	@addtogroup txt
 	@{
 */
 
@@ -324,7 +324,7 @@ public:
 /// @}
 };
 
-/** @} */ // end of doc-group text
+/** @} */ // end of doc-group txt
 
 } // namespace txt
 } // namespace Beard

@@ -22,7 +22,7 @@ class Node;
 class Cursor; // external
 
 /**
-	@addtogroup text
+	@addtogroup txt
 	@{
 */
 
@@ -195,7 +195,7 @@ public:
 /// @}
 };
 
-/** @} */ // end of doc-group text
+/** @} */ // end of doc-group txt
 
 } // namespace txt
 } // namespace Beard

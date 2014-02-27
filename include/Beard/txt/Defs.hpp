@@ -28,7 +28,7 @@ struct Sequence;
 struct UTF8Block;
 
 /**
-	@addtogroup text
+	@addtogroup txt
 	@{
 */
 
@@ -304,7 +304,7 @@ struct UTF8Block final {
 /// @}
 };
 
-/** @} */ // end of doc-group text
+/** @} */ // end of doc-group txt
 
 } // namespace txt
 } // namespace Beard
