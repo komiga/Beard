@@ -2,8 +2,8 @@
 @file config.hpp
 @brief Configuration.
 
-@author Tim Howard
-@copyright 2013-2014 Tim Howard under the MIT license;
+@author Timothy Howard
+@copyright 2013-2014 Timothy Howard under the MIT license;
 see @ref index or the accompanying LICENSE file for full text.
 */
 
