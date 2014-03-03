@@ -75,9 +75,9 @@ enum : ui::hash_type {
 /**
 	Hash string literal (constexpr).
 
-	@tparam N Size of @a str; inferred from @a str.
+	@tparam N Size of @a str (including NUL); inferred from @a str.
 
-	@returns Hash of @a str if <code>N > 0u</code>; @c ui::hash_null
+	@returns Hash of @a str if <code>N > 1u</code>; @c ui::hash_null
 	otherwise.
 	@param str String to hash.
 */
@@ -88,7 +88,7 @@ constexpr ui::hash_type
 hash(
 	const char (&str)[N]
 ) noexcept {
-	return (0u == N)
+	return (1u >= N)
 		? ui::hash_null
 		: am::hash::fnv1a_c<am::hash::HL32>(str, N)
 	;
@@ -100,8 +100,8 @@ hash(
 	@tparam StringT String type; inferred from @a str. This type must
 	have the same interface as @c std::basic_string<char>.
 
-	@returns Hash of @a str if <code>N > 0u</code>; @c ui::hash_null
-	otherwise.
+	@returns Hash of @a str if the string is not empty;
+	@c ui::hash_null otherwise.
 	@param str String to hash.
 */
 template<
