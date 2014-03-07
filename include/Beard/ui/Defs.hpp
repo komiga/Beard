@@ -86,7 +86,7 @@ template<
 >
 constexpr ui::hash_type
 hash(
-	const char (&str)[N]
+	char const (&str)[N]
 ) noexcept {
 	return (1u >= N)
 		? ui::hash_null
