@@ -883,7 +883,7 @@ Terminal::deinit() {
 	m_attr_fg_last = tty::Color::term_default;
 	m_attr_bg_last = tty::Color::term_default;
 
-	m_streambuf_in.commit_direct(0u);
+	m_streambuf_in.commit_direct(0u, false);
 }
 #undef BEARD_SCOPE_FUNC
 
@@ -948,7 +948,8 @@ Terminal::poll_input(
 		} while (retries-- && EINTR == err);
 		if (0 < amt_read) {
 			m_streambuf_in.commit_direct(
-				seq_size + static_cast<std::size_t>(amt_read)
+				seq_size + static_cast<std::size_t>(amt_read),
+				true
 			);
 		}
 	}
