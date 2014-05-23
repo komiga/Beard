@@ -74,12 +74,12 @@ constexpr auto const
 terminfo_endian = duct::Endian::little;
 
 struct terminfo_header {
-	uint16_t magic{0};
-	uint16_t names_size{0};
-	uint16_t flag_count{0};
-	uint16_t number_count{0};
-	uint16_t string_offset_count{0};
-	uint16_t string_table_size{0};
+	std::uint16_t magic{0};
+	std::uint16_t names_size{0};
+	std::uint16_t flag_count{0};
+	std::uint16_t number_count{0};
+	std::uint16_t string_offset_count{0};
+	std::uint16_t string_table_size{0};
 };
 } // anonymous namespace
 
