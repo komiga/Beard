@@ -40,8 +40,7 @@ enum class ErrorCode : unsigned {
 
 /** @name Serialization */ /// @{
 	/**
-		Write or read operation failed during deserialization or
-		serialization.
+		Read or write operation failed during serialization.
 	*/
 	serialization_io_failed,
 	/**

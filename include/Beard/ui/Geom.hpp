@@ -40,7 +40,7 @@ private:
 		fill_shift		= expand_shift + 2u
 	};
 
-	enum class Flags : uint8_t {
+	enum class Flags : std::uint8_t {
 		none		= 0u,
 		static_size	= 1u << 0,
 		expand_mask	= enum_cast(Axis::both) << expand_shift,

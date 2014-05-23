@@ -53,8 +53,8 @@ public:
 	>;
 
 private:
-	using cap_flag_vector_type = aux::vector<uint8_t>;
-	using cap_number_vector_type = aux::vector<int16_t>;
+	using cap_flag_vector_type = aux::vector<std::uint8_t>;
+	using cap_number_vector_type = aux::vector<std::int16_t>;
 
 	bool m_initialized;
 	name_vector_type m_names;

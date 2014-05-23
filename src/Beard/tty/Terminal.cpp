@@ -199,7 +199,7 @@ close_fd(
 		if (0 == ::close(fd)) {
 			break;
 		} else {
-			int const err = errno;
+			signed const err = errno;
 			BEARD_DEBUG_CERR_FQN(
 				err,
 				"failed to close file descriptor"
@@ -220,7 +220,7 @@ close_fd(
 // SIGWINCH handling
 
 static void
-sigwinch_handler(int /*signum*/) {
+sigwinch_handler(signed /*signum*/) {
 	if (nullptr != s_sigwinch_terminal) {
 		s_sigwinch_terminal->m_ev_pending.resize.pending = true;
 	}
@@ -507,7 +507,7 @@ flush(
 ) {
 	std::size_t const size = terminal.m_streambuf_out.get_sequence_size();
 	ssize_t written = 0;
-	int err = 0;
+	signed err = 0;
 	unsigned retries = 1;
 	do {
 		written = ::write(
@@ -902,7 +902,7 @@ Terminal::poll_input(
 	}
 
 	struct ::epoll_event ev;
-	int ready_count = -1, err = 0;
+	signed ready_count = -1, err = 0;
 	unsigned retries = 1;
 	do {
 		ready_count = ::epoll_wait(

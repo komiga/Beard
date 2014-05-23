@@ -222,7 +222,7 @@ TerminalInfo::deserialize(
 	);
 
 	// string offsets
-	aux::vector<uint16_t> string_offsets(
+	aux::vector<std::uint16_t> string_offsets(
 		static_cast<std::size_t>(hdr.string_offset_count)
 	);
 	duct::IO::read_arithmetic_array(
