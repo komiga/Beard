@@ -4,6 +4,8 @@
 #include <Beard/ui/Widget/Base.hpp>
 #include <Beard/ui/debug.hpp>
 
+#include <utility>
+
 namespace Beard {
 namespace ui {
 namespace Widget {
@@ -42,6 +44,23 @@ Base::render_impl(
 	ui::Widget::RenderData& /*rd*/
 ) noexcept {
 	/* Do nothing. */
+}
+
+bool
+Base::handle_event(
+	ui::Event const& event
+) noexcept {
+	if (
+		// Avoid SPtr construction if we can
+		signal_event_filter.is_bound() &&
+		signal_event_filter(
+			std::move(shared_from_this()),
+			event
+		)
+	) {
+		return true;
+	}
+	return handle_event_impl(event);
 }
 
 void

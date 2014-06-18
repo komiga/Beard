@@ -18,9 +18,11 @@ see @ref index or the accompanying LICENSE file for full text.
 #include <Beard/ui/Defs.hpp>
 #include <Beard/ui/Widget/Defs.hpp>
 #include <Beard/ui/Geom.hpp>
+#include <Beard/ui/Signal.hpp>
 
 #include <duct/StateStore.hpp>
 
+#include <utility>
 #include <memory>
 #include <functional>
 
@@ -46,8 +48,24 @@ class Base;
 class Base
 	: public aux::enable_shared_from_this<Base>
 {
-public:
 	friend class ui::Root;
+
+public:
+	/**
+		Signal for filtering events.
+
+		This is called before handle_event_impl() and bypasses it if
+		the signal function returns @c true.
+
+		Parameters:
+
+		-# The widget.
+		-# The event.
+	*/
+	ui::Signal<bool(
+		ui::Widget::SPtr,
+		ui::Event const&
+	)> signal_event_filter;
 
 protected:
 	/**
@@ -403,7 +421,6 @@ public:
 		return m_flags.test(ui::Widget::Flags::input_control);
 	}
 
-public:
 	/**
 		Set focus index.
 
@@ -486,9 +503,7 @@ public:
 	bool
 	handle_event(
 		ui::Event const& event
-	) noexcept {
-		return handle_event_impl(event);
-	}
+	) noexcept;
 
 	/**
 		Render the widget.
