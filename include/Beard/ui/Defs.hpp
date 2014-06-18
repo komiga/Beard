@@ -121,10 +121,10 @@ hash(
 	%Property type.
 */
 enum class PropertyType : unsigned {
-	number		= 1 << 0u,
-	attr		= 1 << 1u,
-	boolean		= 1 << 2u,
-	string		= 1 << 3u
+	number		= bit(0u),
+	attr		= bit(1u),
+	boolean		= bit(2u),
+	string		= bit(3u)
 };
 
 /** @name %Property value types */ /// @{
@@ -258,20 +258,20 @@ enum class UpdateActions : unsigned {
 	/**
 		Perform actions on the parent.
 	*/
-	flag_parent		= 1u << 0,
+	flag_parent		= bit(0u),
 	/**
 		Do not clear the back buffer for the widget's area.
 	*/
-	flag_noclear	= 1u << 1,
+	flag_noclear	= bit(1u),
 
 	/**
 		Reflow.
 	*/
-	reflow			= 1u << 2,
+	reflow			= bit(2u),
 	/**
 		Render (after reflowing, if set).
 	*/
-	render			= 1u << 3,
+	render			= bit(3u),
 
 	/**
 		Mask with all flags.

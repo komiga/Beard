@@ -129,9 +129,9 @@ private:
 	};
 
 	enum class State : unsigned {
-		retain_backbuffer = 1u << 0,
-		backbuffer_dirty = 1u << 1,
-		caret_visible = 1u << 2
+		retain_backbuffer = bit(0u),
+		backbuffer_dirty = bit(1u),
+		caret_visible = bit(2u)
 	};
 
 	enum class CapCache : unsigned {

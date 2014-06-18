@@ -42,7 +42,7 @@ private:
 
 	enum class Flags : std::uint8_t {
 		none		= 0u,
-		static_size	= 1u << 0,
+		static_size	= bit(0u),
 		expand_mask	= enum_cast(Axis::both) << expand_shift,
 		fill_mask	= enum_cast(Axis::both) << fill_shift
 	};
@@ -90,7 +90,7 @@ public:
 	{}
 
 	/**
-		Constructor with modes.
+		Constructor with sizing.
 
 		@param static_size Static size mode.
 		@param expand Expand axes.
@@ -239,7 +239,7 @@ public:
 	}
 
 	/**
-		Set expand mode.
+		Set expand axes.
 
 		@param axes Expand axes.
 	*/

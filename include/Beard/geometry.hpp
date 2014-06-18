@@ -36,9 +36,9 @@ struct Quad;
 */
 enum class Axis : unsigned {
 	/** X-axis. */
-	x = 1u << 0,
+	x = bit(0u),
 	/** Y-axis. */
-	y = 1u << 1,
+	y = bit(1u),
 
 	/** Alias for Axis::x. */
 	horizontal = x,

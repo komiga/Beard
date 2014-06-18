@@ -36,7 +36,7 @@ private:
 public:
 	struct Column final {
 		enum class Flags : unsigned {
-			focused = 1 << 0
+			focused = bit(0u)
 		};
 
 		duct::StateStore<Flags> states{};
@@ -45,7 +45,7 @@ public:
 
 	struct Row final {
 		enum class Flags : unsigned {
-			selected = 1 << 0
+			selected = bit(0u)
 		};
 
 		duct::StateStore<Flags> states{};

@@ -23,6 +23,7 @@ namespace Beard {
 	@{
 */
 
+using duct::bit;
 using duct::make_const;
 using duct::signed_cast;
 using duct::unsigned_cast;

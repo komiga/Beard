@@ -12,6 +12,7 @@ see @ref index or the accompanying LICENSE file for full text.
 
 #include <Beard/config.hpp>
 #include <Beard/String.hpp>
+#include <Beard/utility.hpp>
 
 #include <duct/char.hpp>
 
@@ -35,16 +36,16 @@ enum class KeyMod : unsigned {
 	/** Absence of modifier. */
 	none = 0u,
 	/** Escape or alt. */
-	esc   = 1u << 0,
+	esc   = bit(0u),
 	/** Control. */
-	ctrl  = 1u << 1,
+	ctrl  = bit(1u),
 	/**
 		Shift.
 
 		@note This will only ever be used for KeyCodes -- not
 		code points.
 	*/
-	shift = 1u << 2,
+	shift = bit(2u),
 
 	/** Escape and control. */
 	esc_ctrl  = esc | ctrl,

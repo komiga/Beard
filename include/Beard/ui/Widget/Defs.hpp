@@ -12,6 +12,7 @@ see @ref index or the accompanying LICENSE file for full text.
 
 #include <Beard/config.hpp>
 #include <Beard/aux.hpp>
+#include <Beard/utility.hpp>
 #include <Beard/tty/Terminal.hpp>
 #include <Beard/ui/Defs.hpp>
 #include <Beard/ui/PropertyMap.hpp>
@@ -110,11 +111,11 @@ enum class TypeFlags : unsigned {
 	/**
 		Type is focusable.
 	*/
-	focusable		= 1u << 0,
+	focusable		= bit(0u),
 	/**
 		Type is a container.
 	*/
-	container		= 1u << 1,
+	container		= bit(1u),
 };
 
 /**
@@ -139,23 +140,23 @@ enum class Flags : unsigned {
 	/**
 		%Widget is enabled.
 	*/
-	enabled			= 1u << 0,
+	enabled			= bit(0u),
 	/**
 		%Widget is visible.
 	*/
-	visible			= 1u << 1,
+	visible			= bit(1u),
 	/**
 		%Widget is focused.
 	*/
-	focused			= 1u << 2,
+	focused			= bit(2u),
 	/**
 		%Widget is in input control mode.
 	*/
-	input_control	= 1u << 3,
+	input_control	= bit(3u),
 	/**
 		One or more queued update actions.
 	*/
-	queued_actions	= 1u << 4,
+	queued_actions	= bit(4u),
 
 /** @cond INTERNAL */
 	COUNT = 5u
