@@ -67,6 +67,9 @@ void
 Base::render(
 	ui::Widget::RenderData& rd
 ) noexcept {
+	if (!is_visible()) {
+		return;
+	}
 	if (rd.get_boolean(ui::property_frame_debug_enabled)) {
 		ui::geom_debug_render(
 			rd.terminal,
