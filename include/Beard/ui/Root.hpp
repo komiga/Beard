@@ -58,6 +58,11 @@ private:
 	ui::Widget::type_info const&
 	get_type_info_impl() const noexcept override;
 
+	bool
+	handle_event_impl(
+		ui::Event const& event
+	) noexcept override;
+
 	void
 	notify_focus_index_changing(
 		ui::Widget::SPtr const& widget,

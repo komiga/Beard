@@ -822,7 +822,7 @@ main(
 	ctx.render(true);
 	std::cout.flush();
 
-	while (!ctx.update(10u)) {}
+	while (context_update(ctx)) {}
 	ctx.close();
 	return 0;
 }

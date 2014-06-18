@@ -115,6 +115,19 @@ public:
 	}
 
 	/**
+		Get last event.
+
+		@note The only event types that are be visible are:
+
+		- ui::EventType::none
+		- ui::EventType::key_input
+	*/
+	ui::Event const&
+	get_last_event() const noexcept {
+		return m_event;
+	}
+
+	/**
 		Set property map.
 	*/
 	void
@@ -200,7 +213,13 @@ public:
 	/**
 		Poll for events and update widgets.
 
+		@note The @c last_event property is changed to
+		ui::EventType::none before this function polls for any events.
+
+		@returns @c true if an event was handled.
 		@param input_timeout Input polling timeout in milliseconds.
+
+		@sa get_last_event()
 	*/
 	bool
 	update(

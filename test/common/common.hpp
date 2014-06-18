@@ -6,6 +6,9 @@
 #include <Beard/String.hpp>
 #include <Beard/Error.hpp>
 #include <Beard/tty/TerminalInfo.hpp>
+#include <Beard/keys.hpp>
+#include <Beard/ui/Defs.hpp>
+#include <Beard/ui/Context.hpp>
 #include <Beard/ui/Geom.hpp>
 
 #include <iostream>
@@ -104,6 +107,30 @@ load_term_info(
 		throw;
 	}
 	stream.close();
+	return true;
+}
+
+namespace {
+
+static Beard::KeyInputMatch const
+s_kim_c{Beard::KeyMod::ctrl , Beard::KeyCode::none,  'c', false};
+
+} // anonymous namespace
+
+// Returns false if the program should terminate
+bool
+context_update(
+	Beard::ui::Context& context,
+	unsigned const timeout_ms = 10u
+) {
+	if (!context.update(timeout_ms)) {
+		auto const& event = context.get_last_event();
+		if (Beard::ui::EventType::key_input == event.type) {
+			if (Beard::key_input_match(event.key_input, s_kim_c)) {
+				return false;
+			}
+		}
+	}
 	return true;
 }
 

@@ -186,18 +186,13 @@ Context::close() noexcept {
 	m_terminal.close();
 }
 
-static KeyInputMatch const
-s_kim_root[]{
-	{KeyMod::shift, KeyCode::none, '\t', false},
-	{KeyMod::none , KeyCode::none, '\t', false},
-	{KeyMod::ctrl , KeyCode::none,  'c', false},
-};
-
 bool
 Context::update(
 	unsigned const input_timeout
 ) {
 	tty::Event tty_event;
+	ui::Widget::SPtr focus;
+	m_event.type = ui::EventType::none;
 	switch (m_terminal.poll(tty_event, input_timeout)) {
 	case tty::EventType::resize:
 		render(true);
@@ -206,23 +201,13 @@ Context::update(
 	case tty::EventType::key_input:
 		m_event.type = ui::EventType::key_input;
 		m_event.key_input = tty_event.key_input;
-		if (!push_event(m_event, get_root()->get_focus())) {
-			// TODO: Remove ^C hack and add handlers
-			auto const kim = key_input_match(m_event.key_input, s_kim_root);
-			if (kim) {
-				switch (kim->cp) {
-				case '\t':
-					get_root()->focus_dir(
-						(KeyMod::shift == m_event.key_input.mod)
-						? ui::FocusDir::prev
-						: ui::FocusDir::next
-					);
-					break;
-
-				case 'c':
-					return true;
-				}
-			}
+		focus
+			= get_root()->has_focus()
+			? get_root()->get_focus()
+			: get_root()
+		;
+		if (push_event(m_event, focus)) {
+			return true;
 		}
 		break;
 

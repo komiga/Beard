@@ -1,4 +1,5 @@
 
+#include <Beard/keys.hpp>
 #include <Beard/ui/Context.hpp>
 #include <Beard/ui/Root.hpp>
 
@@ -22,6 +23,38 @@ Root::~Root() noexcept = default;
 ui::Widget::type_info const&
 Root::get_type_info_impl() const noexcept {
 	return s_type_info;
+}
+
+static KeyInputMatch const
+s_kim_root[]{
+	{KeyMod::shift, KeyCode::none, '\t', false},
+	{KeyMod::none , KeyCode::none, '\t', false},
+};
+
+bool
+Root::handle_event_impl(
+	ui::Event const& event
+) noexcept {
+	switch (event.type) {
+	case ui::EventType::key_input: {
+		auto const kim = key_input_match(event.key_input, s_kim_root);
+		if (kim) {
+			switch (kim->cp) {
+			case '\t':
+				focus_dir(
+					(KeyMod::shift == event.key_input.mod)
+					? ui::FocusDir::prev
+					: ui::FocusDir::next
+				);
+				return has_focus();
+			}
+		}
+	}	break;
+
+	default:
+		break;
+	}
+	return false;
 }
 
 void

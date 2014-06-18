@@ -146,7 +146,7 @@ main(
 	}
 	std::cout.flush();
 
-	while (!ctx.update(10u)) {}
+	while (context_update(ctx)) {}
 	ctx.close();
 	return 0;
 }
