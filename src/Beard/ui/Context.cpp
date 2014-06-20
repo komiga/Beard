@@ -1,5 +1,4 @@
 
-#include <Beard/detail/gr_ceformat.hpp>
 #include <Beard/ui/Defs.hpp>
 #include <Beard/ui/Context.hpp>
 #include <Beard/ui/Root.hpp>
@@ -8,6 +7,8 @@
 #include <Beard/ui/Container.hpp>
 
 #include <utility>
+
+#include <Beard/detail/gr_ceformat.hpp>
 
 namespace Beard {
 namespace ui {

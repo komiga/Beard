@@ -2,8 +2,6 @@
 #include <Beard/String.hpp>
 #include <Beard/keys.hpp>
 #include <Beard/utility.hpp>
-#include <Beard/detail/gr_ceformat.hpp>
-#include <Beard/detail/debug.hpp>
 #include <Beard/txt/Defs.hpp>
 #include <Beard/tty/Defs.hpp>
 #include <Beard/tty/Caps.hpp>
@@ -29,6 +27,9 @@
 #include <algorithm>
 #include <iterator>
 #include <string>
+
+#include <Beard/detail/gr_ceformat.hpp>
+#include <Beard/detail/debug.hpp>
 
 #if !defined(BEARD_TTY_TERMINAL_IGNORE_OLD_CASTS) && (	\
 	 (DUCT_COMPILER & DUCT_FLAG_COMPILER_GCC) ||		\

@@ -11,7 +11,6 @@ see @ref index or the accompanying LICENSE file for full text.
 #define BEARD_UI_PROPERTYMAP_HPP_
 
 #include <Beard/config.hpp>
-#include <Beard/detail/gr_core.hpp>
 #include <Beard/aux.hpp>
 #include <Beard/ui/Defs.hpp>
 #include <Beard/ui/PropertyValue.hpp>
@@ -19,6 +18,8 @@ see @ref index or the accompanying LICENSE file for full text.
 
 #include <initializer_list>
 #include <utility>
+
+#include <Beard/detail/gr_core.hpp>
 
 namespace Beard {
 namespace ui {
@@ -438,5 +439,7 @@ public:
 
 } // namespace ui
 } // namespace Beard
+
+#include <Beard/detail/gr_unconfigure.hpp>
 
 #endif // BEARD_UI_PROPERTYMAP_HPP_

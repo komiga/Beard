@@ -1,5 +1,4 @@
 
-#include <Beard/detail/gr_ceformat.hpp>
 #include <Beard/tty/TerminalInfo.hpp>
 
 #include <duct/EndianUtils.hpp>
@@ -7,6 +6,8 @@
 #include <duct/IO/unicode.hpp>
 
 #include <istream>
+
+#include <Beard/detail/gr_ceformat.hpp>
 
 namespace Beard {
 namespace tty {

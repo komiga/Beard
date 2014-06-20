@@ -1,7 +1,8 @@
 
+#include <Beard/ui/PropertyMap.hpp>
+
 #include <Beard/detail/gr_core.hpp>
 #include <Beard/detail/gr_ceformat.hpp>
-#include <Beard/ui/PropertyMap.hpp>
 
 namespace Beard {
 namespace ui {
