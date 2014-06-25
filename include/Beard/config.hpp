@@ -7,8 +7,7 @@
 see @ref index or the accompanying LICENSE file for full text.
 */
 
-#ifndef BEARD_CONFIG_HPP_
-#define BEARD_CONFIG_HPP_
+#pragma once
 
 #include <cstddef>
 #include <cstdint>
@@ -39,4 +38,3 @@ namespace Beard {
 
 } // namespace Beard
 
-#endif // BEARD_CONFIG_HPP_

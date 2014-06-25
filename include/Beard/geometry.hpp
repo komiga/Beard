@@ -7,8 +7,7 @@
 see @ref index or the accompanying LICENSE file for full text.
 */
 
-#ifndef BEARD_GEOMETRY_HPP_
-#define BEARD_GEOMETRY_HPP_
+#pragma once
 
 #include <Beard/config.hpp>
 #include <Beard/utility.hpp>
@@ -749,4 +748,3 @@ quad_intersects(
 
 } // namespace Beard
 
-#endif // BEARD_GEOMETRY_HPP_

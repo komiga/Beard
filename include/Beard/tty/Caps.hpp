@@ -7,8 +7,7 @@
 see @ref index or the accompanying LICENSE file for full text.
 */
 
-#ifndef BEARD_TTY_CAPS_HPP_
-#define BEARD_TTY_CAPS_HPP_
+#pragma once
 
 #include <Beard/config.hpp>
 #include <Beard/String.hpp>
@@ -612,4 +611,3 @@ enum class CapString : unsigned {
 } // namespace tty
 } // namespace Beard
 
-#endif // BEARD_TTY_CAPS_HPP_

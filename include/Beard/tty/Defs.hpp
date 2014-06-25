@@ -7,8 +7,7 @@
 see @ref index or the accompanying LICENSE file for full text.
 */
 
-#ifndef BEARD_TTY_DEFS_HPP_
-#define BEARD_TTY_DEFS_HPP_
+#pragma once
 
 #include <Beard/config.hpp>
 #include <Beard/keys.hpp>
@@ -220,4 +219,3 @@ struct Event final {
 } // namespace tty
 } // namespace Beard
 
-#endif // BEARD_TTY_DEFS_HPP_

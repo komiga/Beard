@@ -7,8 +7,7 @@
 see @ref index or the accompanying LICENSE file for full text.
 */
 
-#ifndef BEARD_TTY_OPS_HPP_
-#define BEARD_TTY_OPS_HPP_
+#pragma once
 
 #include <Beard/config.hpp>
 #include <Beard/String.hpp>
@@ -34,4 +33,3 @@ this_path() noexcept;
 } // namespace tty
 } // namespace Beard
 
-#endif // BEARD_TTY_OPS_HPP_

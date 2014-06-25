@@ -7,8 +7,7 @@
 see @ref index or the accompanying LICENSE file for full text.
 */
 
-#ifndef BEARD_DETAIL_DEBUG_HPP_
-#define BEARD_DETAIL_DEBUG_HPP_
+#pragma once
 
 #include <Beard/config.hpp>
 #include <Beard/detail/gr_core.hpp>
@@ -40,4 +39,3 @@ see @ref index or the accompanying LICENSE file for full text.
 	)
 //
 
-#endif // BEARD_DETAIL_DEBUG_HPP_

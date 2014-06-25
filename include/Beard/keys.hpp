@@ -7,8 +7,7 @@
 see @ref index or the accompanying LICENSE file for full text.
 */
 
-#ifndef BEARD_KEYS_HPP_
-#define BEARD_KEYS_HPP_
+#pragma once
 
 #include <Beard/config.hpp>
 #include <Beard/String.hpp>
@@ -182,4 +181,3 @@ key_input_match(
 
 } // namespace Beard
 
-#endif // BEARD_KEYS_HPP_

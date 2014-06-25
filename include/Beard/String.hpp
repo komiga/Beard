@@ -7,8 +7,7 @@
 see @ref index or the accompanying LICENSE file for full text.
 */
 
-#ifndef BEARD_STRING_HPP_
-#define BEARD_STRING_HPP_
+#pragma once
 
 #include <Beard/config.hpp>
 #include <Beard/aux.hpp>
@@ -55,4 +54,3 @@ using char32 = duct::char32;
 
 } // namespace Beard
 
-#endif // BEARD_STRING_HPP_

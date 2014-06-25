@@ -7,8 +7,7 @@
 see @ref index or the accompanying LICENSE file for full text.
 */
 
-#ifndef BEARD_TTY_TERMINAL_HPP_
-#define BEARD_TTY_TERMINAL_HPP_
+#pragma once
 
 #include <Beard/config.hpp>
 #include <Beard/aux.hpp>
@@ -710,4 +709,3 @@ public:
 } // namespace tty
 } // namespace Beard
 
-#endif // BEARD_TTY_TERMINAL_HPP_

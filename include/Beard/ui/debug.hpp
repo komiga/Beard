@@ -7,8 +7,7 @@
 see @ref index or the accompanying LICENSE file for full text.
 */
 
-#ifndef BEARD_UI_DEBUG_HPP_
-#define BEARD_UI_DEBUG_HPP_
+#pragma once
 
 #include <Beard/config.hpp>
 #include <Beard/tty/Defs.hpp>
@@ -47,4 +46,3 @@ geom_debug_render(
 } // namespace ui
 } // namespace Beard
 
-#endif // BEARD_UI_DEBUG_HPP_

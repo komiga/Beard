@@ -7,8 +7,7 @@
 see @ref index or the accompanying LICENSE file for full text.
 */
 
-#ifndef BEARD_AUX_HPP_
-#define BEARD_AUX_HPP_
+#pragma once
 
 #include <Beard/config.hpp>
 
@@ -161,4 +160,3 @@ using set
 } // namespace aux
 } // namespace Beard
 
-#endif // BEARD_AUX_HPP_

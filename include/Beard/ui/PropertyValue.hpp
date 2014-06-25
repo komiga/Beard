@@ -7,8 +7,7 @@
 see @ref index or the accompanying LICENSE file for full text.
 */
 
-#ifndef BEARD_UI_PROPERTYVALUE_HPP_
-#define BEARD_UI_PROPERTYVALUE_HPP_
+#pragma once
 
 #include <Beard/config.hpp>
 #include <Beard/ui/Defs.hpp>
@@ -287,4 +286,3 @@ public:
 } // namespace ui
 } // namespace Beard
 
-#endif // BEARD_UI_PROPERTYVALUE_HPP_

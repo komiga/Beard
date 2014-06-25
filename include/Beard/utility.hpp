@@ -7,8 +7,7 @@
 see @ref index or the accompanying LICENSE file for full text.
 */
 
-#ifndef BEARD_UTILITY_HPP_
-#define BEARD_UTILITY_HPP_
+#pragma once
 
 #include <Beard/config.hpp>
 
@@ -38,4 +37,3 @@ using duct::max_ce;
 
 } // namespace Beard
 
-#endif // BEARD_UTILITY_HPP_

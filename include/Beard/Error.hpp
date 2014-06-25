@@ -7,8 +7,7 @@
 see @ref index or the accompanying LICENSE file for full text.
 */
 
-#ifndef BEARD_ERROR_HPP_
-#define BEARD_ERROR_HPP_
+#pragma once
 
 #include <Beard/config.hpp>
 #include <Beard/ErrorCode.hpp>
@@ -52,4 +51,3 @@ get_error_name(
 
 } // namespace Beard
 
-#endif // BEARD_ERROR_HPP_

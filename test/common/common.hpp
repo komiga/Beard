@@ -1,6 +1,5 @@
 
-#ifndef BEARD_TEST_COMMON_COMMON_HPP_
-#define BEARD_TEST_COMMON_COMMON_HPP_
+#pragma once
 
 #include <Beard/geometry.hpp>
 #include <Beard/String.hpp>
@@ -134,4 +133,3 @@ context_update(
 	return true;
 }
 
-#endif // BEARD_TEST_COMMON_COMMON_HPP_

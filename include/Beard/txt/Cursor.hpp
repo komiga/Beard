@@ -7,8 +7,7 @@
 see @ref index or the accompanying LICENSE file for full text.
 */
 
-#ifndef BEARD_TXT_CURSOR_HPP_
-#define BEARD_TXT_CURSOR_HPP_
+#pragma once
 
 #include <Beard/config.hpp>
 #include <Beard/String.hpp>
@@ -329,4 +328,3 @@ public:
 } // namespace txt
 } // namespace Beard
 
-#endif // BEARD_TXT_CURSOR_HPP_

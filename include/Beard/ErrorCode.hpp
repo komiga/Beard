@@ -7,8 +7,7 @@
 see @ref index or the accompanying LICENSE file for full text.
 */
 
-#ifndef BEARD_ERRORCODE_HPP_
-#define BEARD_ERRORCODE_HPP_
+#pragma once
 
 #include <Beard/config.hpp>
 
@@ -111,4 +110,3 @@ enum class ErrorCode : unsigned {
 
 } // namespace Beard
 
-#endif // BEARD_ERRORCODE_HPP_
