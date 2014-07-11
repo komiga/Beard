@@ -93,7 +93,7 @@ reflow_slots(
 
 	// Calculate initial area
 	for (auto& s : slots) {
-		if (s.widget) {
+		if (s.widget && s.widget->is_visible()) {
 			if (cache_geometry) {
 				s.widget->cache_geometry();
 			}
@@ -109,7 +109,9 @@ reflow_slots(
 		} else {
 			// Empty slot acts as a both-expand widget of size {0, 0}
 			s.area.size.x = 0;
-			++expand_count;
+			if (!s.widget) {
+				++expand_count;
+			}
 		}
 		s.area.size.y = area_aligned.y;
 		--remaining;
@@ -131,8 +133,10 @@ reflow_slots(
 		if (
 			0 < unused && (
 				!expand_only ||
-				!s.widget ||
-				s.widget->get_geometry().expands(axis)
+				!s.widget || (
+					s.widget->is_visible() &&
+					s.widget->get_geometry().expands(axis)
+				)
 			)
 		) {
 			s.area.size.x += dist + (0 < each--);
