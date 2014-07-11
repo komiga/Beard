@@ -14,7 +14,7 @@ void
 ProtoSlotContainer::cache_geometry_impl() noexcept {
 	Vec2 rs = get_geometry().get_request_size();
 	for (auto& slot : m_slots) {
-		if (slot.widget) {
+		if (slot.widget && slot.widget->is_visible()) {
 			slot.widget->cache_geometry();
 			Vec2 const& ws = slot.widget->get_geometry().get_request_size();
 			rs.width  = max_ce(rs.width , ws.width);
