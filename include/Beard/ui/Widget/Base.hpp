@@ -120,6 +120,16 @@ protected:
 	get_type_info_impl() const noexcept = 0;
 
 	/**
+		set_input_control() implementation.
+
+		%Base definition assigns Widget::Flags::input_control.
+	*/
+	virtual void
+	set_input_control_impl(
+		bool const enabled
+	) noexcept;
+
+	/**
 		cache_geometry() implementation.
 
 		%Base definition does nothing.
@@ -407,7 +417,7 @@ public:
 	set_input_control(
 		bool const enabled
 	) noexcept {
-		m_flags.set(ui::Widget::Flags::input_control, enabled);
+		set_input_control_impl(enabled);
 	}
 
 	/**

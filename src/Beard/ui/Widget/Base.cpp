@@ -17,6 +17,13 @@ Base::~Base() noexcept = default;
 // implementation
 
 void
+Base::set_input_control_impl(
+	bool const enabled
+) noexcept {
+	m_flags.set(ui::Widget::Flags::input_control, enabled);
+}
+
+void
 Base::cache_geometry_impl() noexcept {
 	/* Do nothing. */
 }
