@@ -351,9 +351,7 @@ public:
 	void
 	set_visible(
 		bool const visible
-	) noexcept {
-		m_flags.set(ui::Widget::Flags::visible, visible);
-	}
+	) noexcept;
 
 	/**
 		Check if the widget is visible.

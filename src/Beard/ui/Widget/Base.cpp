@@ -84,6 +84,20 @@ Base::render(
 // properties
 
 void
+Base::set_visible(
+	bool const visible
+) noexcept {
+	if (is_visible() != visible) {
+		m_flags.set(ui::Widget::Flags::visible, visible);
+		queue_actions(enum_combine(
+			ui::UpdateActions::flag_parent,
+			ui::UpdateActions::reflow,
+			ui::UpdateActions::render
+		));
+	}
+}
+
+void
 Base::set_focused(
 	bool const focused
 ) noexcept {
