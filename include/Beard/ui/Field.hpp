@@ -88,6 +88,11 @@ private:
 	get_type_info_impl() const noexcept override;
 
 	void
+	set_input_control_impl(
+		bool const enabled
+	) noexcept override;
+
+	void
 	reflow_impl(
 		Rect const& area,
 		bool const cache

@@ -55,6 +55,32 @@ Field::get_type_info_impl() const noexcept {
 }
 
 void
+Field::set_input_control_impl(
+	bool const enabled
+) noexcept {
+	base_type::set_input_control_impl(enabled);
+	signal_control_changed(
+		std::move(std::static_pointer_cast<ui::Field>(
+			shared_from_this()
+		)),
+		has_input_control()
+	);
+	get_root()->get_context().get_terminal().set_caret_visible(
+		has_input_control()
+	);
+	/*m_cursor.col_extent(
+		has_input_control()
+		? txt::Extent::tail
+		: txt::Extent::head
+	);*/
+	update_view();
+	queue_actions(enum_combine(
+		ui::UpdateActions::render,
+		ui::UpdateActions::flag_noclear
+	));
+}
+
+void
 Field::reflow_impl(
 	Rect const& area,
 	bool const cache
@@ -87,25 +113,6 @@ Field::handle_event_impl(
 			(has_input_control() && KeyCode::esc == event.key_input.code)
 		) {
 			set_input_control(!has_input_control());
-			signal_control_changed(
-				std::move(std::static_pointer_cast<ui::Field>(
-					shared_from_this()
-				)),
-				has_input_control()
-			);
-			get_root()->get_context().get_terminal().set_caret_visible(
-				has_input_control()
-			);
-			/*m_cursor.col_extent(
-				has_input_control()
-				? txt::Extent::tail
-				: txt::Extent::head
-			);*/
-			update_view();
-			queue_actions(enum_combine(
-				ui::UpdateActions::render,
-				ui::UpdateActions::flag_noclear
-			));
 			return true;
 		} else if (has_input_control()) {
 			switch (event.key_input.code) {
