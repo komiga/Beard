@@ -38,4 +38,3 @@ see @ref index or the accompanying LICENSE file for full text.
 		__VA_ARGS__									\
 	)
 //
-

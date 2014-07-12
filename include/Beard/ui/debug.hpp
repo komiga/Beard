@@ -45,4 +45,3 @@ geom_debug_render(
 
 } // namespace ui
 } // namespace Beard
-

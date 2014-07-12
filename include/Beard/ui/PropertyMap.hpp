@@ -440,4 +440,3 @@ public:
 } // namespace Beard
 
 #include <Beard/detail/gr_unconfigure.hpp>
-

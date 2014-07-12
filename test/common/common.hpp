@@ -132,4 +132,3 @@ context_update(
 	}
 	return true;
 }
-

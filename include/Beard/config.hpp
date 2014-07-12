@@ -37,4 +37,3 @@ namespace Beard {
 /** @} */ // end of doc-group config
 
 } // namespace Beard
-

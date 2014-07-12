@@ -218,4 +218,3 @@ struct Event final {
 
 } // namespace tty
 } // namespace Beard
-

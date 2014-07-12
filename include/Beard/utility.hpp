@@ -36,4 +36,3 @@ using duct::max_ce;
 /** @} */ // end of doc-group etc
 
 } // namespace Beard
-

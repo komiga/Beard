@@ -579,4 +579,3 @@ public:
 
 } // namespace ui
 } // namespace Beard
-

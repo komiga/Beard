@@ -529,4 +529,3 @@ public:
 } // namespace Widget
 } // namespace ui
 } // namespace Beard
-

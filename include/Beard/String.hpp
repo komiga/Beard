@@ -53,4 +53,3 @@ using char32 = duct::char32;
 /** @} */ // end of doc-group etc
 
 } // namespace Beard
-

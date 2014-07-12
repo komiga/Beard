@@ -747,4 +747,3 @@ quad_intersects(
 /** @} */ // end of doc-group geometry
 
 } // namespace Beard
-

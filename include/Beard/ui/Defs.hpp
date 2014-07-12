@@ -352,4 +352,3 @@ struct Event final {
 
 } // namespace ui
 } // namespace Beard
-

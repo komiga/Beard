@@ -180,4 +180,3 @@ key_input_match(
 /** @} */ // end of doc-group keys
 
 } // namespace Beard
-

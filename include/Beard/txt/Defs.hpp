@@ -307,4 +307,3 @@ struct UTF8Block final {
 
 } // namespace txt
 } // namespace Beard
-

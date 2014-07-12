@@ -32,4 +32,3 @@ this_path() noexcept;
 
 } // namespace tty
 } // namespace Beard
-

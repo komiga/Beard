@@ -50,4 +50,3 @@ get_error_name(
 /** @} */ // end of doc-group error
 
 } // namespace Beard
-

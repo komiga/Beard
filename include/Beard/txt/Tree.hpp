@@ -193,4 +193,3 @@ public:
 
 } // namespace txt
 } // namespace Beard
-

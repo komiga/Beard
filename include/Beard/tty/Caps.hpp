@@ -610,4 +610,3 @@ enum class CapString : unsigned {
 
 } // namespace tty
 } // namespace Beard
-

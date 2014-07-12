@@ -278,4 +278,3 @@ struct RenderData final {
 } // namespace Widget
 } // namespace ui
 } // namespace Beard
-

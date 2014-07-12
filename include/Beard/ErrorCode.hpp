@@ -109,4 +109,3 @@ enum class ErrorCode : unsigned {
 /** @} */ // end of doc-group error
 
 } // namespace Beard
-

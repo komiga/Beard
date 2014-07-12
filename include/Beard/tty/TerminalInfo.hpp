@@ -239,4 +239,3 @@ public:
 
 } // namespace tty
 } // namespace Beard
-

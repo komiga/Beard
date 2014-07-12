@@ -159,4 +159,3 @@ using set
 
 } // namespace aux
 } // namespace Beard
-
