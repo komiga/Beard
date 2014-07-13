@@ -93,6 +93,7 @@ public:
 		)
 		, m_context(context)
 		, m_focus_map()
+		, m_focus({m_focus_map.cend(), ui::Widget::WPtr()})
 	{}
 	/** @endcond */
 
@@ -198,17 +199,19 @@ public:
 	void
 	set_focus(
 		ui::Widget::SPtr const& widget
-	) {
-		if (has_focus() && widget->is_focused()) {
-			return;
-		}
-		set_focus(
-			static_cast<bool>(widget)
-			? m_focus_map.find(widget)
-			: m_focus_map.cend(),
-			widget
-		);
-	}
+	);
+
+	/**
+		Set bound focus index.
+
+		If this is not equal to @c ui::focus_index_none, any widgets
+		that do not have @a bound_index as their focus index will not
+		be focusable by focus_dir().
+	*/
+	void
+	set_bound_index(
+		ui::focus_index_type const bound_index
+	);
 
 	/**
 		Clear focus.
@@ -242,23 +245,7 @@ public:
 	void
 	focus_dir(
 		ui::FocusDir const dir
-	) {
-		ui::FocusMap::const_iterator const
-		iter = has_focus()
-			? (ui::FocusDir::prev == dir)
-				? m_focus_map.prev(m_focus.iter)
-				: m_focus_map.next(m_focus.iter)
-			: (ui::FocusDir::prev == dir)
-				? m_focus_map.clast()
-				: m_focus_map.cbegin()
-		;
-		set_focus(
-			iter,
-			(m_focus_map.cend() != iter)
-				? iter->second.lock()
-				: Widget::SPtr()
-		);
-	}
+	);
 /// @}
 };
 

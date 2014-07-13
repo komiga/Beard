@@ -54,17 +54,37 @@ public:
 
 private:
 	map_type m_map;
+	ui::focus_index_type m_bound_index;
+	std::pair<const_iterator, const_iterator> m_bound_range;
 
 	FocusMap(FocusMap const&) = delete;
 	FocusMap& operator=(FocusMap const&) = delete;
 
+	void
+	update_bound_range() {
+		if (!is_bound()) {
+			m_bound_range.first = m_map.cbegin();
+			m_bound_range.second = m_map.cend();
+		} else {
+			m_bound_range = m_map.equal_range(m_bound_index);
+			if (m_bound_range.first == m_bound_range.second) {
+				m_bound_range.first = m_map.cend();
+				m_bound_range.second = m_map.cend();
+			}
+		}
+	}
+
 public:
 /** @name Constructors and destructor */ /// @{
 	/** Destructor. */
-	~FocusMap() noexcept = default;
+	~FocusMap() = default;
 
 	/** Default constructor. */
-	FocusMap() noexcept = default;
+	FocusMap()
+		: m_map()
+		, m_bound_index(ui::focus_index_none)
+		, m_bound_range(m_map.cbegin(), m_map.cend())
+	{}
 
 	/** Move constructor. */
 	FocusMap(FocusMap&&) noexcept = default;
@@ -101,7 +121,7 @@ public:
 	}
 
 	/**
-		Get iterator to beginning of map.
+		Get iterator to beginning of the map.
 	*/
 	iterator
 	begin() noexcept {
@@ -109,7 +129,7 @@ public:
 	}
 
 	/**
-		Get iterator to beginning of map.
+		Get iterator to beginning of the map.
 	*/
 	const_iterator
 	cbegin() const noexcept {
@@ -117,7 +137,7 @@ public:
 	}
 
 	/**
-		Get iterator to end of map.
+		Get iterator to end of the map.
 	*/
 	iterator
 	end() noexcept {
@@ -125,7 +145,7 @@ public:
 	}
 
 	/**
-		Get iterator to end of map.
+		Get iterator to end of the map.
 	*/
 	const_iterator
 	cend() const noexcept {
@@ -133,14 +153,74 @@ public:
 	}
 
 	/**
-		Get iterator to last element.
-
-		@returns Iterator to @c std::prev(cend()), or cend() if map
-		is empty.
+		Get iterator to beginning of the map (bound range).
 	*/
 	const_iterator
-	clast() const noexcept {
-		return empty() ? m_map.cend() : std::prev(m_map.cend());
+	cbegin_bound() const noexcept {
+		return m_bound_range.first;
+	}
+
+	/**
+		Get iterator to end of the map (bound range).
+	*/
+	const_iterator
+	cend_bound() const noexcept {
+		return m_bound_range.second;
+	}
+
+	/**
+		Get iterator to last element (bound range).
+
+		@returns Iterator to @c std::prev(cend_bound()), or cend()
+		if the bound range is empty.
+	*/
+	const_iterator
+	clast_bound() const noexcept {
+		return
+			(cbegin_bound() == cend_bound())
+			? cend()
+			: std::prev(cend_bound())
+		;
+	}
+
+	/**
+		Set bound index.
+
+		If the bound index is ui::focus_index_none, the bound range
+		is the entire focus map.
+	*/
+	void
+	set_bound_index(
+		ui::focus_index_type const index
+	) {
+		m_bound_index = index;
+		update_bound_range();
+	}
+
+	/**
+		Get bound index.
+	*/
+	ui::focus_index_type
+	get_bound_index() {
+		return m_bound_index;
+	}
+
+	/**
+		Check if map is bound.
+	*/
+	bool
+	is_bound() const noexcept {
+		return ui::focus_index_none != m_bound_index;
+	}
+
+	/**
+		Check if a focus index is in the current bound.
+	*/
+	bool
+	is_index_in_bound(
+		ui::focus_index_type const index
+	) const noexcept {
+		return !is_bound() ? true : index == m_bound_index;
 	}
 /// @}
 
@@ -150,15 +230,20 @@ public:
 
 		@returns Iterator for @a widget.
 		@param widget %Widget to lookup.
+		@param bound Whether to lookup only within the bound index.
 	*/
 	const_iterator
 	find(
-		ui::Widget::SPtr const& widget
+		ui::Widget::SPtr const& widget,
+		bool const bound
 	) const noexcept {
 		if (widget) {
 			ui::focus_index_type const index = widget->get_focus_index();
-			if (ui::focus_index_none != index) {
-				auto const pair = equal_range(index);
+			if (
+				ui::focus_index_none != index &&
+				(!bound || is_index_in_bound(index))
+			) {
+				auto const pair = m_map.equal_range(index);
 				for (auto it = pair.first; pair.second != it; ++it) {
 					if (
 						!it->second.expired() &&
@@ -197,12 +282,14 @@ public:
 		ui::focus_index_type const index,
 		ui::Widget::SPtr const& widget
 	) {
-		if (!widget) {
+		if (!widget || ui::focus_index_none == index) {
 			throw std::invalid_argument(
 				"FocusMap::emplace(): widget is invalid"
 			);
 		}
-		return m_map.emplace(index, ui::Widget::WPtr(widget));
+		auto const it = m_map.emplace(index, ui::Widget::WPtr(widget));
+		update_bound_range();
+		return it;
 	}
 
 	/**
@@ -217,7 +304,9 @@ public:
 	erase(
 		const_iterator const pos
 	) {
-		return m_map.erase(pos);
+		auto const it = m_map.erase(pos);
+		update_bound_range();
+		return it;
 	}
 
 	/**
@@ -231,9 +320,9 @@ public:
 	erase(
 		ui::Widget::SPtr const& widget
 	) {
-		auto const it = find(widget);
+		auto const it = find(widget, false);
 		if (cend() != it) {
-			return {m_map.erase(it), true};
+			return {erase(it), true};
 		}
 		return {cend(), false};
 	}
@@ -253,7 +342,11 @@ public:
 	equal_range(
 		ui::focus_index_type const index
 	) const noexcept {
-		return m_map.equal_range(index);
+		if (is_bound() && index == m_bound_index) {
+			return m_bound_range;
+		} else {
+			return m_map.equal_range(index);
+		}
 	}
 
 	/**
@@ -262,12 +355,11 @@ public:
 		@param pos Iterator to step from.
 	*/
 	const_iterator
-	prev(
+	prev_bound(
 		const_iterator const& pos
 	) noexcept {
-		return (cbegin() != pos)
-			? std::prev(pos)
-			: clast()
+		return (cbegin_bound() == pos || cbegin() == pos)
+			? clast_bound() : std::prev(pos)
 		;
 	}
 
@@ -277,12 +369,11 @@ public:
 		@param pos Iterator to step from.
 	*/
 	const_iterator
-	next(
+	next_bound(
 		const_iterator const& pos
 	) noexcept {
-		return (clast() != pos && cend() != pos)
-			? std::next(pos)
-			: cbegin()
+		return (cend_bound() == pos || clast_bound() == pos || cend() == pos)
+			? cbegin_bound() : std::next(pos)
 		;
 	}
 /// @}

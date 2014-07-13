@@ -74,15 +74,21 @@ Root::notify_focus_index_changing(
 		}
 	} else if (widget->is_focused() && has_focus()) {
 		// TODO: Retain focus?
-		iter = (m_focus_map.cend() == iter)
-			? m_focus_map.prev(iter)
-			: iter
-		;
+		if (
+			m_focus_map.cend() == iter ||
+			m_focus_map.cend_bound() == iter
+		) {
+			iter = m_focus_map.clast_bound();
+		} else if (!m_focus_map.is_index_in_bound(
+			iter->second.lock()->get_focus_index()
+		)) {
+			iter = m_focus_map.cbegin_bound();
+		}
 		set_focus(
 			iter,
 			(m_focus_map.cend() == iter)
-				? ui::Widget::SPtr()
-				: iter->second.lock()
+			? ui::Widget::SPtr()
+			: iter->second.lock()
 		);
 	}
 }
@@ -109,6 +115,63 @@ Root::set_focus(
 		m_focus.iter = m_focus_map.cend();
 		m_focus.widget.reset();
 	}
+}
+
+void
+Root::set_focus(
+	ui::Widget::SPtr const& widget
+) {
+	if (has_focus() && widget->is_focused()) {
+		return;
+	}
+	set_focus(
+		static_cast<bool>(widget)
+		? m_focus_map.find(widget, true)
+		: m_focus_map.cend(),
+		widget
+	);
+}
+
+void
+Root::set_bound_index(
+	ui::focus_index_type const bound_index
+) {
+	if (
+		ui::focus_index_none != bound_index &&
+		has_focus()
+	) {
+		auto focus_widget = get_focus();
+		if (focus_widget->get_focus_index() != bound_index) {
+			focus_widget->set_focused(false);
+			m_focus.iter = m_focus_map.cend();
+			m_focus.widget.reset();
+		}
+	}
+	m_focus_map.set_bound_index(bound_index);
+}
+
+void
+Root::focus_dir(
+	ui::FocusDir const dir
+) {
+	ui::FocusMap::const_iterator iter;
+	if (has_focus()) {
+		iter = (ui::FocusDir::prev == dir)
+			? m_focus_map.prev_bound(m_focus.iter)
+			: m_focus_map.next_bound(m_focus.iter)
+		;
+	} else {
+		iter = (ui::FocusDir::prev == dir)
+			? m_focus_map.clast_bound()
+			: m_focus_map.cbegin_bound()
+		;
+	}
+	set_focus(
+		iter,
+		(m_focus_map.cend() == iter)
+		? Widget::SPtr()
+		: iter->second.lock()
+	);
 }
 
 } // namespace ui
