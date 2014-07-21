@@ -2,15 +2,5 @@
 Makefile
 *.make
 out/
-
-general/headers
-general/range
-
-tty/info
-tty/hello
-
-txt/ops
-
-ui/grid
-ui/packing
-ui/bound_focus
+*.exe
+*.elf
