@@ -762,6 +762,7 @@ Terminal::init(
 	m_tty_priv->have_orig = true;
 
 	// Input modes
+	m_tty_priv->tios.c_iflag |= IUTF8;
 	m_tty_priv->tios.c_iflag &=
 	~(
 		// Disable BREAK ignore and side-effects
@@ -1664,6 +1665,7 @@ Terminal::close() noexcept {
 }
 #undef BEARD_SCOPE_FUNC
 
+#define BEARD_SCOPE_FUNC update_size
 bool
 Terminal::update_size() {
 	if (is_open()) {
@@ -1679,6 +1681,7 @@ Terminal::update_size() {
 	}
 	return false;
 }
+#undef BEARD_SCOPE_FUNC
 
 #undef BEARD_SCOPE_CLASS
 
