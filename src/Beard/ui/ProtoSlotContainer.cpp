@@ -72,6 +72,10 @@ ProtoSlotContainer::clear() {
 		}
 	}
 	m_slots.clear();
+	queue_actions(enum_combine(
+		ui::UpdateActions::reflow,
+		ui::UpdateActions::render
+	));
 }
 
 void
@@ -87,6 +91,10 @@ ProtoSlotContainer::set_child(
 	if (slot.widget) {
 		slot.widget->set_parent(shared_from_this(), index);
 	}
+	queue_actions(enum_combine(
+		ui::UpdateActions::reflow,
+		ui::UpdateActions::render
+	));
 }
 
 void
@@ -97,6 +105,10 @@ ProtoSlotContainer::push_back(
 		widget->set_parent(shared_from_this(), static_cast<signed>(m_slots.size()));
 	}
 	m_slots.push_back(ui::Widget::Slot{std::move(widget), {}});
+	queue_actions(enum_combine(
+		ui::UpdateActions::reflow,
+		ui::UpdateActions::render
+	));
 }
 
 } // namespace ui
