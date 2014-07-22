@@ -99,6 +99,11 @@ enum class ErrorCode : unsigned {
 		Context is already open.
 	*/
 	ui_context_already_open,
+
+	/**
+		Child insertion of or assignment to a null widget.
+	*/
+	ui_container_null_widget,
 /// @}
 
 /** @cond INTERNAL */

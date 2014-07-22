@@ -3,10 +3,14 @@
 #include <Beard/ui/packing.hpp>
 #include <Beard/ui/ProtoSlotContainer.hpp>
 
+#include <Beard/detail/gr_core.hpp>
+
 namespace Beard {
 namespace ui {
 
 // class ProtoSlotContainer implementation
+
+#define BEARD_SCOPE_CLASS ui::ProtoSlotContainer
 
 ProtoSlotContainer::~ProtoSlotContainer() noexcept = default;
 
@@ -14,7 +18,7 @@ void
 ProtoSlotContainer::cache_geometry_impl() noexcept {
 	Vec2 rs = get_geometry().get_request_size();
 	for (auto& slot : m_slots) {
-		if (slot.widget && slot.widget->is_visible()) {
+		if (slot.widget->is_visible()) {
 			slot.widget->cache_geometry();
 			Vec2 const& ws = slot.widget->get_geometry().get_request_size();
 			rs.width  = max_ce(rs.width , ws.width);
@@ -45,10 +49,8 @@ ProtoSlotContainer::render_impl(
 	ui::Widget::RenderData& rd
 ) noexcept {
 	for (auto& slot : m_slots) {
-		if (slot.widget) {
-			rd.update_group(slot.widget->get_group());
-			slot.widget->render(rd);
-		}
+		rd.update_group(slot.widget->get_group());
+		slot.widget->render(rd);
 	}
 }
 
@@ -85,9 +87,7 @@ ProtoSlotContainer::remove(
 void
 ProtoSlotContainer::clear() {
 	for (auto const& slot : m_slots) {
-		if (slot.widget) {
-			slot.widget->clear_parent();
-		}
+		slot.widget->clear_parent();
 	}
 	m_slots.clear();
 	queue_actions(enum_combine(
@@ -96,38 +96,48 @@ ProtoSlotContainer::clear() {
 	));
 }
 
+#define BEARD_SCOPE_FUNC set_child
 void
 ProtoSlotContainer::set_child(
 	ui::index_type const index,
 	ui::Widget::SPtr widget
 ) {
+	if (!widget) {
+		BEARD_THROW_FQN(
+			ErrorCode::ui_container_null_widget,
+			"cannot set child to null"
+		);
+	}
 	auto& slot = m_slots.at(static_cast<unsigned>(index));
-	if (slot.widget) {
-		slot.widget->clear_parent();
-	}
+	slot.widget->clear_parent();
 	slot.widget = std::move(widget);
-	if (slot.widget) {
-		slot.widget->set_parent(shared_from_this(), index);
-	}
+	slot.widget->set_parent(shared_from_this(), index);
 	queue_actions(enum_combine(
 		ui::UpdateActions::reflow,
 		ui::UpdateActions::render
 	));
 }
+#undef BEARD_SCOPE_FUNC
 
 void
 ProtoSlotContainer::push_back(
 	ui::Widget::SPtr widget
 ) {
-	if (widget) {
-		widget->set_parent(shared_from_this(), static_cast<signed>(m_slots.size()));
+	if (!widget) {
+		BEARD_THROW_FQN(
+			ErrorCode::ui_container_null_widget,
+			"cannot add null child"
+		);
 	}
+	widget->set_parent(shared_from_this(), static_cast<signed>(m_slots.size()));
 	m_slots.push_back(ui::Widget::Slot{std::move(widget), {}});
 	queue_actions(enum_combine(
 		ui::UpdateActions::reflow,
 		ui::UpdateActions::render
 	));
 }
+
+#undef BEARD_SCOPE_CLASS // ProtoSlotContainer
 
 } // namespace ui
 } // namespace Beard

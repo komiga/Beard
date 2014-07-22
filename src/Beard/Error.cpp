@@ -35,6 +35,8 @@ s_error_invalid[]{BEARD_STR_LIT("INVALID")},
 	BEARD_STR_LIT("ui_property_not_found"),
 
 	BEARD_STR_LIT("ui_context_already_open"),
+
+	BEARD_STR_LIT("ui_container_null_widget"),
 };
 } // anonymous namespace
 

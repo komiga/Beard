@@ -178,6 +178,9 @@ public:
 		@throws std::out_of_range
 		If @a index is out of bounds.
 
+		@throws Error{ErrorCode::ui_container_null_widget}
+		If @a widget is null.
+
 		@param index Index.
 		@param widget %Widget.
 	*/
