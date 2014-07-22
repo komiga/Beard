@@ -385,29 +385,32 @@ protected:
 	/**
 		Constructor.
 
-		@param root %Root.
+		@param type %Widget type.
 		@param flags Flags.
-		@param group %Property group.
+		@param group Property group name.
 		@param geometry Geometry.
+		@param root %Root.
 		@param parent Parent.
 		@param col_count Number of columns.
 		@param row_count Number of rows.
+
 	*/
 	ProtoGrid(
-		ui::RootWPtr&& root,
+		ui::Widget::Type const type,
 		ui::Widget::Flags const flags,
 		ui::group_hash_type const group,
 		ui::Geom&& geometry,
+		ui::RootWPtr&& root,
 		ui::Widget::WPtr&& parent,
-
 		ui::index_type const col_count,
 		ui::index_type const row_count
 	) noexcept
 		: base_type(
-			std::move(root),
+			type,
 			flags,
 			group,
 			std::move(geometry),
+			std::move(root),
 			std::move(parent)
 		)
 		, m_col_count(max_ce(ui::index_type{0}, col_count))

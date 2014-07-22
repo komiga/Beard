@@ -60,9 +60,7 @@ private:
 	Button(Button const&) = delete;
 	Button& operator=(Button const&) = delete;
 
-	ui::Widget::type_info const&
-	get_type_info_impl() const noexcept override;
-
+// implementation
 	void
 	cache_geometry_impl() noexcept override;
 
@@ -91,18 +89,20 @@ public:
 	/* Required for visibility in make_shared; do not use directly. */
 	Button(
 		ctor_priv const,
-		ui::RootWPtr&& root,
-		String&& text,
 		ui::group_hash_type const group,
-		ui::Widget::WPtr&& parent
+		ui::RootWPtr&& root,
+		ui::Widget::WPtr&& parent,
+		String&& text
 	) noexcept
 		: base_type(
-			std::move(root),
+			ui::Widget::Type::Button,
 			enum_combine(
+				ui::Widget::Flags::trait_focusable,
 				ui::Widget::Flags::visible
 			),
 			group,
 			{{1, 1}, false, Axis::none, Axis::none},
+			std::move(root),
 			std::move(parent)
 		)
 		, signal_pressed()
@@ -132,10 +132,10 @@ public:
 	) {
 		auto p = aux::make_shared<ui::Button>(
 			ctor_priv{},
-			std::move(root),
-			std::move(text),
 			group,
-			std::move(parent)
+			std::move(root),
+			std::move(parent),
+			std::move(text)
 		);
 		p->set_focus_index(focus_index);
 		return p;

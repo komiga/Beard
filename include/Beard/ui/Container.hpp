@@ -48,9 +48,6 @@ private:
 	Container(Container const&) = delete;
 	Container& operator=(Container const&) = delete;
 
-	ui::Widget::type_info const&
-	get_type_info_impl() const noexcept override;
-
 public:
 /** @name Constructors and destructor */ /// @{
 	/** Destructor. */
@@ -61,15 +58,18 @@ public:
 	Container(
 		ctor_priv const,
 		ui::RootWPtr&& root,
+		ui::Widget::WPtr&& parent,
 		Axis const orientation,
-		std::size_t const slot_count,
-		ui::Widget::WPtr&& parent
+		std::size_t const slot_count
 	) noexcept
 		: base_type(
-			std::move(root),
-			enum_combine(ui::Widget::Flags::visible),
+			ui::Widget::Type::Container,
+			enum_combine(
+				ui::Widget::Flags::visible
+			),
 			ui::group_null,
 			{{0, 0}, true, Axis::both, Axis::both},
+			std::move(root),
 			std::move(parent),
 			orientation,
 			slot_count
@@ -98,9 +98,9 @@ public:
 		return aux::make_shared<ui::Container>(
 			ctor_priv{},
 			std::move(root),
+			std::move(parent),
 			orientation,
-			slot_count,
-			std::move(parent)
+			slot_count
 		);
 	}
 

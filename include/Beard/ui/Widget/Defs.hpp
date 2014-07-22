@@ -31,7 +31,6 @@ namespace Widget {
 // Forward declarations
 class Base; // external
 enum class Type : unsigned;
-enum class TypeFlags : unsigned;
 struct type_info;
 enum class Flags : unsigned;
 struct Slot;
@@ -100,35 +99,6 @@ enum class Type : unsigned {
 };
 
 /**
-	%Widget type flags.
-*/
-enum class TypeFlags : unsigned {
-	/**
-		No type flags.
-	*/
-	none			= 0u,
-	/**
-		Type is focusable.
-	*/
-	focusable		= bit(0u),
-	/**
-		Type is a container.
-	*/
-	container		= bit(1u),
-};
-
-/**
-	%Widget type information.
-*/
-struct type_info final {
-	/** Widget type. */
-	ui::Widget::Type const type;
-
-	/** Type flags. */
-	duct::StateStore<ui::Widget::TypeFlags> const type_flags;
-};
-
-/**
 	%Widget flags.
 */
 enum class Flags : unsigned {
@@ -136,29 +106,52 @@ enum class Flags : unsigned {
 		No flags.
 	*/
 	none			= 0x00,
+
+	/**
+		%Widget is focusable.
+	*/
+	trait_focusable	= bit(0u),
+	/**
+		%Widget is a container.
+
+		Containers must implement the following functions:
+
+		- ui::Widget::Base::num_children_impl()
+		- ui::Widget::Base::get_child_impl()
+	*/
+	trait_container	= bit(1u),
+
 	/**
 		%Widget is enabled.
 	*/
-	enabled			= bit(0u),
+	enabled			= bit(2u),
 	/**
 		%Widget is visible.
 	*/
-	visible			= bit(1u),
+	visible			= bit(3u),
 	/**
 		%Widget is focused.
 	*/
-	focused			= bit(2u),
+	focused			= bit(4u),
 	/**
 		%Widget is in input control mode.
 	*/
-	input_control	= bit(3u),
+	input_control	= bit(5u),
 	/**
 		One or more queued update actions.
 	*/
-	queued_actions	= bit(4u),
+	queued_actions	= bit(6u),
+
+	/**
+		Mask for trait flags.
+	*/
+	trait_mask
+		= trait_focusable
+		| trait_container
+	,
 
 /** @cond INTERNAL */
-	COUNT = 5u
+	COUNT = 7u
 /** @endcond */
 };
 

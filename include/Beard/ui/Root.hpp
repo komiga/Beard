@@ -54,9 +54,6 @@ private:
 	Root(Root const&) = delete;
 	Root& operator=(Root const&) = delete;
 
-	ui::Widget::type_info const&
-	get_type_info_impl() const noexcept override;
-
 	bool
 	handle_event_impl(
 		ui::Event const& event
@@ -83,10 +80,13 @@ public:
 		std::size_t const slot_count
 	)
 		: base_type(
-			{},
-			enum_combine(ui::Widget::Flags::visible),
+			ui::Widget::Type::Root,
+			enum_combine(
+				ui::Widget::Flags::visible
+			),
 			ui::group_null,
 			{{0, 0}, true, Axis::both, Axis::both},
+			{},
 			{},
 			orientation,
 			slot_count

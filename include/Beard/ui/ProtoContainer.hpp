@@ -92,24 +92,30 @@ protected:
 	/**
 		Constructor.
 
-		@param root %Root.
+		@param type %Widget type.
 		@param flags Flags.
-		@param group %Property group.
+		@param group Property group name.
 		@param geometry Geometry.
+		@param root %Root.
 		@param parent Parent.
 	*/
 	ProtoContainer(
-		ui::RootWPtr&& root,
+		ui::Widget::Type const type,
 		ui::Widget::Flags const flags,
 		ui::group_hash_type const group,
 		ui::Geom&& geometry,
+		ui::RootWPtr&& root,
 		ui::Widget::WPtr&& parent
 	) noexcept
 		: base_type(
-			std::move(root),
-			flags,
+			type,
+			enum_combine(
+				ui::Widget::Flags::trait_container,
+				flags
+			),
 			group,
 			std::move(geometry),
+			std::move(root),
 			std::move(parent)
 		)
 	{}

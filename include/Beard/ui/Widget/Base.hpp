@@ -82,11 +82,12 @@ private:
 		enum_cast(ui::UpdateActions::mask_all) << shift_ua
 	);
 
-	ui::RootWPtr m_root;
+	ui::Widget::Type const m_type;
 	flag_store_type m_flags;
 	ui::group_hash_type m_group;
 	ui::focus_index_type m_focus_index;
 	ui::Geom m_geometry;
+	ui::RootWPtr m_root;
 	ui::Widget::WPtr m_parent;
 
 	Base() = delete;
@@ -113,12 +114,6 @@ protected:
 /// @}
 
 /** @name Implementation */ /// @{
-	/**
-		get_type_info() implementation.
-	*/
-	virtual ui::Widget::type_info const&
-	get_type_info_impl() const noexcept = 0;
-
 	/**
 		set_input_control() implementation.
 
@@ -183,25 +178,28 @@ protected:
 	/**
 		Constructor with properties.
 
-		@param root %Root.
+		@param type %Widget type.
 		@param flags Flags.
 		@param group Property group name.
-		@param parent Parent.
 		@param geometry Geometry.
+		@param root %Root.
+		@param parent Parent.
 	*/
 	explicit
 	Base(
-		ui::RootWPtr&& root,
+		ui::Widget::Type const type,
 		ui::Widget::Flags const flags,
 		ui::group_hash_type const group,
 		ui::Geom&& geometry,
+		ui::RootWPtr&& root,
 		ui::Widget::WPtr&& parent
 	) noexcept
-		: m_root(std::move(root))
+		: m_type(type)
 		, m_flags(flags)
 		, m_group(group)
 		, m_focus_index(ui::focus_index_none)
 		, m_geometry(std::move(geometry))
+		, m_root(std::move(root))
 		, m_parent(std::move(parent))
 	{}
 /// @}
@@ -215,11 +213,11 @@ protected:
 public:
 /** @name Properties */ /// @{
 	/**
-		Get type information.
+		Get type.
 	*/
-	ui::Widget::type_info const&
-	get_type_info() const noexcept {
-		return get_type_info_impl();
+	ui::Widget::Type
+	get_type() const noexcept {
+		return m_type;
 	}
 
 	/**
@@ -353,6 +351,22 @@ public:
 		return static_cast<ui::UpdateActions>(
 			enum_cast(m_flags.get_states(mask_ua)) >> shift_ua
 		);
+	}
+
+	/**
+		Check if the widget is focusable.
+	*/
+	bool
+	is_focusable() const noexcept {
+		return m_flags.test(ui::Widget::Flags::trait_focusable);
+	}
+
+	/**
+		Check if the widget is a container.
+	*/
+	bool
+	is_container() const noexcept {
+		return m_flags.test(ui::Widget::Flags::trait_container);
 	}
 
 	/**

@@ -14,24 +14,9 @@ namespace ui {
 
 // class Label implementation
 
-namespace {
-static ui::Widget::type_info const
-s_type_info{
-	ui::Widget::Type::Label,
-	enum_combine(
-		ui::Widget::TypeFlags::none
-	)
-};
-} // anonymous namespace
-
 Label::~Label() noexcept = default;
 
 // implementation
-
-ui::Widget::type_info const&
-Label::get_type_info_impl() const noexcept {
-	return s_type_info;
-}
 
 void
 Label::cache_geometry_impl() noexcept {

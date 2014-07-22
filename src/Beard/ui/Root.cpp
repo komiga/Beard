@@ -8,22 +8,7 @@ namespace ui {
 
 // class Root implementation
 
-namespace {
-static ui::Widget::type_info const
-s_type_info{
-	ui::Widget::Type::Root,
-	enum_combine(
-		ui::Widget::TypeFlags::container
-	)
-};
-} // anonymous namespace
-
 Root::~Root() noexcept = default;
-
-ui::Widget::type_info const&
-Root::get_type_info_impl() const noexcept {
-	return s_type_info;
-}
 
 static KeyInputMatch const
 s_kim_root[]{

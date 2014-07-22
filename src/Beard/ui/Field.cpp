@@ -17,16 +17,6 @@ namespace ui {
 
 // class Field implementation
 
-namespace {
-static ui::Widget::type_info const
-s_type_info{
-	ui::Widget::Type::Field,
-	enum_combine(
-		ui::Widget::TypeFlags::focusable
-	)
-};
-} // anonymous namespace
-
 Field::~Field() noexcept = default;
 
 void
@@ -48,11 +38,6 @@ Field::update_view() noexcept {
 }
 
 // implementation
-
-ui::Widget::type_info const&
-Field::get_type_info_impl() const noexcept {
-	return s_type_info;
-}
 
 void
 Field::set_input_control_impl(

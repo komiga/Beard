@@ -84,9 +84,6 @@ private:
 	update_view() noexcept;
 
 // implementation
-	ui::Widget::type_info const&
-	get_type_info_impl() const noexcept override;
-
 	void
 	set_input_control_impl(
 		bool const enabled
@@ -117,19 +114,21 @@ public:
 	/* Required for visibility in make_shared; do not use directly. */
 	Field(
 		ctor_priv const,
-		ui::RootWPtr&& root,
-		String&& text,
-		filter_type&& filter,
 		ui::group_hash_type const group,
-		ui::Widget::WPtr&& parent
+		ui::RootWPtr&& root,
+		ui::Widget::WPtr&& parent,
+		String&& text,
+		filter_type&& filter
 	) noexcept
 		: base_type(
-			std::move(root),
+			ui::Widget::Type::Field,
 			enum_combine(
+				ui::Widget::Flags::trait_focusable,
 				ui::Widget::Flags::visible
 			),
 			group,
 			{{2, 1}, false, Axis::none, Axis::none},
+			std::move(root),
 			std::move(parent)
 		)
 		, signal_control_changed()
@@ -169,11 +168,11 @@ public:
 	) {
 		auto p = aux::make_shared<ui::Field>(
 			ctor_priv{},
-			std::move(root),
-			std::move(text),
-			std::move(filter),
 			group,
-			std::move(parent)
+			std::move(root),
+			std::move(parent),
+			std::move(text),
+			std::move(filter)
 		);
 		p->set_focus_index(focus_index);
 		return p;

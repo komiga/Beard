@@ -49,9 +49,6 @@ private:
 	Label(Label const&) = delete;
 	Label& operator=(Label const&) = delete;
 
-	ui::Widget::type_info const&
-	get_type_info_impl() const noexcept override;
-
 	void
 	cache_geometry_impl() noexcept override;
 
@@ -75,18 +72,19 @@ public:
 	/* Required for visibility in make_shared; do not use directly. */
 	Label(
 		ctor_priv const,
-		ui::RootWPtr&& root,
-		String&& text,
 		ui::group_hash_type const group,
-		ui::Widget::WPtr&& parent
+		ui::RootWPtr&& root,
+		ui::Widget::WPtr&& parent,
+		String&& text
 	) noexcept
 		: base_type(
-			std::move(root),
+			ui::Widget::Type::Label,
 			enum_combine(
 				ui::Widget::Flags::visible
 			),
 			group,
 			{{1, 1}, false, Axis::none, Axis::none},
+			std::move(root),
 			std::move(parent)
 		)
 		, m_text(std::move(text))
@@ -113,10 +111,10 @@ public:
 	) {
 		auto p = aux::make_shared<ui::Label>(
 			ctor_priv{},
-			std::move(root),
-			std::move(text),
 			group,
-			std::move(parent)
+			std::move(root),
+			std::move(parent),
+			std::move(text)
 		);
 		return p;
 	}

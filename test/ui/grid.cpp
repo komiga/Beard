@@ -95,9 +95,6 @@ private:
 
 private:
 // ui::Widget::Base implementation
-	ui::Widget::type_info const&
-	get_type_info_impl() const noexcept override;
-
 	void
 	reflow_impl(
 		Rect const& area,
@@ -153,17 +150,23 @@ public:
 
 	TestGrid(
 		ctor_priv const,
-		ui::RootWPtr&& root,
-		ui::index_type const col_count,
-		ui::index_type const row_count,
 		ui::group_hash_type const group,
-		ui::Widget::WPtr&& parent
+		ui::RootWPtr&& root,
+		ui::Widget::WPtr&& parent,
+		ui::index_type const col_count,
+		ui::index_type const row_count
 	) noexcept
 		: base_type(
-			std::move(root),
-			enum_combine(ui::Widget::Flags::visible),
+			static_cast<ui::Widget::Type>(
+				enum_cast(ui::Widget::Type::USERSPACE_BASE) + 1000u
+			),
+			enum_combine(
+				ui::Widget::Flags::trait_focusable,
+				ui::Widget::Flags::visible
+			),
 			group,
 			{{0, 0}, true, Axis::both, Axis::both},
+			std::move(root),
 			std::move(parent),
 			col_count,
 			row_count
@@ -187,11 +190,11 @@ public:
 	) {
 		auto p = aux::make_shared<TestGrid>(
 			ctor_priv{},
-			std::move(root),
-			col_count,
-			row_count,
 			group,
-			std::move(parent)
+			std::move(root),
+			std::move(parent),
+			col_count,
+			row_count
 		);
 		p->set_focus_index(focus_index);
 		p->m_field = ui::Field::make(
@@ -251,23 +254,6 @@ public:
 		row_abs(m_cursor.row + amt);
 	}
 };
-
-namespace {
-static ui::Widget::type_info const
-s_type_info{
-	static_cast<ui::Widget::Type>(
-		enum_cast(ui::Widget::Type::USERSPACE_BASE) + 1000u
-	),
-	enum_combine(
-		ui::Widget::TypeFlags::focusable
-	)
-};
-} // anonymous namespace
-
-ui::Widget::type_info const&
-TestGrid::get_type_info_impl() const noexcept {
-	return s_type_info;
-}
 
 void
 TestGrid::reflow_impl(
