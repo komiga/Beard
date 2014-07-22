@@ -53,6 +53,18 @@ Base::render_impl(
 	/* Do nothing. */
 }
 
+signed
+Base::num_children_impl() const noexcept {
+	return 0;
+}
+
+ui::Widget::SPtr
+Base::get_child_impl(
+	index_type const /*index*/
+) {
+	return nullptr;
+}
+
 bool
 Base::handle_event(
 	ui::Event const& event

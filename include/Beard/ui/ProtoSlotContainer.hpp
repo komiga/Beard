@@ -64,7 +64,13 @@ protected:
 		ui::Widget::RenderData& rd
 	) noexcept override;
 
+	signed
+	num_children_impl() const noexcept override;
 
+	ui::Widget::SPtr
+	get_child_impl(
+		ui::index_type const index
+	) override;
 
 protected:
 /** @name Constructors and destructor */ /// @{

@@ -163,6 +163,24 @@ protected:
 	render_impl(
 		ui::Widget::RenderData& rd
 	) noexcept;
+
+	/**
+		num_children() implementation.
+
+		%Base definition returns 0.
+	*/
+	virtual signed
+	num_children_impl() const noexcept;
+
+	/**
+		get_child() implementation.
+
+		%Base definition returns nullptr.
+	*/
+	virtual ui::Widget::SPtr
+	get_child_impl(
+		ui::index_type const index
+	);
 /// @}
 
 public:
@@ -459,6 +477,54 @@ public:
 	ui::focus_index_type
 	get_focus_index() const noexcept {
 		return m_focus_index;
+	}
+
+	/**
+		Get the number of children.
+
+		@note This returns 0 if the widget is not a container.
+	*/
+	signed
+	num_children() const noexcept {
+		return is_container() ? num_children_impl() : 0;
+	}
+
+	/**
+		Check if widget has children.
+	*/
+	bool
+	has_children() const noexcept {
+		return 0 < num_children();
+	}
+
+	/**
+		Get child by index.
+
+		@note This returns nullptr if the widget is not a container.
+	*/
+	ui::Widget::SPtr
+	get_child(
+		ui::index_type const index
+	) {
+		return is_container() ? get_child_impl(max_ce(0, index)) : nullptr;
+	}
+
+	/**
+		Get last child index.
+	*/
+	ui::index_type
+	get_last_child_index() const noexcept {
+		signed const num = num_children_impl();
+		return max_ce(0, num - 1);
+	}
+
+	/**
+		Get last child.
+	*/
+	ui::Widget::SPtr
+	get_last_child() noexcept {
+		signed const num = num_children_impl();
+		return 0 < num ? get_child_impl(num - 1) : nullptr;
 	}
 /// @}
 

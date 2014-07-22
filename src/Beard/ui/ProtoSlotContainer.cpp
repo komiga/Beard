@@ -52,9 +52,16 @@ ProtoSlotContainer::render_impl(
 	}
 }
 
-std::size_t
-ProtoSlotContainer::size() const noexcept {
+signed
+ProtoSlotContainer::num_children_impl() const noexcept {
 	return m_slots.size();
+}
+
+ui::Widget::SPtr
+ProtoSlotContainer::get_child_impl(
+	ui::index_type const index
+) {
+	return m_slots.at(static_cast<unsigned>(index)).widget;
 }
 
 void
