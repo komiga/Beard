@@ -59,8 +59,7 @@ public:
 		ctor_priv const,
 		ui::RootWPtr&& root,
 		ui::Widget::WPtr&& parent,
-		Axis const orientation,
-		std::size_t const slot_count
+		Axis const orientation
 	) noexcept
 		: base_type(
 			ui::Widget::Type::Container,
@@ -71,8 +70,7 @@ public:
 			{{0, 0}, true, Axis::both, Axis::both},
 			std::move(root),
 			std::move(parent),
-			orientation,
-			slot_count
+			orientation
 		)
 	{}
 	/** @endcond */ // INTERNAL
@@ -85,22 +83,19 @@ public:
 
 		@param root %Root.
 		@param orientation Orientation.
-		@param slot_count Number of slots to reserve.
 		@param parent Parent.
 	*/
 	static aux::shared_ptr<ui::Container>
 	make(
 		ui::RootWPtr root,
 		Axis const orientation,
-		std::size_t const slot_count = 0u,
 		ui::Widget::WPtr parent = ui::Widget::WPtr()
 	) {
 		return aux::make_shared<ui::Container>(
 			ctor_priv{},
 			std::move(root),
 			std::move(parent),
-			orientation,
-			slot_count
+			orientation
 		);
 	}
 

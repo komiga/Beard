@@ -63,8 +63,7 @@ public:
 	Root(
 		ctor_priv const,
 		ui::Context& context,
-		Axis const orientation,
-		std::size_t const slot_count
+		Axis const orientation
 	)
 		: base_type(
 			ui::Widget::Type::Root,
@@ -75,8 +74,7 @@ public:
 			{{0, 0}, true, Axis::both, Axis::both},
 			{},
 			{},
-			orientation,
-			slot_count
+			orientation
 		)
 		, m_context(context)
 		, m_focus()
@@ -91,19 +89,16 @@ public:
 
 		@param context Context.
 		@param orientation Orientation.
-		@param slot_count Number of slots to reserve.
 	*/
 	static ui::RootSPtr
 	make(
 		ui::Context& context,
-		Axis const orientation,
-		std::size_t const slot_count = 0u
+		Axis const orientation
 	) {
 		auto p = aux::make_shared<ui::Root>(
 			ctor_priv{},
 			context,
-			orientation,
-			slot_count
+			orientation
 		);
 		p->m_root = ui::RootWPtr(p);
 		return std::move(p);

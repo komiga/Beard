@@ -92,7 +92,6 @@ protected:
 		@param root %Root.
 		@param parent Parent.
 		@param orientation Orientation.
-		@param slot_count Number of slots to reserve.
 	*/
 	ProtoSlotContainer(
 		ui::Widget::Type const type,
@@ -101,8 +100,7 @@ protected:
 		ui::Geom&& geometry,
 		ui::RootWPtr&& root,
 		ui::Widget::WPtr&& parent,
-		Axis const orientation,
-		std::size_t const slot_count
+		Axis const orientation
 	) noexcept
 		: base_type(
 			type,
@@ -116,7 +114,7 @@ protected:
 			std::move(parent)
 		)
 		, m_orientation(orientation)
-		, m_slots(slot_count)
+		, m_slots()
 	{}
 
 	/** Move constructor. */
