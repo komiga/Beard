@@ -65,6 +65,24 @@ ProtoSlotContainer::get_child_impl(
 }
 
 void
+ProtoSlotContainer::remove(
+	ui::index_type const s_index
+) {
+	unsigned index = static_cast<unsigned>(s_index);
+	if (0 > s_index || m_slots.size() <= index) {
+		throw std::out_of_range{"index is out of bounds"};
+	}
+	m_slots.erase(m_slots.cbegin() + index);
+	for (; m_slots.size() > index; ++index) {
+		m_slots[index].widget->set_index(index);
+	}
+	queue_actions(enum_combine(
+		ui::UpdateActions::reflow,
+		ui::UpdateActions::render
+	));
+}
+
+void
 ProtoSlotContainer::clear() {
 	for (auto const& slot : m_slots) {
 		if (slot.widget) {

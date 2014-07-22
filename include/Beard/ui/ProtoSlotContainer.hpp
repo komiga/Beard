@@ -190,6 +190,19 @@ public:
 	);
 
 	/**
+		Remove child by index.
+
+		@throws std::out_of_range
+		If @a index is out of bounds.
+
+		@param index Index to remove.
+	*/
+	void
+	remove(
+		ui::index_type const index
+	);
+
+	/**
 		Add a widget to the end of the container.
 
 		@param widget %Widget to add.
