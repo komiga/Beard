@@ -15,7 +15,6 @@ see @ref index or the accompanying LICENSE file for full text.
 #include <Beard/ui/Defs.hpp>
 #include <Beard/ui/Widget/Defs.hpp>
 #include <Beard/ui/Widget/Base.hpp>
-#include <Beard/ui/ProtoContainer.hpp>
 
 #include <utility>
 
@@ -34,10 +33,10 @@ class ProtoSlotContainer;
 	Prototype slot-based container widget.
 */
 class ProtoSlotContainer
-	: public ui::ProtoContainer
+	: public ui::Widget::Base
 {
 private:
-	using base_type = ui::ProtoContainer;
+	using base_type = ui::Widget::Base;
 
 protected:
 	/** Orientation. */
@@ -65,56 +64,7 @@ protected:
 		ui::Widget::RenderData& rd
 	) noexcept override;
 
-	/**
-		size() implementation.
 
-		Base definition returns @c m_slots.size().
-	*/
-	std::size_t
-	size_impl() const noexcept override final;
-
-	/**
-		clear() implementation.
-
-		Base definition unsets the parents of all slot widgets
-		and then calls @c m_slots.clear().
-	*/
-	virtual void
-	clear_impl() override;
-
-	/**
-		get_widget() implementation.
-
-		Base definition returns @c m_slots.at(idx).
-	*/
-	ui::Widget::SPtr
-	get_widget_impl(
-		std::size_t const idx
-	) const override final;
-
-	/**
-		set_widget() implementation.
-
-		Base definition unsets parent of current widget,
-		sets slot widget to @a widget, then sets the parent of
-		@a widget to the container.
-	*/
-	virtual void
-	set_widget_impl(
-		std::size_t const idx,
-		ui::Widget::SPtr widget
-	) override;
-
-	/**
-		push_back() implementation.
-
-		Base definition calls @c m_slots.push_pack() and sets
-		the parent of @a widget to the container.
-	*/
-	virtual void
-	push_back_impl(
-		ui::Widget::SPtr widget
-	) override;
 
 protected:
 /** @name Constructors and destructor */ /// @{
@@ -209,6 +159,39 @@ public:
 	get_slots() const noexcept {
 		return m_slots;
 	}
+/// @}
+
+/** @name Collection */ /// @{
+	/**
+		Remove all widgets.
+	*/
+	void
+	clear();
+
+	/**
+		Set child by index.
+
+		@throws std::out_of_range
+		If @a index is out of bounds.
+
+		@param index Index.
+		@param widget %Widget.
+	*/
+	void
+	set_child(
+		ui::index_type const index,
+		ui::Widget::SPtr widget
+	);
+
+	/**
+		Add a widget to the end of the container.
+
+		@param widget %Widget to add.
+	*/
+	void
+	push_back(
+		ui::Widget::SPtr widget
+	);
 /// @}
 };
 

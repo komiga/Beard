@@ -53,12 +53,12 @@ ProtoSlotContainer::render_impl(
 }
 
 std::size_t
-ProtoSlotContainer::size_impl() const noexcept {
+ProtoSlotContainer::size() const noexcept {
 	return m_slots.size();
 }
 
 void
-ProtoSlotContainer::clear_impl() {
+ProtoSlotContainer::clear() {
 	for (auto const& slot : m_slots) {
 		slot.widget->set_parent(nullptr);
 	}
@@ -66,11 +66,11 @@ ProtoSlotContainer::clear_impl() {
 }
 
 void
-ProtoSlotContainer::set_widget_impl(
-	std::size_t const idx,
+ProtoSlotContainer::set_child(
+	ui::index_type const index,
 	ui::Widget::SPtr widget
 ) {
-	auto& slot = m_slots.at(idx);
+	auto& slot = m_slots.at(static_cast<unsigned>(index));
 	if (slot.widget) {
 		slot.widget->set_parent(nullptr);
 	}
@@ -80,15 +80,8 @@ ProtoSlotContainer::set_widget_impl(
 	}
 }
 
-ui::Widget::SPtr
-ProtoSlotContainer::get_widget_impl(
-	std::size_t const idx
-) const {
-	return m_slots.at(idx).widget;
-}
-
 void
-ProtoSlotContainer::push_back_impl(
+ProtoSlotContainer::push_back(
 	ui::Widget::SPtr widget
 ) {
 	if (widget) {
