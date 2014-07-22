@@ -154,7 +154,6 @@ public:
 		@param text Text.
 		@param filter Input filter.
 		@param group %Property group.
-		@param focus_index Focus index.
 		@param parent Parent.
 	*/
 	static aux::shared_ptr<ui::Field>
@@ -163,7 +162,6 @@ public:
 		String text,
 		filter_type filter = nullptr,
 		ui::group_hash_type const group = ui::group_field,
-		ui::focus_index_type const focus_index = ui::focus_index_lazy,
 		ui::Widget::WPtr parent = ui::Widget::WPtr()
 	) {
 		auto p = aux::make_shared<ui::Field>(
@@ -174,7 +172,6 @@ public:
 			std::move(text),
 			std::move(filter)
 		);
-		p->set_focus_index(focus_index);
 		return p;
 	}
 

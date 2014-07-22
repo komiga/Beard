@@ -119,7 +119,6 @@ public:
 		@param root %Root.
 		@param text Text.
 		@param group %Property group.
-		@param focus_index Focus index.
 		@param parent Parent.
 	*/
 	static aux::shared_ptr<ui::Button>
@@ -127,7 +126,6 @@ public:
 		ui::RootWPtr root,
 		String text,
 		ui::group_hash_type const group = ui::group_button,
-		ui::focus_index_type const focus_index = ui::focus_index_lazy,
 		ui::Widget::WPtr parent = ui::Widget::WPtr()
 	) {
 		auto p = aux::make_shared<ui::Button>(
@@ -137,7 +135,6 @@ public:
 			std::move(parent),
 			std::move(text)
 		);
-		p->set_focus_index(focus_index);
 		return p;
 	}
 

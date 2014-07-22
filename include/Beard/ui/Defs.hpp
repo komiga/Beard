@@ -218,23 +218,6 @@ enum : group_hash_type {
 using index_type = signed;
 
 /**
-	Focus index type.
-
-	@note Only @c ui::focus_index_none will be ignored in focus maps.
-*/
-using focus_index_type = signed;
-
-/**
-	Special focus indices.
-*/
-enum : ui::focus_index_type {
-	/** Non-participating focus index. */
-	focus_index_none = ui::focus_index_type(-1),
-	/** Default lazy index for focusable widgets. */
-	focus_index_lazy = ui::focus_index_type(0)
-};
-
-/**
 	Focus direction.
 */
 enum class FocusDir : unsigned {

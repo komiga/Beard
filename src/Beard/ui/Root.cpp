@@ -42,47 +42,93 @@ Root::handle_event_impl(
 	return false;
 }
 
-void
-Root::notify_focus_index_changing(
-	ui::Widget::SPtr const& widget,
-	ui::focus_index_type const old_index,
-	ui::focus_index_type const new_index
+// focus
+
+namespace {
+	enum : signed {
+		INDEX_SWIM = ~0,
+	};
+	enum : unsigned {
+		FLAG_DIR_PREV = bit(0u),
+		FLAG_CYCLED = bit(1u),
+		FLAG_USE_INDEX = bit(2u),
+	};
+} // anonymous namespace
+
+ui::Widget::SPtr
+deepest_rightmost_widget(
+	ui::Widget::SPtr widget
 ) {
-	ui::FocusMap::const_iterator iter = m_focus_map.cend();
-	if (ui::focus_index_none != old_index) {
-		iter = m_focus_map.erase(widget).first;
+	while (widget->has_children()) {
+		widget = widget->get_last_child();
 	}
-	if (ui::focus_index_none != new_index) {
-		iter = m_focus_map.emplace(new_index, widget);
-		if (widget->is_focused() && has_focus()) {
-			m_focus.iter = iter;
-		}
-	} else if (widget->is_focused() && has_focus()) {
-		// TODO: Retain focus?
+	return widget;
+}
+
+ui::Widget::SPtr
+Root::focus_dir(
+	ui::Widget::SPtr from,
+	ui::FocusDir const dir
+) {
+	if (!from) {
+		from = shared_from_this();
+	}
+	unsigned flags = (ui::FocusDir::prev == dir) ? FLAG_DIR_PREV : 0;
+	signed const dir_value = (FLAG_DIR_PREV & flags) ? -1 : 1;
+	ui::Widget::SPtr widget{from};
+	signed child_index = 0;
+	if ((FLAG_DIR_PREV & flags) && this == widget.get()) {
+		widget = deepest_rightmost_widget(widget);
+	}
+	child_index = widget->get_index();
+	while (true) {
 		if (
-			m_focus_map.cend() == iter ||
-			m_focus_map.cend_bound() == iter
+			INDEX_SWIM != child_index &&
+			widget->is_visible() &&
+			widget->has_children()
 		) {
-			iter = m_focus_map.clast_bound();
-		} else if (!m_focus_map.is_index_in_bound(
-			iter->second.lock()->get_focus_index()
-		)) {
-			iter = m_focus_map.cbegin_bound();
+			widget = widget->get_child(
+				/*(FLAG_USE_INDEX & flags)
+				? */child_index
+				// : ((FLAG_DIR_PREV & flags) ? widget->get_last_child_index() : 0)
+			);
+			child_index
+				= (FLAG_DIR_PREV & flags)
+				? widget->get_last_child_index()
+				: 0
+			;
+			flags &= ~FLAG_USE_INDEX;
+		} else if (widget->has_parent()) {
+			child_index = widget->get_index() + dir_value;
+			widget = widget->get_parent();
+			if (
+				0 > child_index ||
+				widget->num_children() <= child_index
+			) {
+				child_index = INDEX_SWIM;
+			}
+			flags |= FLAG_USE_INDEX;
+		} else {
+			// Swam all the way to the root (assuming invariants)
+			if (ui::FocusDir::prev == dir) {
+				widget = deepest_rightmost_widget(shared_from_this());
+				child_index = widget->get_index();
+			} else {
+				widget = shared_from_this();
+				child_index = 0;
+			}
+			flags |= FLAG_CYCLED;
 		}
-		set_focus(
-			iter,
-			(m_focus_map.cend() == iter)
-			? ui::Widget::SPtr()
-			: iter->second.lock()
-		);
+		if ((FLAG_CYCLED & flags) && widget == from) {
+			return widget->is_focusable(true) ? widget : ui::Widget::SPtr();
+		} else if (widget->is_focusable(true)) {
+			return widget;
+		}
 	}
 }
 
-// focus
-
 void
 Root::set_focus(
-	ui::FocusMap::const_iterator const iter,
 	ui::Widget::SPtr const& widget
 ) {
 	ui::Widget::SPtr const current = get_focus();
@@ -93,70 +139,11 @@ Root::set_focus(
 		current->set_focused(false);
 	}
 	if (widget) {
-		m_focus.iter = iter;
-		m_focus.widget = widget;
 		widget->set_focused(true);
+		m_focus = widget;
 	} else {
-		m_focus.iter = m_focus_map.cend();
-		m_focus.widget.reset();
+		m_focus.reset();
 	}
-}
-
-void
-Root::set_focus(
-	ui::Widget::SPtr const& widget
-) {
-	if (has_focus() && widget->is_focused()) {
-		return;
-	}
-	set_focus(
-		static_cast<bool>(widget)
-		? m_focus_map.find(widget, true)
-		: m_focus_map.cend(),
-		widget
-	);
-}
-
-void
-Root::set_bound_index(
-	ui::focus_index_type const bound_index
-) {
-	if (
-		ui::focus_index_none != bound_index &&
-		has_focus()
-	) {
-		auto focus_widget = get_focus();
-		if (focus_widget->get_focus_index() != bound_index) {
-			focus_widget->set_focused(false);
-			m_focus.iter = m_focus_map.cend();
-			m_focus.widget.reset();
-		}
-	}
-	m_focus_map.set_bound_index(bound_index);
-}
-
-void
-Root::focus_dir(
-	ui::FocusDir const dir
-) {
-	ui::FocusMap::const_iterator iter;
-	if (has_focus()) {
-		iter = (ui::FocusDir::prev == dir)
-			? m_focus_map.prev_bound(m_focus.iter)
-			: m_focus_map.next_bound(m_focus.iter)
-		;
-	} else {
-		iter = (ui::FocusDir::prev == dir)
-			? m_focus_map.clast_bound()
-			: m_focus_map.cbegin_bound()
-		;
-	}
-	set_focus(
-		iter,
-		(m_focus_map.cend() == iter)
-		? Widget::SPtr()
-		: iter->second.lock()
-	);
 }
 
 } // namespace ui

@@ -12,7 +12,6 @@ see @ref index or the accompanying LICENSE file for full text.
 #include <Beard/config.hpp>
 #include <Beard/tty/Terminal.hpp>
 #include <Beard/ui/Defs.hpp>
-#include <Beard/ui/FocusMap.hpp>
 #include <Beard/ui/Context.hpp>
 #include <Beard/ui/ProtoSlotContainer.hpp>
 
@@ -43,12 +42,7 @@ private:
 	enum class ctor_priv {};
 
 	std::reference_wrapper<ui::Context> m_context;
-	ui::FocusMap m_focus_map;
-
-	struct {
-		ui::FocusMap::const_iterator iter;
-		ui::Widget::WPtr widget;
-	} m_focus;
+	ui::Widget::WPtr m_focus;
 
 	Root() = delete;
 	Root(Root const&) = delete;
@@ -58,13 +52,6 @@ private:
 	handle_event_impl(
 		ui::Event const& event
 	) noexcept override;
-
-	void
-	notify_focus_index_changing(
-		ui::Widget::SPtr const& widget,
-		ui::focus_index_type const old_index,
-		ui::focus_index_type const new_index
-	);
 
 public:
 /** @name Constructors and destructor */ /// @{
@@ -92,8 +79,7 @@ public:
 			slot_count
 		)
 		, m_context(context)
-		, m_focus_map()
-		, m_focus({m_focus_map.cend(), ui::Widget::WPtr()})
+		, m_focus()
 	{}
 	/** @endcond */
 
@@ -129,7 +115,7 @@ public:
 
 /** @name Operators */ /// @{
 	/** Move assignment operator. */
-	Root& operator=(Root&&) noexcept = default;
+	Root& operator=(Root&&) = default;
 /// @}
 
 /** @name Properties */ /// @{
@@ -164,30 +150,14 @@ public:
 	get_terminal() const noexcept {
 		return get_context().get_terminal();
 	}
-
-	/**
-		Get focus map (mutable).
-	*/
-	ui::FocusMap&
-	get_focus_map() noexcept {
-		return m_focus_map;
-	}
-
-	/**
-		Get focus map.
-	*/
-	ui::FocusMap const&
-	get_focus_map() const noexcept {
-		return m_focus_map;
-	}
 /// @}
 
 /** @name Focus */ /// @{
 private:
-	void
-	set_focus(
-		ui::FocusMap::const_iterator const iter,
-		ui::Widget::SPtr const& widget
+	ui::Widget::SPtr
+	focus_dir(
+		ui::Widget::SPtr from,
+		ui::FocusDir const dir
 	);
 
 public:
@@ -202,23 +172,11 @@ public:
 	);
 
 	/**
-		Set bound focus index.
-
-		If this is not equal to @c ui::focus_index_none, any widgets
-		that do not have @a bound_index as their focus index will not
-		be focusable by focus_dir().
-	*/
-	void
-	set_bound_index(
-		ui::focus_index_type const bound_index
-	);
-
-	/**
 		Clear focus.
 	*/
 	void
 	clear_focus() {
-		set_focus(m_focus_map.cend(), nullptr);
+		set_focus(nullptr);
 	}
 
 	/**
@@ -228,7 +186,7 @@ public:
 	*/
 	ui::Widget::SPtr
 	get_focus() noexcept {
-		return m_focus.widget.lock();
+		return m_focus.lock();
 	}
 
 	/**
@@ -236,7 +194,7 @@ public:
 	*/
 	bool
 	has_focus() const noexcept {
-		return !m_focus.widget.expired();
+		return !m_focus.expired();
 	}
 
 	/**
@@ -245,7 +203,9 @@ public:
 	void
 	focus_dir(
 		ui::FocusDir const dir
-	);
+	) {
+		set_focus(focus_dir(get_focus(), dir));
+	}
 /// @}
 };
 

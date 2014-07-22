@@ -17,7 +17,6 @@
 #include "../common/common.hpp"
 
 using namespace Beard;
-using Beard::tty::make_cell;
 
 static constexpr ui::focus_index_type const focus_index_1 = 10;
 static constexpr ui::focus_index_type const focus_index_2 = 20;

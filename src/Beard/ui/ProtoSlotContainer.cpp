@@ -67,7 +67,9 @@ ProtoSlotContainer::get_child_impl(
 void
 ProtoSlotContainer::clear() {
 	for (auto const& slot : m_slots) {
-		slot.widget->set_parent(nullptr);
+		if (slot.widget) {
+			slot.widget->clear_parent();
+		}
 	}
 	m_slots.clear();
 }
@@ -79,11 +81,11 @@ ProtoSlotContainer::set_child(
 ) {
 	auto& slot = m_slots.at(static_cast<unsigned>(index));
 	if (slot.widget) {
-		slot.widget->set_parent(nullptr);
+		slot.widget->clear_parent();
 	}
 	slot.widget = std::move(widget);
 	if (slot.widget) {
-		slot.widget->set_parent(shared_from_this());
+		slot.widget->set_parent(shared_from_this(), index);
 	}
 }
 
@@ -92,7 +94,7 @@ ProtoSlotContainer::push_back(
 	ui::Widget::SPtr widget
 ) {
 	if (widget) {
-		widget->set_parent(shared_from_this());
+		widget->set_parent(shared_from_this(), static_cast<signed>(m_slots.size()));
 	}
 	m_slots.push_back(ui::Widget::Slot{std::move(widget), {}});
 }

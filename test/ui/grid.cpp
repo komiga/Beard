@@ -185,7 +185,6 @@ public:
 		ui::index_type const col_count,
 		ui::index_type const row_count,
 		ui::group_hash_type const group = ui::group_default,
-		ui::focus_index_type const focus_index = ui::focus_index_lazy,
 		ui::Widget::WPtr parent = ui::Widget::WPtr()
 	) {
 		auto p = aux::make_shared<TestGrid>(
@@ -196,13 +195,11 @@ public:
 			col_count,
 			row_count
 		);
-		p->set_focus_index(focus_index);
 		p->m_field = ui::Field::make(
 			p->get_root(),
 			{},
 			nullptr,
-			ui::group_field,
-			ui::focus_index_none/*,
+			ui::group_field/*,
 			p*/
 		);
 		p->m_field->get_geometry().set_sizing(Axis::x, Axis::x);

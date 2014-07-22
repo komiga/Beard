@@ -84,8 +84,8 @@ private:
 
 	ui::Widget::Type const m_type;
 	flag_store_type m_flags;
+	ui::index_type m_index;
 	ui::group_hash_type m_group;
-	ui::focus_index_type m_focus_index;
 	ui::Geom m_geometry;
 	ui::RootWPtr m_root;
 	ui::Widget::WPtr m_parent;
@@ -214,8 +214,8 @@ protected:
 	) noexcept
 		: m_type(type)
 		, m_flags(flags)
+		, m_index(0)
 		, m_group(group)
-		, m_focus_index(ui::focus_index_none)
 		, m_geometry(std::move(geometry))
 		, m_root(std::move(root))
 		, m_parent(std::move(parent))
@@ -299,6 +299,26 @@ public:
 	/** @} */
 
 	/**
+		Set parent and index.
+	*/
+	void
+	set_parent(
+		ui::Widget::WPtr const& widget,
+		unsigned const index
+	) noexcept {
+		set_parent(widget);
+		set_index(index);
+	}
+
+	/**
+		Clear parent and reset index.
+	*/
+	void
+	clear_parent() noexcept {
+		set_parent(ui::Widget::WPtr(), 0);
+	}
+
+	/**
 		Get parent.
 
 		@note The return value will be empty (@c nullptr) if either
@@ -373,10 +393,21 @@ public:
 
 	/**
 		Check if the widget is focusable.
+
+		@param and_visible Whether to also check visibility.
 	*/
 	bool
-	is_focusable() const noexcept {
-		return m_flags.test(ui::Widget::Flags::trait_focusable);
+	is_focusable(
+		bool const and_visible = false
+	) const noexcept {
+		return m_flags.test(
+			and_visible
+			? enum_combine(
+				ui::Widget::Flags::trait_focusable,
+				ui::Widget::Flags::visible
+			)
+			: ui::Widget::Flags::trait_focusable
+		);
 	}
 
 	/**
@@ -461,22 +492,21 @@ public:
 	}
 
 	/**
-		Set focus index.
-
-		@note This will modify the root's focus map and should not be
-		called from a constructor or destructor.
+		Set index of widget in parent.
 	*/
 	void
-	set_focus_index(
-		ui::focus_index_type const index
-	) noexcept;
+	set_index(
+		ui::index_type const index
+	) {
+		m_index = max_ce(0, index);
+	}
 
 	/**
-		Get focus index.
+		Get index of widget in parent.
 	*/
-	ui::focus_index_type
-	get_focus_index() const noexcept {
-		return m_focus_index;
+	ui::index_type
+	get_index() const noexcept {
+		return m_index;
 	}
 
 	/**

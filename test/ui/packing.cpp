@@ -95,7 +95,7 @@ main(
 	hcont2->get_geometry().set_sizing(Axis::x, Axis::x);
 	{
 		hcont2->push_back(ui::Field::make(root, "hi I am a field"));
-		hcont2->push_back(nullptr);
+		// hcont2->push_back(nullptr);
 		hcont2->push_back(ui::Field::make(
 			root,
 			"that is not a field, I am a field!"
@@ -116,7 +116,7 @@ main(
 	{
 		hcont3->push_back(ui::Button::make(root, "aaa"));
 		hcont3->push_back(ui::Button::make(root, "bbb"));
-		hcont3->push_back(nullptr);
+		// hcont3->push_back(nullptr);
 		hcont3->push_back(ui::Button::make(root, "ccc"));
 		hcont3->push_back(ui::Button::make(root, "ddd"));
 		for (auto& s : hcont3->get_slots()) {

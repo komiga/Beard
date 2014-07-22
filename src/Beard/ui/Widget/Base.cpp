@@ -127,29 +127,11 @@ Base::set_focused(
 		m_flags.set(ui::Widget::Flags::focused, focused);
 		if (!handle_event(event)) {
 			queue_actions(enum_combine(
-				ui::UpdateActions::render,
-				ui::UpdateActions::flag_noclear
+				ui::UpdateActions::flag_noclear,
+				ui::UpdateActions::render
 			));
 		}
 	}
-}
-
-void
-Base::set_focus_index(
-	ui::focus_index_type const index
-) noexcept {
-	if (
-		index != m_focus_index &&
-		get_type_info().type_flags.test(ui::Widget::TypeFlags::focusable) &&
-		is_root_valid()
-	) {
-		m_root.lock()->notify_focus_index_changing(
-			shared_from_this(),
-			m_focus_index,
-			index
-		);
-	}
-	m_focus_index = index;
 }
 
 // operations
