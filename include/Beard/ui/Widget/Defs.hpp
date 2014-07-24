@@ -81,6 +81,8 @@ enum class Type : unsigned {
 */
 	/** ui::Root. */
 	Root = STANDARD_BASE,
+	/** ui::Spacer. */
+	Spacer,
 	/** ui::Container. */
 	Container,
 	/** ui::Label. */
