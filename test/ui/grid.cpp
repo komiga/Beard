@@ -357,7 +357,7 @@ TestGrid::handle_event_impl(
 		// to queue a non-clearing render. Simpler to queue a cell
 		// render (needed due to due to the debug backdrop) than
 		// it would be to queue a clearing render.
-		//queue_cell_render(0, get_row_count());
+		queue_cell_render(m_cursor.row, m_cursor.row + 1);
 		return false;
 
 	default:
@@ -633,7 +633,7 @@ TestGrid::render_content(
 			frame.pos.x + frame.size.width - cell_frame.pos.x
 		);
 		cell.attr_bg
-			= it->states.test(Column::Flags::focused)
+			= (it->states.test(Column::Flags::focused) && is_focused())
 			? attr_bg | tty::Attr::inverted
 			: attr_bg
 		;
@@ -752,7 +752,7 @@ main(
 	if (2 > argc || 3 < argc) {
 		std::cerr <<
 			"invalid arguments\n"
-			"usage: packing terminfo-file-path [tty-path]\n"
+			"usage: grid terminfo-file-path [tty-path]\n"
 		;
 		return -1;
 	}
