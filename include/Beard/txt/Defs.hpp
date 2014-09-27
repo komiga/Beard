@@ -52,9 +52,9 @@ enum class Extent : unsigned {
 struct Sequence final {
 /** @name Properties */ /// @{
 	/** Data. */
-	txt::EncUtils::char_type const* const data;
+	txt::EncUtils::char_type const* data;
 	/** Size. */
-	std::size_t const size;
+	std::size_t size;
 /// @}
 
 /** @name Constructors and destructor */ /// @{
