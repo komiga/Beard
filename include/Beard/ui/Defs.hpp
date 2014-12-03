@@ -49,9 +49,14 @@ using RootSPtr = aux::shared_ptr<ui::Root>;
 using RootWPtr = aux::weak_ptr<ui::Root>;
 
 /**
+	Hash implementation type.
+*/
+using hash_impl_type = am::hash::fnv1a<am::hash::HL32>;
+
+/**
 	Common hash type.
 */
-using hash_type = am::hash::common_hash_type<am::hash::HL32>;
+using hash_type = ui::hash_impl_type::hash_type;
 
 /**
 	%Property hash type.
@@ -83,13 +88,13 @@ enum : ui::hash_type {
 template<
 	std::size_t const N
 >
-constexpr ui::hash_type
+inline constexpr ui::hash_type
 hash(
 	char const (&str)[N]
 ) noexcept {
 	return (1u >= N)
 		? ui::hash_null
-		: am::hash::fnv1a_c<am::hash::HL32>(str, N)
+		: am::hash::calc_ce<ui::hash_impl_type>(str, N)
 	;
 }
 
@@ -106,13 +111,13 @@ hash(
 template<
 	class StringT
 >
-ui::hash_type
+inline ui::hash_type
 hash(
 	StringT const& str
 ) noexcept {
 	return (str.empty())
 		? ui::hash_null
-		: am::hash::fnv1a_str<am::hash::HL32>(str)
+		: am::hash::calc_string<ui::hash_impl_type>(str)
 	;
 }
 
