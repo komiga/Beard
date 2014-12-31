@@ -50,10 +50,12 @@ using attr_type = std::uint16_t;
 */
 namespace Attr {
 enum enum_type : tty::attr_type {
+	none		= 0,
 	bold		= 0x0100,
 	underline	= 0x0200,
 	inverted	= 0x0400,
-	blink		= 0x0800
+	blink		= 0x0800,
+	mask		= 0x0F00,
 };
 }
 
@@ -74,7 +76,7 @@ enum enum_type : tty::attr_type {
 	blue			= 0x05,
 	magenta			= 0x06,
 	cyan			= 0x07,
-	white			= 0x08
+	white			= 0x08,
 	// TODO: What is the canonical 38/48?
 };
 }
