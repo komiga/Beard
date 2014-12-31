@@ -303,7 +303,7 @@ protected:
 	/**
 		Render the view.
 
-		@note This calls render_cells(). If the header is enabled,
+		@note This calls render_content(). If the header is enabled,
 		render_header() is also called.
 
 		@param grid_rd Render data.
@@ -313,7 +313,7 @@ protected:
 	void
 	render_view(
 		ui::GridRenderData& grid_rd,
-		bool const all
+		bool all
 	) noexcept;
 /// @}
 
@@ -361,7 +361,8 @@ protected:
 		the current dimensions.
 
 		@param grid_rd Render data.
-		@param row Row to render.
+		@param row_begin Start of row range.
+		@param row_end End of row range (non-inclusive).
 		@param col_begin Start of column range.
 		@param col_end End of column range (non-inclusive).
 		@param frame Frame of the entire visible row.
@@ -369,7 +370,8 @@ protected:
 	virtual void
 	render_content(
 		ui::GridRenderData& grid_rd,
-		ui::index_type const row,
+		ui::index_type const row_begin,
+		ui::index_type const row_end,
 		ui::index_type const col_begin,
 		ui::index_type const col_end,
 		Rect const& frame

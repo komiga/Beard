@@ -301,54 +301,83 @@ ProtoGrid::reflow_view(
 void
 ProtoGrid::render_view(
 	ui::GridRenderData& grid_rd,
-	bool const all
+	bool all
 ) noexcept {
-	Vec2 cr;
+	Vec2 cr = m_view.col_range;
 	if (is_header_enabled()) {
-		cr = m_dirty.header;
-		if (-1 == cr.x) {
-			cr = m_view.col_range;
-		} else {
-			cr.x = value_clamp(cr.x, m_view.col_range);
-			cr.y = value_clamp(cr.y, cr.x, m_view.col_range.y);
+		if (!all) {
+			cr = m_dirty.header;
+			if (-1 == cr.x) {
+				cr.x = value_clamp(cr.x, m_view.col_range);
+				cr.y = value_clamp(cr.y, cr.x, m_view.col_range.y);
+			}
 		}
-		if (all || cr.x < cr.y) {
+		if (cr.x < cr.y) {
 			render_header(grid_rd, cr.x, cr.y, m_view.header_frame);
 		}
 	}
 
-	auto it = m_dirty.rows.begin();
-	auto row = m_view.row_range.x;
-	Rect row_frame = m_view.content_frame;
-	row_frame.size.height = 1;
-	if (0 < range_length(m_view.col_range)) {
-		cr = m_view.col_range;
-		while (m_dirty.rows.end() != it) {
-			if (!all) {
-				cr = *it;
-				if (-1 == cr.x) {
-					cr = m_view.col_range;
-				} else {
-					cr.x = value_clamp(cr.x, m_view.col_range);
-					cr.y = value_clamp(cr.y, cr.x, m_view.col_range.y);
+	signed row = 0;
+	signed row_end = 0;
+	Rect frame = m_view.content_frame;
+	if (0 >= range_length(m_view.col_range)) {
+		// Do nothing
+	} else if (all) {
+		render_content(
+			grid_rd,
+			m_view.row_range.x, m_view.row_range.y,
+			cr.x, cr.y,
+			frame
+		);
+		row = m_view.row_count;
+	} else {
+		Vec2 cr_queued;
+		while (m_view.row_count > row) {
+			if (m_view.row_count == row_end || 0 == m_dirty.rows[row_end].y) {
+				if (row == row_end) {
+					row = ++row_end;
+					continue;
 				}
+			} else {
+				if (!all) {
+					cr_queued = m_dirty.rows[row_end];
+					if (-1 == cr_queued.x) {
+						cr = m_view.col_range;
+						all = true;
+					} else {
+						cr.x = value_clamp(min_ce(cr.x, cr_queued.x), m_view.col_range);
+						cr.y = value_clamp(max_ce(cr.y, cr_queued.y), cr.x, m_view.col_range.y);
+						if (range_length(cr) == range_length(m_view.col_range)) {
+							all = true;
+						}
+					}
+				}
+				++row_end;
+				continue;
 			}
-			if (row >= m_view.row_range.y) {
-				break;
-			} else if (all || cr.x < cr.y) {
-				render_content(grid_rd, row, cr.x, cr.y, row_frame);
-				*it = {0, 0};
-			}
-			++it;
-			++row;
-			++row_frame.pos.y;
+			frame.pos.y = m_view.content_frame.pos.y + row;
+			frame.size.height = row_end - row;
+			render_content(
+				grid_rd,
+				m_view.row_range.x + row,
+				m_view.row_range.x + row_end,
+				cr.x, cr.y,
+				frame
+			);
+			std::fill(
+				m_dirty.rows.begin() + row,
+				m_dirty.rows.begin() + row_end,
+				Vec2{0, 0}
+			);
+			row = ++row_end;
 		}
 	}
 
-	if (m_dirty.rows.end() != it) {
+	if (m_view.fit_count > row) {
 		// FIXME: Destructive clear
-		row_frame.size.height = m_view.fit_count - m_view.row_count;
-		grid_rd.rd.terminal.clear_back(row_frame);
+		frame.pos.y = m_view.content_frame.pos.y + m_view.row_count;
+		frame.size.height = m_view.fit_count - m_view.row_count;
+		grid_rd.rd.terminal.clear_back(frame);
 	}
 }
 
