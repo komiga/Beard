@@ -130,7 +130,8 @@ private:
 	void
 	render_content(
 		ui::GridRenderData& grid_rd,
-		ui::index_type const row,
+		ui::index_type const row_begin,
+		ui::index_type const row_end,
 		ui::index_type const col_begin,
 		ui::index_type const col_end,
 		Rect const& frame
@@ -597,7 +598,8 @@ TestGrid::render_header(
 void
 TestGrid::render_content(
 	ui::GridRenderData& grid_rd,
-	ui::index_type const row,
+	ui::index_type row_begin,
+	ui::index_type const row_end,
 	ui::index_type const col_begin,
 	ui::index_type const col_end,
 	Rect const& frame
@@ -611,32 +613,35 @@ TestGrid::render_content(
 	);*/
 
 	auto& rd = grid_rd.rd;
-	auto const& r = m_rows[row];
-	tty::attr_type attr_fg = grid_rd.content_fg;
-	tty::attr_type attr_bg = grid_rd.content_bg;
-	if (r.states.test(Row::Flags::selected)) {
-		attr_fg = grid_rd.selected_fg;
-		attr_bg = grid_rd.selected_bg;
-	}
-
 	Rect cell_frame = frame;
-	cell_frame.pos.x += col_begin * 10;
-	auto const end
+	cell_frame.size.height = 1;
+	/*auto const end
 		= get_col_count() < col_end
 		? r.columns.cend()
 		: r.columns.cbegin() + col_end
-	;
-	auto cell = tty::make_cell(' ', attr_fg, attr_bg);
-	for (auto it = r.columns.cbegin() + col_begin; end > it; ++it) {
+	;*/
+	auto cell = tty::make_cell(' ');
+	for (; row_end > row_begin; ++row_begin, ++cell_frame.pos.y) {
+		auto const& r = m_rows[row_begin];
+		auto const it_end = r.columns.cbegin() + col_end;
+		if (r.states.test(Row::Flags::selected)) {
+			cell.attr_fg = grid_rd.selected_fg;
+			cell.attr_bg = grid_rd.selected_bg;
+		} else {
+			cell.attr_fg = grid_rd.content_fg;
+			cell.attr_bg = grid_rd.content_bg;
+		}
+		cell_frame.pos.x = frame.pos.x + col_begin * 10;
+	for (auto it = r.columns.cbegin() + col_begin; it_end > it; ++it) {
 		cell_frame.size.width = min_ce(
 			10,
 			frame.pos.x + frame.size.width - cell_frame.pos.x
 		);
-		cell.attr_bg
-			= (it->states.test(Column::Flags::focused) && is_focused())
-			? attr_bg | tty::Attr::inverted
-			: attr_bg
-		;
+		if (it->states.test(Column::Flags::focused) && is_focused()) {
+			cell.attr_bg |= tty::Attr::inverted;
+		} else {
+			cell.attr_bg &= ~tty::Attr::mask;
+		}
 		rd.terminal.put_line(
 			cell_frame.pos,
 			cell_frame.size.width,
@@ -648,14 +653,14 @@ TestGrid::render_content(
 			cell_frame.pos.y,
 			txt::Sequence{it->value, 0u, it->value.size()},
 			cell_frame.size.width,
-			attr_fg,
+			cell.attr_fg,
 			cell.attr_bg
 		);
 		if (10 > cell_frame.size.width) {
 			break;
 		}
 		cell_frame.pos.x += 10;
-	}
+	}}
 }
 
 void
