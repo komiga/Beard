@@ -35,4 +35,4 @@ configuration {}
 		"src/Beard/**"
 	}
 
-action_clean()
+precore.action_clean("out", "lib")

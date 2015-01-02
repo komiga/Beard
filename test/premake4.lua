@@ -54,4 +54,4 @@ include("tty")
 include("txt")
 include("ui")
 
-action_clean()
+precore.action_clean("out")
