@@ -8,6 +8,7 @@
 #pragma once
 
 #include <Beard/config.hpp>
+#include <Beard/aux.hpp>
 #include <Beard/utility.hpp>
 #include <Beard/geometry.hpp>
 #include <Beard/ui/Defs.hpp>
@@ -35,6 +36,12 @@ class ProtoSlotContainer
 {
 private:
 	using base_type = ui::Widget::Base;
+
+public:
+	/**
+		Shared pointer.
+	*/
+	using SPtr = aux::shared_ptr<ui::ProtoSlotContainer>;
 
 protected:
 	/** Orientation. */

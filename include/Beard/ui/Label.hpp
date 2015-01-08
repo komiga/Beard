@@ -8,6 +8,7 @@
 #pragma once
 
 #include <Beard/config.hpp>
+#include <Beard/aux.hpp>
 #include <Beard/String.hpp>
 #include <Beard/utility.hpp>
 #include <Beard/geometry.hpp>
@@ -36,6 +37,12 @@ class Label final
 {
 private:
 	using base_type = ui::Widget::Base;
+
+public:
+	/**
+		Shared pointer.
+	*/
+	using SPtr = aux::shared_ptr<ui::Label>;
 
 private:
 	enum class ctor_priv {};
@@ -100,7 +107,7 @@ public:
 		@param group %Property group.
 		@param parent Parent.
 	*/
-	static aux::shared_ptr<ui::Label>
+	static ui::Label::SPtr
 	make(
 		ui::RootWPtr root,
 		String text,

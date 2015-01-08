@@ -8,6 +8,7 @@
 #pragma once
 
 #include <Beard/config.hpp>
+#include <Beard/aux.hpp>
 #include <Beard/geometry.hpp>
 #include <Beard/ui/Defs.hpp>
 #include <Beard/ui/Widget/Defs.hpp>
@@ -122,7 +123,14 @@ private:
 	using base_type = ui::Widget::Base;
 
 public:
-	/** Content actions. */
+	/**
+		Shared pointer.
+	*/
+	using SPtr = aux::shared_ptr<ui::ProtoGrid>;
+
+	/**
+		Content actions.
+	*/
 	enum class ContentAction : unsigned {
 		select = 0u,
 		unselect,

@@ -39,6 +39,12 @@ class Container final
 private:
 	using base_type = ui::ProtoSlotContainer;
 
+public:
+	/**
+		Shared pointer.
+	*/
+	using SPtr = aux::shared_ptr<ui::Container>;
+
 private:
 	enum class ctor_priv {};
 
@@ -83,7 +89,7 @@ public:
 		@param orientation Orientation.
 		@param parent Parent.
 	*/
-	static aux::shared_ptr<ui::Container>
+	static ui::Container::SPtr
 	make(
 		ui::RootWPtr root,
 		Axis const orientation,

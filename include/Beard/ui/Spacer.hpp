@@ -8,6 +8,7 @@
 #pragma once
 
 #include <Beard/config.hpp>
+#include <Beard/aux.hpp>
 #include <Beard/String.hpp>
 #include <Beard/utility.hpp>
 #include <Beard/geometry.hpp>
@@ -36,6 +37,12 @@ class Spacer final
 {
 private:
 	using base_type = ui::Widget::Base;
+
+public:
+	/**
+		Shared pointer.
+	*/
+	using SPtr = aux::shared_ptr<ui::Spacer>;
 
 private:
 	enum class ctor_priv {};
@@ -80,7 +87,7 @@ public:
 		@param expand_and_fill Expand and fill axes.
 		@param parent Parent.
 	*/
-	static aux::shared_ptr<ui::Spacer>
+	static ui::Spacer::SPtr
 	make(
 		ui::RootWPtr root,
 		Axis const expand_and_fill = Axis::both,

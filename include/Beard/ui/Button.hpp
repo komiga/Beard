@@ -8,6 +8,7 @@
 #pragma once
 
 #include <Beard/config.hpp>
+#include <Beard/aux.hpp>
 #include <Beard/String.hpp>
 #include <Beard/utility.hpp>
 #include <Beard/geometry.hpp>
@@ -40,13 +41,20 @@ private:
 
 public:
 	/**
+		Shared pointer.
+	*/
+	using SPtr = aux::shared_ptr<ui::Button>;
+
+	/**
 		Signal for the <em>pressed</em> event.
 
 		Parameters:
 
 		-# The actuated button.
 	*/
-	ui::Signal<void(aux::shared_ptr<ui::Button>)> signal_pressed;
+	ui::Signal<void(
+		ui::Button::SPtr button
+	)> signal_pressed;
 
 private:
 	enum class ctor_priv {};
@@ -119,7 +127,7 @@ public:
 		@param group %Property group.
 		@param parent Parent.
 	*/
-	static aux::shared_ptr<ui::Button>
+	static ui::Button::SPtr
 	make(
 		ui::RootWPtr root,
 		String text,

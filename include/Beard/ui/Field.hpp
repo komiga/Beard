@@ -43,6 +43,11 @@ private:
 
 public:
 	/**
+		Shared pointer.
+	*/
+	using SPtr = aux::shared_ptr<ui::Field>;
+
+	/**
 		Input filter function type.
 
 		Returns @c true if the code point is accepted.
@@ -62,8 +67,8 @@ public:
 		-# Whether the field has gained or lost input control.
 	*/
 	ui::Signal<void(
-		aux::shared_ptr<ui::Field> /*field*/,
-		bool /*have_control*/
+		ui::Field::SPtr field,
+		bool have_control
 	)> signal_control_changed;
 
 private:
@@ -154,7 +159,7 @@ public:
 		@param group %Property group.
 		@param parent Parent.
 	*/
-	static aux::shared_ptr<ui::Field>
+	static ui::Field::SPtr
 	make(
 		ui::RootWPtr root,
 		String text,
