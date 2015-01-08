@@ -1,3 +1,6 @@
+/**
+@copyright MIT license; see @ref index or the accompanying LICENSE file.
+*/
 
 #include <Beard/tty/Defs.hpp>
 #include <Beard/ui/debug.hpp>

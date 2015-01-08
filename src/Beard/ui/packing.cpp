@@ -1,3 +1,6 @@
+/**
+@copyright MIT license; see @ref index or the accompanying LICENSE file.
+*/
 
 #include <Beard/utility.hpp>
 #include <Beard/geometry.hpp>

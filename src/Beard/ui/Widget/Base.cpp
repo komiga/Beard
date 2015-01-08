@@ -1,3 +1,6 @@
+/**
+@copyright MIT license; see @ref index or the accompanying LICENSE file.
+*/
 
 #include <Beard/ui/packing.hpp>
 #include <Beard/ui/Root.hpp>
