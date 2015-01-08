@@ -1159,12 +1159,11 @@ Terminal::put_line(
 		return;
 	}
 
-	geom_value_type&
-		aval = vec2_axis_ref(position, direction);
+	geom_value_type& aval = vec2_axis_ref(position, direction);
 	geom_value_type const
 		target = value_clamp(
 			aval + length,
-			0, vec2_axis_value(m_tty_size, direction) - 1
+			0, vec2_axis_value(m_tty_size, direction)
 		),
 		stride = Axis::horizontal == direction
 			? 1
@@ -1177,11 +1176,7 @@ Terminal::put_line(
 			= m_cell_backbuffer.begin()
 			+ (position.y * m_tty_size.width) + position.x
 		;
-		for (
-			;
-			aval < target;
-			++aval, it += stride
-		) {
+		for (; aval < target; ++aval, it += stride) {
 			if (BEARD_TERMINAL_CELL_CMP(*it, cell)) {
 				std::copy(&cell, &cell + 1u, it);
 				m_dirty_rows[position.y] = true;
