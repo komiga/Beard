@@ -1027,9 +1027,11 @@ Terminal::parse_input() {
 
 void
 Terminal::set_caret_pos(
-	geom_value_type const x,
-	geom_value_type const y
+	geom_value_type x,
+	geom_value_type y
 ) {
+	x = max_ce(0, x);
+	y = max_ce(0, y);
 	if (x != m_caret_pos.x || y != m_caret_pos.y) {
 		m_caret_pos.x = x;
 		m_caret_pos.y = y;

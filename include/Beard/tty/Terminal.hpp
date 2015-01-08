@@ -420,8 +420,8 @@ public:
 	*/
 	void
 	set_caret_pos(
-		geom_value_type const x,
-		geom_value_type const y
+		geom_value_type x,
+		geom_value_type y
 	);
 
 	/**
