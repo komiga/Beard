@@ -1,5 +1,5 @@
 /**
-@file detail/debug.hpp
+@file
 @brief Debug macros.
 
 @author Timothy Howard

@@ -1,5 +1,5 @@
 /**
-@file txt/Cursor.hpp
+@file
 @brief Text cursor.
 
 @author Timothy Howard

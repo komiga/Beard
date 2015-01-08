@@ -1,5 +1,5 @@
 /**
-@file ui/Button.hpp
+@file
 @brief %Button widget.
 
 @author Timothy Howard

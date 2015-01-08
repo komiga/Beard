@@ -1,5 +1,5 @@
 /**
-@file ui/ProtoGrid.hpp
+@file
 @brief Prototype grid widget.
 
 @author Timothy Howard

@@ -1,5 +1,5 @@
 /**
-@file ui/ProtoSlotContainer.hpp
+@file
 @brief Prototype slot-based container widget.
 
 @author Timothy Howard

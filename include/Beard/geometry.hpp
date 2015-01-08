@@ -1,5 +1,5 @@
 /**
-@file geometry.hpp
+@file
 @brief Geometry primitives.
 
 @author Timothy Howard

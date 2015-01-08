@@ -1,5 +1,5 @@
 /**
-@file ui/Geom.hpp
+@file
 @brief %Widget geometry.
 
 @author Timothy Howard

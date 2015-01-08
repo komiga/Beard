@@ -1,5 +1,5 @@
 /**
-@file ui/Container.hpp
+@file
 @brief %Container widget.
 
 @author Timothy Howard

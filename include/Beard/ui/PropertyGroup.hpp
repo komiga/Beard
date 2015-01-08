@@ -1,5 +1,5 @@
 /**
-@file ui/PropertyGroup.hpp
+@file
 @brief %Property group class.
 
 @author Timothy Howard

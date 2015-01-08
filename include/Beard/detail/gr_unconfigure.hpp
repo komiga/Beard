@@ -1,5 +1,5 @@
 /**
-@file detail/gr_unconfigure.hpp
+@file
 @brief Unconfigure GR.
 
 @author Timothy Howard

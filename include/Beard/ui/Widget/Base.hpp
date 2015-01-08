@@ -1,5 +1,5 @@
 /**
-@file ui/Widget/Base.hpp
+@file
 @brief %Base widget class.
 
 @author Timothy Howard

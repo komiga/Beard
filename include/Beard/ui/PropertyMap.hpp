@@ -1,5 +1,5 @@
 /**
-@file ui/PropertyMap.hpp
+@file
 @brief %Property map class.
 
 @author Timothy Howard

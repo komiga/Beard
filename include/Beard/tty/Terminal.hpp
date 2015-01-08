@@ -1,5 +1,5 @@
 /**
-@file tty/Terminal.hpp
+@file
 @brief %Terminal class.
 
 @author Timothy Howard

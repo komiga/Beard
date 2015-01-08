@@ -1,5 +1,5 @@
 /**
-@file tty/Caps.hpp
+@file
 @brief %Terminal capabilities.
 
 @author Timothy Howard

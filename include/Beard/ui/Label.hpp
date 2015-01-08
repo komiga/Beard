@@ -1,5 +1,5 @@
 /**
-@file ui/Label.hpp
+@file
 @brief %Label widget.
 
 @author Timothy Howard

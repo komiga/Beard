@@ -1,5 +1,5 @@
 /**
-@file ui/Signal.hpp
+@file
 @brief UI signal.
 
 @author Timothy Howard

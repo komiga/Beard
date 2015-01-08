@@ -1,5 +1,5 @@
 /**
-@file ui/Field.hpp
+@file
 @brief %Field widget.
 
 @author Timothy Howard

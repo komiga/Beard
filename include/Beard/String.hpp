@@ -1,5 +1,5 @@
 /**
-@file String.hpp
+@file
 @brief String type.
 
 @author Timothy Howard

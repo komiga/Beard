@@ -1,5 +1,5 @@
 /**
-@file ui/Root.hpp
+@file
 @brief UI root class.
 
 @author Timothy Howard

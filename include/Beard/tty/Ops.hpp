@@ -1,5 +1,5 @@
 /**
-@file tty/Ops.hpp
+@file
 @brief %Terminal operations.
 
 @author Timothy Howard

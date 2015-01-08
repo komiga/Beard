@@ -1,5 +1,5 @@
 /**
-@file ui/Widget/Defs.hpp
+@file
 @brief %Widget definitions.
 
 @author Timothy Howard

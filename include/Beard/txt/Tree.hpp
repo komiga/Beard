@@ -1,5 +1,5 @@
 /**
-@file txt/Tree.hpp
+@file
 @brief Text tree class.
 
 @author Timothy Howard

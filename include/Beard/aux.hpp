@@ -1,5 +1,5 @@
 /**
-@file aux.hpp
+@file
 @brief Auxiliary stdlib specializations.
 
 @author Timothy Howard

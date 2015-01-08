@@ -1,5 +1,5 @@
 /**
-@file ui/PropertyValue.hpp
+@file
 @brief %Property value class.
 
 @author Timothy Howard

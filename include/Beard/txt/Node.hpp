@@ -1,5 +1,5 @@
 /**
-@file txt/Node.hpp
+@file
 @brief Text node class.
 
 @author Timothy Howard

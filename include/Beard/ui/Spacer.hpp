@@ -1,5 +1,5 @@
 /**
-@file ui/Spacer.hpp
+@file
 @brief %Spacer widget.
 
 @author Timothy Howard

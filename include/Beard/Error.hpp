@@ -1,5 +1,5 @@
 /**
-@file Error.hpp
+@file
 @brief %Error class.
 
 @author Timothy Howard

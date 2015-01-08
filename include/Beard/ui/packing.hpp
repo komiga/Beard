@@ -1,5 +1,5 @@
 /**
-@file ui/packing.hpp
+@file
 @brief %Widget packing operations.
 
 @author Timothy Howard

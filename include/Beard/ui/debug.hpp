@@ -1,5 +1,5 @@
 /**
-@file ui/debug.hpp
+@file
 @brief Debug operations.
 
 @author Timothy Howard

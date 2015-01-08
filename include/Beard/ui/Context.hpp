@@ -1,5 +1,5 @@
 /**
-@file ui/Context.hpp
+@file
 @brief UI context.
 
 @author Timothy Howard

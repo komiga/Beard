@@ -1,5 +1,5 @@
 /**
-@file ErrorCode.hpp
+@file
 @brief %Error codes.
 
 @author Timothy Howard

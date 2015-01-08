@@ -1,5 +1,5 @@
 /**
-@file tty/Defs.hpp
+@file
 @brief TTY definitions.
 
 @author Timothy Howard

@@ -1,5 +1,5 @@
 /**
-@file tty/TerminalInfo.hpp
+@file
 @brief %Terminal information.
 
 @author Timothy Howard

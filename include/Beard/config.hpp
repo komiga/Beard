@@ -1,5 +1,5 @@
 /**
-@file config.hpp
+@file
 @brief Configuration.
 
 @author Timothy Howard
