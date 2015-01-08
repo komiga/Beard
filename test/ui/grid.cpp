@@ -34,6 +34,8 @@ private:
 	using base_type = ui::ProtoGrid;
 
 public:
+	using SPtr = aux::shared_ptr<TestGrid>;
+
 	struct Column final {
 		enum class Flags : unsigned {
 			focused = bit(0u)
@@ -91,7 +93,7 @@ private:
 	} m_cursor{};
 
 	row_vector_type m_rows;
-	aux::shared_ptr<ui::Field> m_field;
+	ui::Field::SPtr m_field;
 
 private:
 // ui::Widget::Base implementation
@@ -180,7 +182,7 @@ public:
 		}
 	}
 
-	static aux::shared_ptr<TestGrid>
+	static TestGrid::SPtr
 	make(
 		ui::RootWPtr root,
 		ui::index_type const col_count,

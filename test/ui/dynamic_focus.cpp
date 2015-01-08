@@ -20,8 +20,8 @@ using namespace Beard;
 
 void
 add_button(
-	aux::shared_ptr<ui::Root> const& root,
-	aux::shared_ptr<ui::ProtoSlotContainer> container,
+	ui::RootSPtr const& root,
+	ui::ProtoSlotContainer::SPtr container,
 	Axis const orientation,
 	String&& label,
 	bool const no_container
@@ -45,7 +45,7 @@ add_button(
 
 void
 remove_widget(
-	aux::shared_ptr<ui::Root> const& root
+	ui::RootSPtr const& root
 ) {
 	if (root->has_focus()) {
 		auto const focus = root->get_focus();

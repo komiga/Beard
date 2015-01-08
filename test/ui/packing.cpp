@@ -79,7 +79,7 @@ main(
 		auto button = ui::Button::make(root, "xyzzyzzyx");
 		button->get_geometry().set_sizing(Axis::both, Axis::both);
 		button->signal_pressed.bind([](
-			aux::shared_ptr<ui::Button> b
+			ui::Button::SPtr b
 		) {
 			if ('x' == b->get_text()[0u]) {
 				b->set_text("blblblblblblblblblbl");
