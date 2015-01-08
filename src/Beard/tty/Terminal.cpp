@@ -410,15 +410,6 @@ repos_out(
 }
 
 static void
-write_caret(
-	std::ostream& stream,
-	geom_value_type const caret_x,
-	geom_value_type const caret_y
-) {
-	repos_out(stream, caret_x, caret_y);
-}
-
-static void
 write_colors(
 	std::ostream& stream,
 	unsigned const color_fg,
@@ -681,7 +672,7 @@ Terminal::clear_screen(
 		true
 	);
 	if (is_caret_visible()) {
-		terminal_internal::write_caret(
+		terminal_internal::repos_out(
 			m_stream_out, m_caret_pos.x, m_caret_pos.y
 		);
 	}
@@ -1036,7 +1027,7 @@ Terminal::set_caret_pos(
 		m_caret_pos.x = x;
 		m_caret_pos.y = y;
 		if (is_caret_visible()) {
-			terminal_internal::write_caret(
+			terminal_internal::repos_out(
 				m_stream_out, m_caret_pos.x, m_caret_pos.y
 			);
 			terminal_internal::flush(*this);
@@ -1267,6 +1258,7 @@ Terminal::present() {
 	m_stream_out.clear();
 	//put_cap_cache(CapCache::exit_attribute_mode);
 
+	// FIXME: Hide caret when flushing?
 	// TODO: No-change optimization: add state flag to signify any
 	// change in the backbuffer
 	// TODO: Gah, this is such a mess; try reducing some of the
@@ -1353,11 +1345,10 @@ Terminal::present() {
 	}
 	m_states.disable(State::backbuffer_dirty);
 
-	if (is_caret_visible()) {
-		terminal_internal::write_caret(
-			m_stream_out, m_caret_pos.x, m_caret_pos.y
-		);
-	}
+	// Reset to the caret position
+	terminal_internal::repos_out(
+		m_stream_out, m_caret_pos.x, m_caret_pos.y
+	);
 	terminal_internal::flush(*this);
 }
 
