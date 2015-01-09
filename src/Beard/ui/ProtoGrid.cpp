@@ -326,6 +326,7 @@ ProtoGrid::render_view(
 	if (0 >= range_length(m_view.col_range)) {
 		// Do nothing
 	} else if (all) {
+		frame.size.height = m_view.row_count;
 		render_content(
 			grid_rd,
 			m_view.row_range.x, m_view.row_range.y,
