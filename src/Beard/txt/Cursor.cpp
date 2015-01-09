@@ -149,14 +149,15 @@ Cursor::clear() {
 
 void
 Cursor::assign(
-	String const& str
+	char8 const* const str,
+	unsigned const size
 ) {
 	auto& node = get_node();
 	auto const ucount = signed_cast(node.units());
 	auto const pcount = signed_cast(node.points());
-	node.m_buffer.assign(str.cbegin(), str.cend());
+	node.m_buffer.assign(str, str + size);
 	auto const new_pcount = signed_cast(
-		txt::EncUtils::count(str.cbegin(), str.cend(), false)
+		txt::EncUtils::count(str, str + size, false)
 	);
 	get_tree().update_counts(
 		node,

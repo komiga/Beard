@@ -277,11 +277,25 @@ public:
 		Assign current row to string.
 
 		@param str %String.
+		@param size Size of string.
+	*/
+	void
+	assign(
+		char8 const* const str,
+		unsigned const size
+	);
+
+	/**
+		Assign current row to string.
+
+		@param str %String.
 	*/
 	void
 	assign(
 		String const& str
-	);
+	) {
+		assign(str.data(), str.size());
+	}
 
 	/**
 		Insert a code point.
