@@ -268,6 +268,12 @@ public:
 
 /** @name Operations */ /// @{
 	/**
+		Clear the current row.
+	*/
+	void
+	clear();
+
+	/**
 		Assign current row to string.
 
 		@param str %String.

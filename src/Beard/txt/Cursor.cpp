@@ -137,6 +137,17 @@ Cursor::col_step(
 // operations
 
 void
+Cursor::clear() {
+	auto& node = get_node();
+	auto const ucount = signed_cast(node.units());
+	auto const pcount = signed_cast(node.points());
+	node.m_buffer.clear();
+	get_tree().update_counts(node, -ucount, -pcount);
+	m_col = 0;
+	m_index = 0;
+}
+
+void
 Cursor::assign(
 	String const& str
 ) {
