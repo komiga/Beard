@@ -100,6 +100,14 @@ Field::handle_event_impl(
 			key_input_match(event.key_input, s_kim_icontrol) ||
 			(has_input_control() && KeyCode::esc == event.key_input.code)
 		) {
+			if (has_input_control()) {
+				signal_user_modified(
+					std::move(std::static_pointer_cast<ui::Field>(
+						shared_from_this()
+					)),
+					KeyCode::esc != event.key_input.code
+				);
+			}
 			set_input_control(!has_input_control());
 			return true;
 		} else if (has_input_control()) {

@@ -59,7 +59,25 @@ public:
 	using filter_type = aux::function<bool(char32 const)>;
 
 	/**
+		Signal for the <em>user modified</em> event.
+
+		@note The field text does not revert to its previous value if
+		<code>accept == true</code>.
+
+		Parameters:
+
+		-# The affected field.
+		-# Whether the user entered a new value.
+	*/
+	ui::Signal<void(
+		ui::Field::SPtr field,
+		bool accept
+	)> signal_user_modified;
+
+	/**
 		Signal for the <em>control changed</em> event.
+
+		@note This occurs after @c signal_user_modified.
 
 		Parameters:
 
@@ -134,6 +152,7 @@ public:
 			std::move(root),
 			std::move(parent)
 		)
+		, signal_user_modified()
 		, signal_control_changed()
 		, m_tree(std::move(text))
 		, m_filter(std::move(filter))
