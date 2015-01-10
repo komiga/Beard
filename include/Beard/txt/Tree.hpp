@@ -134,6 +134,14 @@ public:
 	}
 
 	/**
+		Check if the tree is empty.
+	*/
+	bool
+	empty() const noexcept {
+		return points() == 0 && lines() == 1;
+	}
+
+	/**
 		Get iterator to beginning.
 	*/
 	iterator
