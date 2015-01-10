@@ -17,6 +17,10 @@ static KeyInputMatch const
 s_kim_root[]{
 	{KeyMod::shift, KeyCode::none, '\t', false},
 	{KeyMod::none , KeyCode::none, '\t', false},
+	{KeyMod::none , KeyCode::up   , codepoint_none, false},
+	{KeyMod::none , KeyCode::left , codepoint_none, false},
+	{KeyMod::none , KeyCode::down , codepoint_none, false},
+	{KeyMod::none , KeyCode::right, codepoint_none, false},
 };
 
 bool
@@ -27,15 +31,15 @@ Root::handle_event_impl(
 	case ui::EventType::key_input: {
 		auto const kim = key_input_match(event.key_input, s_kim_root);
 		if (kim) {
-			switch (kim->cp) {
-			case '\t':
-				focus_dir(
-					(KeyMod::shift == event.key_input.mod)
-					? ui::FocusDir::prev
-					: ui::FocusDir::next
-				);
-				return has_focus();
+			if (
+				kim->code == KeyCode::up || kim->code == KeyCode::left ||
+				(kim->cp == '\t' && KeyMod::shift == event.key_input.mod)
+			) {
+				focus_dir(ui::FocusDir::prev);
+			} else {
+				focus_dir(ui::FocusDir::next);
 			}
+			return has_focus();
 		}
 	}	break;
 
