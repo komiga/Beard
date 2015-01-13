@@ -478,7 +478,7 @@ public:
 		@param x X position.
 		@param y Y position.
 		@param seq %Sequence to put.
-		@param points Number of code points to put.
+		@param points Maximum number of code points to put.
 		@param attr_fg Foreground attributes.
 		@param attr_bg Background attributes.
 	*/
