@@ -371,21 +371,26 @@ resize_buffer(
 	bool const retain
 ) {
 	// TODO: Choose optimal ctor if new buffer is strictly smaller
-	tty::Terminal::cell_vector_type newb{new_size, tty::s_cell_default};
-	if (retain && 0u < oldb.size() && 0u < newb.size()) {
-		auto const
-			min_width  = min_ce(old_width , new_width),
-			min_height = min_ce(old_height, new_height)
-		;
-		auto it_old = oldb.cbegin();
-		auto it_new = newb.begin();
-		for (geom_value_type y = 0; min_height > y; ++y) {
-			std::copy(it_old, it_old + min_width, it_new);
-			it_old += old_width;
-			it_new += new_width;
+	if (retain) {
+		tty::Terminal::cell_vector_type newb{new_size, tty::s_cell_default};
+		if (0u < oldb.size() && 0u < newb.size()) {
+			auto const
+				min_width  = min_ce(old_width , new_width),
+				min_height = min_ce(old_height, new_height)
+			;
+			auto it_old = oldb.cbegin();
+			auto it_new = newb.begin();
+			for (geom_value_type y = 0; min_height > y; ++y) {
+				std::copy(it_old, it_old + min_width, it_new);
+				it_old += old_width;
+				it_new += new_width;
+			}
 		}
+		oldb.operator=(std::move(newb));
+	} else {
+		oldb.resize(new_size);
+		std::fill(oldb.begin(), oldb.end(), tty::s_cell_default);
 	}
-	oldb.operator=(std::move(newb));
 }
 
 // rendering
