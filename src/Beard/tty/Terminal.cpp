@@ -664,13 +664,13 @@ Terminal::clear_screen(
 	m_states.set(State::backbuffer_dirty, back_dirty);
 	std::fill(m_dirty_rows.begin(), m_dirty_rows.end(), back_dirty);
 
-	put_cap_cache(CapCache::clear_screen);
 	terminal_internal::write_attrs(
 		*this,
 		tty::Color::term_default,
 		tty::Color::term_default,
 		true
 	);
+	put_cap_cache(CapCache::clear_screen);
 	if (is_caret_visible()) {
 		terminal_internal::repos_out(
 			m_stream_out, m_caret_pos.x, m_caret_pos.y
@@ -856,18 +856,23 @@ Terminal::deinit() {
 	set_caret_pos(0u, 0u);
 	set_caret_visible(false);
 
-	/*bool const resized = */resize(0u, 0u);
+	resize(0u, 0u);
+	terminal_internal::write_attrs(
+		*this,
+		tty::Color::term_default,
+		tty::Color::term_default,
+		true
+	);
 	put_cap_cache(CapCache::cursor_normal);
 	put_cap_cache(CapCache::exit_attribute_mode);
-	//if (!resized) {
-		put_cap_cache(CapCache::clear_screen);
-	//}
+	put_cap_cache(CapCache::clear_screen);
 	put_cap_cache(CapCache::exit_ca_mode);
 	put_cap_cache(CapCache::keypad_local);
 	terminal_internal::flush(*this);
 
-	if (m_tty_priv->have_orig
-	 && 0 != ::tcsetattr(m_tty_fd, TCSAFLUSH, &m_tty_priv->tios_orig)
+	if (
+		m_tty_priv->have_orig &&
+		0 != ::tcsetattr(m_tty_fd, TCSAFLUSH, &m_tty_priv->tios_orig)
 	) {
 		BEARD_DEBUG_CERR_FQN(
 			errno,
