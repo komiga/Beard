@@ -1396,28 +1396,21 @@ Terminal::clear_back(
 	} else {
 		// Eliminate degeneracies
 		vec2_clamp_min(quad.v2, quad.v1);
-		Rect const rect_clamped = quad_rect(quad);
-		if (v0 == rect_clamped.size) {
+		Rect const clamped = quad_rect(quad);
+		if (clamped.size.width == 0 || clamped.size.height == 0) {
 			return;
 		}
-		auto it_dirty = m_dirty_rows.begin() + rect_clamped.pos.y;
+		auto it_dirty = m_dirty_rows.begin() + clamped.pos.y;
 		auto it_row
 			= m_cell_backbuffer.begin()
-			+ (rect_clamped.pos.y * m_tty_size.width)
-			+ rect_clamped.pos.x;
-		auto const it_row_e
-			= it_row + (rect_clamped.size.height * m_tty_size.width);
-		bool row_dirtied = false, state_dirtied = false;
-		for (
-			; it_row_e > it_row;
-			it_row += m_tty_size.width, ++it_dirty
-		) {
-			auto const it_row_stride = it_row + rect_clamped.size.width;
-			for (
-				auto it = it_row;
-				it_row_stride != it;
-				++it
-			) {
+			+ (clamped.pos.y * m_tty_size.width)
+			+ clamped.pos.x;
+		auto const it_row_e = it_row + (clamped.size.height * m_tty_size.width);
+		bool row_dirtied = false;
+		bool state_dirtied = false;
+		for (; it_row < it_row_e; it_row += m_tty_size.width, ++it_dirty) {
+			auto const it_row_stride = it_row + clamped.size.width;
+			for (auto it = it_row; it != it_row_stride; ++it) {
 				if (BEARD_TERMINAL_CELL_CMP(*it, cell)) {
 					std::copy(&cell, &cell + 1u, it);
 					row_dirtied = true;
