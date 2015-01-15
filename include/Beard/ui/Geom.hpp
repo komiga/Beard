@@ -80,8 +80,8 @@ public:
 		, m_area()
 		, m_frame()
 		, m_flags(
-			static_size ? Flags::static_size : Flags::none,
-			static_cast<Flags>(enum_cast(expand) << expand_shift),
+			(static_size ? Flags::static_size : Flags::none) |
+			static_cast<Flags>(enum_cast(expand) << expand_shift) |
 			static_cast<Flags>(enum_cast(fill) << fill_shift)
 		)
 	{}

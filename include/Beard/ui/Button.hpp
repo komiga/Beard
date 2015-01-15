@@ -102,10 +102,9 @@ public:
 	) noexcept
 		: base_type(
 			ui::Widget::Type::Button,
-			enum_combine(
-				ui::Widget::Flags::trait_focusable,
+				ui::Widget::Flags::trait_focusable |
 				ui::Widget::Flags::visible
-			),
+			,
 			group,
 			{{1, 1}, false, Axis::none, Axis::none},
 			std::move(root),

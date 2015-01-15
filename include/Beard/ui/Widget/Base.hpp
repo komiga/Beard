@@ -399,12 +399,11 @@ public:
 		bool const and_visible = false
 	) const noexcept {
 		return m_flags.test(
-			and_visible
-			? enum_combine(
-				ui::Widget::Flags::trait_focusable,
-				ui::Widget::Flags::visible
+			ui::Widget::Flags::trait_focusable | (
+				and_visible
+				? ui::Widget::Flags::visible
+				: ui::Widget::Flags::none
 			)
-			: ui::Widget::Flags::trait_focusable
 		);
 	}
 

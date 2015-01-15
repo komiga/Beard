@@ -102,9 +102,7 @@ public:
 			static_cast<ui::Widget::Type>(
 				CustomWidgetType::KeyInspector
 			),
-			enum_combine(
-				ui::Widget::Flags::visible
-			),
+			ui::Widget::Flags::visible,
 			group,
 			{{1, 1}, false, Axis::both, Axis::both},
 			std::move(root),
@@ -157,9 +155,9 @@ KeyInspector::render_impl(
 ) noexcept {
 	auto const& frame = get_geometry().get_frame();
 
-	bool const has_alt = enum_bitand(m_kid.mod, KeyMod::esc);
-	bool const has_ctrl = enum_bitand(m_kid.mod, KeyMod::ctrl);
-	bool const has_shift = enum_bitand(m_kid.mod, KeyMod::shift);
+	bool const has_alt = enum_cast(m_kid.mod & KeyMod::esc);
+	bool const has_ctrl = enum_cast(m_kid.mod & KeyMod::ctrl);
+	bool const has_shift = enum_cast(m_kid.mod & KeyMod::shift);
 
 	tty::attr_type const
 		inactive_fg = rd.get_attr(ui::property_content_fg_inactive),

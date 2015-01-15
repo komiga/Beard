@@ -163,10 +163,9 @@ public:
 			static_cast<ui::Widget::Type>(
 				enum_cast(ui::Widget::Type::USERSPACE_BASE) + 1000u
 			),
-			enum_combine(
-				ui::Widget::Flags::trait_focusable,
+				ui::Widget::Flags::trait_focusable |
 				ui::Widget::Flags::visible
-			),
+			,
 			group,
 			{{0, 0}, true, Axis::both, Axis::both},
 			std::move(root),
@@ -295,10 +294,10 @@ TestGrid::handle_event_impl(
 					m_cursor.row, m_cursor.row + 1,
 					m_cursor.col, m_cursor.col + 1
 				);
-				queue_actions(enum_combine(
-					ui::UpdateActions::render,
+				queue_actions(
+					ui::UpdateActions::render |
 					ui::UpdateActions::flag_noclear
-				));
+				);
 			}
 			return handled;
 		} else {
@@ -309,9 +308,9 @@ TestGrid::handle_event_impl(
 				reflow_field(true);
 				m_field->set_text(m_rows[m_cursor.row][m_cursor.col].value);
 				m_field->handle_event(event);
-				m_field->queue_actions(enum_combine(
+				m_field->queue_actions(
 					ui::UpdateActions::render
-				));
+				);
 				break;
 
 			case KeyCode::up   : row_step(-1); break;
@@ -327,10 +326,10 @@ TestGrid::handle_event_impl(
 
 			case KeyCode::f1:
 				set_header_enabled(!is_header_enabled());
-				queue_actions(enum_combine(
-					ui::UpdateActions::reflow,
+				queue_actions(
+					ui::UpdateActions::reflow |
 					ui::UpdateActions::render
-				));
+				);
 				break;
 
 			default:
@@ -375,8 +374,8 @@ TestGrid::render_impl(
 ) noexcept {
 	/*DUCT_DEBUGF(
 		"clearing render: %d",
-		signed{!enum_bitand(
-			get_queued_actions(),
+		signed{!enum_cast(
+			get_queued_actions() &
 			ui::UpdateActions::flag_noclear
 		)}
 	);*/
@@ -390,8 +389,8 @@ TestGrid::render_impl(
 
 	render_view(
 		grid_rd,
-		!enum_bitand(
-			get_queued_actions(),
+		!enum_cast(
+			get_queued_actions() &
 			ui::UpdateActions::flag_noclear
 		)
 	);
@@ -559,10 +558,10 @@ TestGrid::content_action(
 		break;
 	}
 
-	queue_actions(enum_combine(
-		ui::UpdateActions::render,
+	queue_actions(
+		ui::UpdateActions::render |
 		clear_flag
-	));
+	);
 }
 
 void
@@ -741,10 +740,10 @@ TestGrid::set_cursor(
 				col, col + 1
 			);
 		}
-		queue_actions(enum_combine(
-			ui::UpdateActions::render,
+		queue_actions(
+			ui::UpdateActions::render |
 			ui::UpdateActions::flag_noclear
-		));
+		);
 		m_cursor.col = col;
 		m_cursor.row = row;
 		adjust_view();

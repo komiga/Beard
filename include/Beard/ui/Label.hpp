@@ -84,9 +84,7 @@ public:
 	) noexcept
 		: base_type(
 			ui::Widget::Type::Label,
-			enum_combine(
-				ui::Widget::Flags::visible
-			),
+			ui::Widget::Flags::visible,
 			group,
 			{{1, 1}, false, Axis::none, Axis::none},
 			std::move(root),

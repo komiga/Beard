@@ -2,6 +2,7 @@
 @copyright MIT license; see @ref index or the accompanying LICENSE file.
 */
 
+#include <Beard/utility.hpp>
 #include <Beard/ui/packing.hpp>
 #include <Beard/ui/Root.hpp>
 #include <Beard/ui/Widget/Base.hpp>
@@ -111,11 +112,11 @@ Base::set_visible(
 ) noexcept {
 	if (is_visible() != visible) {
 		m_flags.set(ui::Widget::Flags::visible, visible);
-		queue_actions(enum_combine(
-			ui::UpdateActions::flag_parent,
-			ui::UpdateActions::reflow,
+		queue_actions(
+			ui::UpdateActions::flag_parent |
+			ui::UpdateActions::reflow |
 			ui::UpdateActions::render
-		));
+		);
 	}
 }
 
@@ -129,10 +130,10 @@ Base::set_focused(
 		event.focus_changed.previous = is_focused();
 		m_flags.set(ui::Widget::Flags::focused, focused);
 		if (!handle_event(event)) {
-			queue_actions(enum_combine(
-				ui::UpdateActions::flag_noclear,
+			queue_actions(
+				ui::UpdateActions::flag_noclear |
 				ui::UpdateActions::render
-			));
+			);
 		}
 	}
 }
@@ -144,14 +145,8 @@ is_clearing_render(
 	ui::UpdateActions const actions
 ) noexcept {
 	return
-		enum_cast(ui::UpdateActions::render)
-		== enum_bitand(
-			actions,
-			enum_combine(
-				ui::UpdateActions::render,
-				ui::UpdateActions::flag_noclear
-			)
-		)
+		ui::UpdateActions::render
+		== (actions & (ui::UpdateActions::render | ui::UpdateActions::flag_noclear))
 	;
 }
 
@@ -159,7 +154,7 @@ void
 Base::queue_actions(
 	ui::UpdateActions const actions
 ) {
-	if (enum_bitand(actions, ui::UpdateActions::mask_actions)) {
+	if (enum_cast(actions & ui::UpdateActions::mask_actions)) {
 		if (!is_action_queued()) {
 			get_root()->get_context().enqueue_widget(shared_from_this());
 		}

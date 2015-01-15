@@ -62,10 +62,10 @@ Field::set_input_control_impl(
 		: txt::Extent::head
 	);*/
 	update_view();
-	queue_actions(enum_combine(
-		ui::UpdateActions::render,
+	queue_actions(
+		ui::UpdateActions::render |
 		ui::UpdateActions::flag_noclear
-	));
+	);
 }
 
 void
@@ -131,10 +131,10 @@ Field::handle_event_impl(
 				break;
 			}
 			update_view();
-			queue_actions(enum_combine(
-				ui::UpdateActions::render,
+			queue_actions(
+				ui::UpdateActions::render |
 				ui::UpdateActions::flag_noclear
-			));
+			);
 			return true;
 		}
 		break;
@@ -243,11 +243,11 @@ Field::set_text(
 	m_cursor.assign(text);
 	m_cursor.col_extent(txt::Extent::tail);
 	update_view();
-	queue_actions(enum_combine(
-		ui::UpdateActions::flag_parent,
-		ui::UpdateActions::reflow,
+	queue_actions(
+		ui::UpdateActions::flag_parent |
+		ui::UpdateActions::reflow |
 		ui::UpdateActions::render
-	));
+	);
 }
 
 } // namespace ui

@@ -72,20 +72,18 @@ Context::run_actions(
 	ui::Widget::SPtr widget,
 	ui::UpdateActions const mask
 ) {
-	auto const actions = static_cast<ui::UpdateActions>(
-		enum_bitand(
-			widget->get_queued_actions(),
-			enum_combine(mask, ui::UpdateActions::mask_flags)
-		)
-	);
+	auto const actions
+		= widget->get_queued_actions()
+		& (mask | ui::UpdateActions::mask_flags)
+	;
 
 	if (
-		enum_bitand(actions, ui::UpdateActions::flag_parent) &&
+		enum_cast(actions & ui::UpdateActions::flag_parent) &&
 		widget->has_parent()
 	) {
 		widget = widget->get_parent();
 	}
-	if (enum_bitand(actions, ui::UpdateActions::reflow)) {
+	if (enum_cast(actions & ui::UpdateActions::reflow)) {
 		widget->reflow(
 			(widget == m_root)
 				? Rect{{0, 0}, m_terminal.get_size()}
@@ -94,10 +92,10 @@ Context::run_actions(
 			true
 		);
 	}
-	if (enum_bitand(actions, ui::UpdateActions::render)) {
+	if (enum_cast(actions & ui::UpdateActions::render)) {
 		// TODO: Optimization: only clear if the terminal hasn't been
 		// cleared entirely?
-		if (!enum_bitand(actions, ui::UpdateActions::flag_noclear)) {
+		if (!enum_cast(actions & ui::UpdateActions::flag_noclear)) {
 			m_terminal.clear_back(widget->get_geometry().get_area());
 		}
 		rd.update_group(widget->get_group());
@@ -118,7 +116,7 @@ Context::run_all_actions() {
 	};
 	auto const root_actions = m_root->get_queued_actions();
 
-	if (enum_bitand(root_actions, ui::UpdateActions::reflow)) {
+	if (enum_cast(root_actions & ui::UpdateActions::reflow)) {
 		run_actions(rd, m_root, ui::UpdateActions::reflow);
 	} else {
 		for (auto wp : m_action_queue) {
@@ -127,7 +125,7 @@ Context::run_all_actions() {
 			}
 		}
 	}
-	if (enum_bitand(root_actions, ui::UpdateActions::render)) {
+	if (enum_cast(root_actions & ui::UpdateActions::render)) {
 		run_actions(rd, m_root, ui::UpdateActions::render);
 	} else {
 		for (auto wp : m_action_queue) {
@@ -236,12 +234,10 @@ void
 Context::render(
 	bool const reflow
 ) {
-	m_root->queue_actions(enum_combine(
-		ui::UpdateActions::render,
-		reflow
-			? ui::UpdateActions::reflow
-			: ui::UpdateActions::none
-	));
+	m_root->queue_actions(
+		ui::UpdateActions::render |
+		(reflow ? ui::UpdateActions::reflow : ui::UpdateActions::none)
+	);
 	run_all_actions();
 	m_terminal.present();
 }

@@ -109,10 +109,9 @@ protected:
 	) noexcept
 		: base_type(
 			type,
-			enum_combine(
-				ui::Widget::Flags::trait_container,
+				ui::Widget::Flags::trait_container |
 				flags
-			),
+			,
 			group,
 			std::move(geometry),
 			std::move(root),

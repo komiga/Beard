@@ -79,11 +79,11 @@ Label::set_text(
 	String text
 ) {
 	m_text.assign(std::move(text));
-	queue_actions(enum_combine(
-		ui::UpdateActions::flag_parent,
-		ui::UpdateActions::reflow,
+	queue_actions(
+		ui::UpdateActions::flag_parent |
+		ui::UpdateActions::reflow |
 		ui::UpdateActions::render
-	));
+	);
 }
 
 } // namespace ui

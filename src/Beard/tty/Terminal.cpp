@@ -1470,16 +1470,12 @@ Terminal::poll(
 					m_streambuf_in.get_remaining()
 				);*/
 				event.type = tty::EventType::key_input;
-				event.key_input.mod =
-				(true == m_ev_pending.key_input.escaped)
-					? static_cast<KeyMod>(
-						enum_cast(event.key_input.mod) |
-						enum_cast(KeyMod::esc)
-					)
-					: m_ev_pending.key_input.mod
-				;
+				event.key_input.mod  = m_ev_pending.key_input.mod;
 				event.key_input.code = m_ev_pending.key_input.code;
 				event.key_input.cp   = m_ev_pending.key_input.cp;
+				if (m_ev_pending.key_input.escaped) {
+					event.key_input.mod |= KeyMod::esc;
+				}
 				m_ev_pending.key_input.reset();
 			} else if (!parse_escape && m_ev_pending.key_input.escaped) {
 				/*BEARD_DEBUG_MSG_FQN_F(

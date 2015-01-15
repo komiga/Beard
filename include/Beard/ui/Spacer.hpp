@@ -66,9 +66,7 @@ public:
 	) noexcept
 		: base_type(
 			ui::Widget::Type::Spacer,
-			enum_combine(
-				ui::Widget::Flags::visible
-			),
+			ui::Widget::Flags::visible,
 			ui::group_null,
 			{{1, 1}, false, expand_and_fill, expand_and_fill},
 			std::move(root),

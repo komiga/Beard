@@ -143,10 +143,9 @@ public:
 	) noexcept
 		: base_type(
 			ui::Widget::Type::Field,
-			enum_combine(
-				ui::Widget::Flags::trait_focusable,
+				ui::Widget::Flags::trait_focusable |
 				ui::Widget::Flags::visible
-			),
+			,
 			group,
 			{{2, 1}, false, Axis::none, Axis::none},
 			std::move(root),

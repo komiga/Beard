@@ -35,14 +35,14 @@ expand_rect(
 ) noexcept {
 	axes = axis_transpose(axes);
 	rect = area;
-	if (enum_bitand(axes, Axis::x)) {
+	if (enum_cast(axes & Axis::x)) {
 		center_axis(
 			area.pos.x, area.size.width,
 			rect.pos.x, rect.size.width,
 			request_size.width
 		);
 	}
-	if (enum_bitand(axes, Axis::y)) {
+	if (enum_cast(axes & Axis::y)) {
 		center_axis(
 			area.pos.y, area.size.height,
 			rect.pos.y, rect.size.height,

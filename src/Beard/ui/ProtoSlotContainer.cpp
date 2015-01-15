@@ -81,10 +81,10 @@ ProtoSlotContainer::remove(
 	for (; m_slots.size() > index; ++index) {
 		m_slots[index].widget->set_index(index);
 	}
-	queue_actions(enum_combine(
-		ui::UpdateActions::reflow,
+	queue_actions(
+		ui::UpdateActions::reflow |
 		ui::UpdateActions::render
-	));
+	);
 }
 
 void
@@ -93,10 +93,10 @@ ProtoSlotContainer::clear() {
 		slot.widget->clear_parent();
 	}
 	m_slots.clear();
-	queue_actions(enum_combine(
-		ui::UpdateActions::reflow,
+	queue_actions(
+		ui::UpdateActions::reflow |
 		ui::UpdateActions::render
-	));
+	);
 }
 
 #define BEARD_SCOPE_FUNC set_child
@@ -115,10 +115,10 @@ ProtoSlotContainer::set_child(
 	slot.widget->clear_parent();
 	slot.widget = std::move(widget);
 	slot.widget->set_parent(shared_from_this(), index);
-	queue_actions(enum_combine(
-		ui::UpdateActions::reflow,
+	queue_actions(
+		ui::UpdateActions::reflow |
 		ui::UpdateActions::render
-	));
+	);
 }
 #undef BEARD_SCOPE_FUNC
 
@@ -134,10 +134,10 @@ ProtoSlotContainer::push_back(
 	}
 	widget->set_parent(shared_from_this(), static_cast<signed>(m_slots.size()));
 	m_slots.push_back(ui::Widget::Slot{std::move(widget), {}});
-	queue_actions(enum_combine(
-		ui::UpdateActions::reflow,
+	queue_actions(
+		ui::UpdateActions::reflow |
 		ui::UpdateActions::render
-	));
+	);
 }
 
 #undef BEARD_SCOPE_CLASS // ProtoSlotContainer
