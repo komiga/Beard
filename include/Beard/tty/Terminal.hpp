@@ -159,30 +159,12 @@ private:
 	// sequence representing the key (size of the CapString, 1 for
 	// non-ASCII single-char input).
 	struct KeyDecodeNode {
-		// Urk. Can't guarantee forward_list supports incomplete
-		// types :(
-		using list_type
-		= aux::forward_list<
-			duct::cc_unique_ptr<KeyDecodeNode>
-		>;
-
 		char ch;
 		KeyMod mod;
 		KeyCode code;
 		char32 cp;
-		list_type next;
-
-		KeyDecodeNode(
-			char ch,
-			KeyMod mod,
-			KeyCode code,
-			char32 cp
-		) noexcept
-			: ch(ch)
-			, mod(mod)
-			, code(code)
-			, cp(cp)
-		{}
+		unsigned next;
+		unsigned branch;
 
 		bool
 		is_terminator() const noexcept {
@@ -192,6 +174,7 @@ private:
 			;
 		}
 	};
+	using kdn_vector_type = aux::vector<KeyDecodeNode>;
 
 	void
 	put_cap_cache(
@@ -235,12 +218,7 @@ private:
 
 	String m_cap_cache[enum_cast(CapCache::COUNT)]{};
 	unsigned m_cap_max_colors{8u};
-	KeyDecodeNode m_key_decode_graph{
-		'\0',
-		KeyMod::none,
-		KeyCode::none,
-		codepoint_none
-	};
+	kdn_vector_type m_key_decode_graph{};
 
 	tty::fd_type m_epoll_fd{tty::FD_INVALID};
 	duct::IO::dynamic_streambuf m_streambuf_in {inbuf_size, 0u, inbuf_size};

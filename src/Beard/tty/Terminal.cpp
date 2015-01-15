@@ -550,48 +550,61 @@ flush(
 
 static void
 add_key_cap(
-	KeyDecodeNode* node,
+	tty::Terminal::kdn_vector_type& data,
+	unsigned node,
 	char const* it,
 	char const* const end,
 	KeyMod const mod,
 	KeyCode const code,
 	char32 const cp
 ) {
-	// On termination by for condition, branch already exists
-	for (
-		auto next_it = node->next.begin();
-		end != it;
-	) {
-		if (node->next.end() == next_it) {
+	// On termination by loop condition, branch already exists
+	auto root = node;
+	auto prev = node;
+	auto next = data[node].next;
+	while (it != end) {
+		if (next == 0) {
 			// New branch
-			while (end != it) {
-				node->next.emplace_front(new KeyDecodeNode(
-					*it,
-					KeyMod::none,
-					KeyCode::none,
-					codepoint_none
-				));
-				node = node->next.front().get();
+			while (it != end) {
+				data.push_back({*it, KeyMod::none, KeyCode::none, codepoint_none, 0, 0});
+				next = data.size() - 1;
+				if (prev == node || prev != 0) {
+					data[prev].next = next;
+					prev = 0;
+				} else {
+					data[node].branch = next;
+				}
+				node = next;
 				++it;
 			}
-			node->mod = mod;
-			node->code = code;
-			node->cp = cp;
+			data[node].mod = mod;
+			data[node].code = code;
+			data[node].cp = cp;
 			return;
-		} else if ((*it) == (*next_it)->ch) {
-			// Existing branch; step in
-			node = next_it->get();
-			next_it = node->next.begin();
+		} else if (*it == data[next].ch) {
+			// Matching branch; step in or terminate at it == end
+			if (data[next].branch) {
+				node = data[next].branch;
+				next = node;
+			} else {
+				node = next;
+				next = 0;
+			}
+			root = node;
+			prev = node;
 			++it;
 		} else {
-			++next_it;
+			// Not found; try next branch
+			prev = next;
+			next = data[next].next;
 		}
 	}
 }
 
 static std::size_t
 decode_key(
-	KeyDecodeNode const* node,
+	tty::Terminal::kdn_vector_type& data,
+	unsigned node,
 	char const* it,
 	char const* const end,
 	KeyMod& mod,
@@ -600,30 +613,29 @@ decode_key(
 ) {
 	// NB: Root in the graph is just a dummy
 	std::size_t seq_size = 0u;
-	for (
-		auto next_it = node->next.begin();
-		end != it;
-	) {
-		if (node->next.end() == next_it) {
+	auto next = data[node].next;
+	while (it != end) {
+		if (next == 0) {
 			// Not found
 			break;
-		} else if ((*it) == (*next_it)->ch) {
+		} else if (*it == data[next].ch) {
 			// Matching branch
 			++seq_size;
-			if ((*next_it)->is_terminator()) {
+			if (data[next].is_terminator()) {
 				// Terminating sequence
-				mod = (*next_it)->mod;
-				code = (*next_it)->code;
-				cp = (*next_it)->cp;
+				mod = data[next].mod;
+				code = data[next].code;
+				cp = data[next].cp;
 				return seq_size;
 			} else {
 				// Step into branch
-				node = next_it->get();
-				next_it = node->next.begin();
+				node = data[next].branch;
+				next = node;
 				++it;
 			}
 		} else {
-			++next_it;
+			// Not found; try next branch
+			next = data[next].next;
 		}
 	}
 	return 0u;
@@ -970,7 +982,7 @@ Terminal::parse_input() {
 	;
 	bool have_event = false;
 	std::size_t seq_size = terminal_internal::decode_key(
-		&m_key_decode_graph,
+		m_key_decode_graph, 0,
 		buffer,
 		buffer + m_streambuf_in.get_remaining(),
 		m_ev_pending.key_input.mod,
@@ -1487,6 +1499,8 @@ Terminal::poll(
 
 // operations
 
+#define BEARD_SCOPE_FUNC update_cache
+
 void
 Terminal::update_cache() {
 	// Cache caps
@@ -1519,18 +1533,18 @@ Terminal::update_cache() {
 	;
 
 	// Cache key decoding graph
-	m_key_decode_graph.next.clear();
+	m_key_decode_graph.resize(
+		1, {'\0', KeyMod::none, KeyCode::none, codepoint_none, 0, 0}
+	);
 	for (auto const kmap : s_input_keymap) {
 		if (static_cast<tty::CapString>(-1) != kmap.cap) {
 			if (m_info.lookup_cap_string(kmap.cap, cap_it)) {
 				if (!cap_it->second.empty()) {
 					terminal_internal::add_key_cap(
-						&m_key_decode_graph,
+						m_key_decode_graph, 0,
 						cap_it->second.data(),
 						cap_it->second.data() + cap_it->second.size(),
-						kmap.mod,
-						kmap.code,
-						kmap.cp
+						kmap.mod, kmap.code, kmap.cp
 					);
 				} else {
 					BEARD_DEBUG_MSG_FQN_F(
@@ -1544,16 +1558,29 @@ Terminal::update_cache() {
 			}
 		} else {
 			terminal_internal::add_key_cap(
-				&m_key_decode_graph,
+				m_key_decode_graph, 0,
 				kmap.seq.data,
 				kmap.seq.data + kmap.seq.size,
-				kmap.mod,
-				kmap.code,
-				kmap.cp
+				kmap.mod, kmap.code, kmap.cp
 			);
 		}
 	}
+	/*BEARD_DEBUG_MSG_FQN_F(
+		"key decode graph: %u", static_cast<unsigned>(m_key_decode_graph.size())
+	);
+	for (auto const& node : m_key_decode_graph) {
+		BEARD_DEBUG_MSG_FQN_F(
+			"  node: %02x %d %d %08x | %3d %3d",
+			node.ch,
+			enum_cast(node.mod),
+			enum_cast(node.code),
+			node.cp,
+			node.branch, node.next
+		);
+	}*/
 }
+
+#undef BEARD_SCOPE_FUNC
 
 // NB: If the terminal is uninitialized (i.e., closed), it
 // will not own the SIGWINCH handler.
