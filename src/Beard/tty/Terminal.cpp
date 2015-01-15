@@ -146,7 +146,7 @@ static struct {
 	{KeyMod::ctrl, KeyCode::none, 'e', static_cast<tty::CapString>(-1), "\x05"},
 	{KeyMod::ctrl, KeyCode::none, 'f', static_cast<tty::CapString>(-1), "\x06"},
 	{KeyMod::ctrl, KeyCode::none, 'g', static_cast<tty::CapString>(-1), "\x07"},
-	{KeyMod::none, KeyCode::backspace, '\x1', static_cast<tty::CapString>(-1), "\x08"},
+	{KeyMod::none, KeyCode::backspace, codepoint_none, static_cast<tty::CapString>(-1), "\x08"},
 	{KeyMod::none , KeyCode::none, '\t', static_cast<tty::CapString>(-1), "\x09"},
 	{KeyMod::shift, KeyCode::none, '\t', tty::CapString::key_btab, {nullptr, 0u}},
 	{KeyMod::ctrl, KeyCode::none, 'j', static_cast<tty::CapString>(-1), "\x0A"},
