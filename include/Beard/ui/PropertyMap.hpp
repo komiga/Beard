@@ -286,9 +286,7 @@ public:
 		@param name Group name.
 		@param args Constructor arguments.
 	*/
-	template<
-		typename... Args
-	>
+	template<class... Args>
 	std::pair<iterator, bool>
 	emplace(
 		ui::group_hash_type const name,

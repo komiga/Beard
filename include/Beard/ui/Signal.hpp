@@ -17,9 +17,7 @@ namespace Beard {
 namespace ui {
 
 // Forward declarations
-template<
-	class
->
+template<class>
 class Signal;
 class SignalList;
 
@@ -34,10 +32,7 @@ class SignalList;
 	@tparam R Return type.
 	@tparam ArgP Argument types.
 */
-template<
-	typename R,
-	typename... ArgP
->
+template<class R, class... ArgP>
 class Signal<R(ArgP...)> final {
 public:
 	/** Return type. */
@@ -120,9 +115,7 @@ public:
 		@tparam CArgP Argument types.
 		@param args Arguments.
 	*/
-	template<
-		typename... CArgP
-	>
+	template<class... CArgP>
 	return_type
 	operator()(
 		CArgP&&... args

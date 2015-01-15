@@ -1010,12 +1010,7 @@ Terminal::parse_input() {
 		seq_size = txt::EncUtils::required_first_whole(buffer[0u]);
 		if (m_streambuf_in.get_remaining() >= seq_size) {
 			char32 cp = codepoint_none;
-			txt::EncUtils::decode(
-				buffer,
-				buffer + seq_size,
-				cp,
-				codepoint_none
-			);
+			txt::EncUtils::decode(buffer, buffer + seq_size, cp, codepoint_none);
 			if (codepoint_none != cp) {
 				m_ev_pending.key_input.mod = KeyMod::none;
 				m_ev_pending.key_input.code = KeyCode::none;
