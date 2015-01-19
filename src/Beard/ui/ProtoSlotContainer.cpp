@@ -20,12 +20,24 @@ ProtoSlotContainer::~ProtoSlotContainer() noexcept = default;
 void
 ProtoSlotContainer::cache_geometry_impl() noexcept {
 	Vec2 rs = get_geometry().get_request_size();
-	for (auto& slot : m_slots) {
-		if (slot.widget->is_visible()) {
-			slot.widget->cache_geometry();
-			Vec2 const& ws = slot.widget->get_geometry().get_request_size();
-			rs.width  = max_ce(rs.width , ws.width);
-			rs.height = max_ce(rs.height, ws.height);
+	rs = {0, 0};
+	if (m_orientation == Axis::vertical) {
+		for (auto& slot : m_slots) {
+			if (slot.widget->is_visible()) {
+				slot.widget->cache_geometry();
+				Vec2 const& ws = slot.widget->get_geometry().get_request_size();
+				rs.width = max_ce(rs.width, ws.width);
+				rs.height += ws.height;
+			}
+		}
+	} else {
+		for (auto& slot : m_slots) {
+			if (slot.widget->is_visible()) {
+				slot.widget->cache_geometry();
+				Vec2 const& ws = slot.widget->get_geometry().get_request_size();
+				rs.width += ws.width;
+				rs.height = max_ce(rs.height, ws.height);
+			}
 		}
 	}
 	if (!get_geometry().is_static()) {
