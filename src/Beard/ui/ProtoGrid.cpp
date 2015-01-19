@@ -311,6 +311,8 @@ ProtoGrid::render_view(
 		if (!all) {
 			cr = m_dirty.header;
 			if (-1 == cr.x) {
+				cr = m_view.col_range;
+			} else {
 				cr.x = value_clamp(cr.x, m_view.col_range);
 				cr.y = value_clamp(cr.y, cr.x, m_view.col_range.y);
 			}
