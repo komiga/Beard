@@ -25,7 +25,7 @@ expand_range(
 		if (range.x == range.y) {
 			range.x = begin;
 			range.y = end;
-		} else if (-1 == begin && begin == end) {
+		} else if (-1 == begin) {
 			range.x = -1;
 			range.y = -1;
 		} else {
@@ -322,10 +322,9 @@ ProtoGrid::render_view(
 		}
 	}
 
-	signed row = 0;
-	signed row_end = 0;
 	Rect frame = m_view.content_frame;
-	if (0 >= range_length(m_view.col_range)) {
+	cr = m_view.col_range;
+	if (m_view.row_count == 0 || range_length(m_view.col_range) <= 0) {
 		// Do nothing
 	} else if (all) {
 		frame.size.height = m_view.row_count;
@@ -335,11 +334,13 @@ ProtoGrid::render_view(
 			cr.x, cr.y,
 			frame
 		);
-		row = m_view.row_count;
 	} else {
+		signed row = 0;
+		signed row_end = 0;
 		Vec2 cr_queued;
-		while (m_view.row_count > row) {
-			if (m_view.row_count == row_end || 0 == m_dirty.rows[row_end].y) {
+		bool first = true;
+		while (row < m_view.row_count) {
+			if (row_end == m_view.row_count || m_dirty.rows[row_end].y == 0) {
 				if (row == row_end) {
 					row = ++row_end;
 					continue;
@@ -347,13 +348,16 @@ ProtoGrid::render_view(
 			} else {
 				if (!all) {
 					cr_queued = m_dirty.rows[row_end];
-					if (-1 == cr_queued.x) {
+					if (first) {
+						cr = cr_queued;
+						first = false;
+					} else if (cr_queued.x == -1) {
 						cr = m_view.col_range;
 						all = true;
 					} else {
 						cr.x = value_clamp(min_ce(cr.x, cr_queued.x), m_view.col_range);
 						cr.y = value_clamp(max_ce(cr.y, cr_queued.y), cr.x, m_view.col_range.y);
-						if (range_length(cr) == range_length(m_view.col_range)) {
+						if (range_length(cr) == m_view.col_count) {
 							all = true;
 						}
 					}
@@ -376,10 +380,11 @@ ProtoGrid::render_view(
 				Vec2{0, 0}
 			);
 			row = ++row_end;
+			first = true;
+			all = false;
 		}
 	}
-
-	if (m_view.fit_count > row) {
+	if (m_view.fit_count > m_view.row_count) {
 		// FIXME: Destructive clear
 		frame.pos.y = m_view.content_frame.pos.y + m_view.row_count;
 		frame.size.height = m_view.fit_count - m_view.row_count;
