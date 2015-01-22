@@ -176,9 +176,7 @@ public:
 	void
 	set_root(
 		ui::RootSPtr root
-	) noexcept {
-		m_root = std::move(root);
-	}
+	) noexcept;
 
 	/**
 		Get root.

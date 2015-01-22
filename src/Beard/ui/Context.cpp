@@ -173,6 +173,21 @@ Context::clear_actions() {
 	m_execution_set_ordered.clear();
 }
 
+void
+Context::set_root(
+	ui::RootSPtr root
+) noexcept {
+	m_root = std::move(root);
+	if (m_root) {
+		m_root->get_geometry().set_area(
+			{{0, 0}, m_terminal.get_size()}
+		);
+		m_root->queue_actions(
+			ui::UpdateActions::reflow
+		);
+	}
+}
+
 // operations
 
 #define BEARD_SCOPE_FUNC open
