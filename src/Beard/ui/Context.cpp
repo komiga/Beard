@@ -142,6 +142,7 @@ Context::run_all_actions() {
 	}
 	for (auto widget : m_execution_set_ordered) {
 		run_actions(rd, widget, ui::UpdateActions::render);
+		widget->clear_actions(false);
 	}
 	clear_actions();
 }
@@ -165,8 +166,10 @@ Context::dequeue_widget(
 
 void
 Context::clear_actions() {
-	for (auto widget : m_execution_set) {
-		widget->clear_actions(false);
+	for (auto wp : m_action_queue) {
+		if (!wp.expired()) {
+			wp.lock()->clear_actions(false);
+		}
 	}
 	m_action_queue.clear();
 	m_execution_set.clear();
