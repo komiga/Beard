@@ -228,7 +228,13 @@ Context::update(
 	m_event.type = ui::EventType::none;
 	switch (m_terminal.poll(tty_event, input_timeout)) {
 	case tty::EventType::resize:
-		render(true);
+		m_root->get_geometry().set_area(
+			{{0, 0}, m_terminal.get_size()}
+		);
+		m_root->queue_actions(
+			ui::UpdateActions::render |
+			ui::UpdateActions::reflow
+		);
 		break;
 
 	case tty::EventType::key_input:
