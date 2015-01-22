@@ -83,14 +83,16 @@ ProtoSlotContainer::get_child_impl(
 
 void
 ProtoSlotContainer::remove(
-	ui::index_type const s_index
-) {
-	unsigned index = static_cast<unsigned>(s_index);
-	if (0 > s_index || m_slots.size() <= index) {
-		throw std::out_of_range{"index is out of bounds"};
+	ui::index_type index
+) noexcept {
+	auto size = signed_cast(m_slots.size());
+	if (index < 0 || index >= size) {
+		return;
 	}
+	m_slots[index].widget->clear_parent();
 	m_slots.erase(m_slots.cbegin() + index);
-	for (; m_slots.size() > index; ++index) {
+	--size;
+	for (; index < size; ++index) {
 		m_slots[index].widget->set_index(index);
 	}
 	queue_actions(
@@ -134,6 +136,7 @@ ProtoSlotContainer::set_child(
 }
 #undef BEARD_SCOPE_FUNC
 
+#define BEARD_SCOPE_FUNC push_back
 void
 ProtoSlotContainer::push_back(
 	ui::Widget::SPtr widget
@@ -151,6 +154,7 @@ ProtoSlotContainer::push_back(
 		ui::UpdateActions::render
 	);
 }
+#undef BEARD_SCOPE_FUNC
 
 #undef BEARD_SCOPE_CLASS // ProtoSlotContainer
 

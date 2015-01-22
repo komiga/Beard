@@ -197,15 +197,12 @@ public:
 	/**
 		Remove child by index.
 
-		@throws std::out_of_range
-		If @a index is out of bounds.
-
 		@param index Index to remove.
 	*/
 	void
 	remove(
-		ui::index_type const index
-	);
+		ui::index_type index
+	) noexcept;
 
 	/**
 		Add a widget to the end of the container.
