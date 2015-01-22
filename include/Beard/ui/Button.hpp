@@ -71,10 +71,7 @@ private:
 	cache_geometry_impl() noexcept override;
 
 	void
-	reflow_impl(
-		Rect const& area,
-		bool const cache
-	) noexcept override;
+	reflow_impl() noexcept override;
 
 	bool
 	handle_event_impl(

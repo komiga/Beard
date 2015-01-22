@@ -26,29 +26,42 @@ namespace ui {
 /**
 	Reflow widget geometry.
 
-	@param area Available area.
 	@param geom Geometry to reflow.
 */
 void
 reflow(
-	Rect const& area,
 	ui::Geom& geom
+) noexcept;
+
+/**
+	Reflow widget geometry into an area.
+
+	@param geom Geometry to reflow.
+	@param area New widget area.
+*/
+void
+reflow_into(
+	ui::Geom& geom,
+	Rect const& area
 ) noexcept;
 
 /**
 	Reflow slots.
 
+	@note This will assign widget areas, but not reflow the widgets
+	or their geometries to avoid compound re-reflowing through the
+	action queue. The parent widget should push the slot widgets from
+	@c ui::Widget::push_action_graph_impl() if they are visible.
+
 	@param area Available area.
 	@param slots %Slots.
 	@param axis %Axis to pack along.
-	@param cache_geometry Whether to cache widget geometry.
 */
 void
 reflow_slots(
 	Rect const& area,
 	ui::Widget::slot_vector_type& slots,
-	Axis const axis,
-	bool const cache_geometry
+	Axis const axis
 ) noexcept;
 
 /** @} */ // end of doc-group ui

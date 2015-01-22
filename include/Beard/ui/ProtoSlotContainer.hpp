@@ -64,10 +64,7 @@ protected:
 	cache_geometry_impl() noexcept override;
 
 	virtual void
-	reflow_impl(
-		Rect const& area,
-		bool const cache
-	) noexcept override;
+	reflow_impl() noexcept override;
 
 	signed
 	num_children_impl() const noexcept override;

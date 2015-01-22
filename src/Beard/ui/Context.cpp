@@ -71,12 +71,7 @@ Context::run_actions(
 		& (mask | ui::UpdateActions::mask_flags)
 	;
 	if (enum_cast(actions & ui::UpdateActions::reflow)) {
-		widget->reflow(
-			(widget == m_root.get())
-			? Rect{{0, 0}, m_terminal.get_size()}
-			: widget->get_geometry().get_area(),
-			true
-		);
+		widget->reflow();
 	}
 	if (enum_cast(actions & ui::UpdateActions::render)) {
 		// TODO: Optimization: only clear if the terminal hasn't been
@@ -141,6 +136,11 @@ Context::run_all_actions() {
 		widget_depth_less
 	);
 
+	for (auto it = m_execution_set_ordered.rbegin(); it != m_execution_set_ordered.rend(); ++it) {
+		if (enum_cast((*it)->get_queued_actions() & ui::UpdateActions::reflow)) {
+			(*it)->cache_geometry();
+		}
+	}
 	for (auto widget : m_execution_set_ordered) {
 		run_actions(rd, widget, ui::UpdateActions::reflow);
 	}

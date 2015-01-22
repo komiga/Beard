@@ -40,14 +40,8 @@ Base::cache_geometry_impl() noexcept {
 }
 
 void
-Base::reflow_impl(
-	Rect const& area,
-	bool const cache
-) noexcept {
-	if (cache) {
-		cache_geometry();
-	}
-	ui::reflow(area, get_geometry());
+Base::reflow_impl() noexcept {
+	ui::reflow(get_geometry());
 }
 
 bool

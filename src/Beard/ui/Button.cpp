@@ -34,11 +34,8 @@ Button::cache_geometry_impl() noexcept {
 }
 
 void
-Button::reflow_impl(
-	Rect const& area,
-	bool const cache
-) noexcept {
-	base_type::reflow_impl(area, cache);
+Button::reflow_impl() noexcept {
+	base_type::reflow_impl();
 
 	auto const& geom = get_geometry();
 	auto const& fr = geom.get_frame();

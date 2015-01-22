@@ -69,11 +69,8 @@ Field::set_input_control_impl(
 }
 
 void
-Field::reflow_impl(
-	Rect const& area,
-	bool const cache
-) noexcept {
-	base_type::reflow_impl(area, cache);
+Field::reflow_impl() noexcept {
+	base_type::reflow_impl();
 	update_view();
 }
 

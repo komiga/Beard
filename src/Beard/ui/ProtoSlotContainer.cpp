@@ -46,7 +46,6 @@ ProtoSlotContainer::cache_geometry_impl() noexcept {
 	if (m_orientation == Axis::vertical) {
 		for (auto& slot : m_slots) {
 			if (slot.widget->is_visible()) {
-				slot.widget->cache_geometry();
 				Vec2 const& ws = slot.widget->get_geometry().get_request_size();
 				rs.width = max_ce(rs.width, ws.width);
 				rs.height += ws.height;
@@ -55,7 +54,6 @@ ProtoSlotContainer::cache_geometry_impl() noexcept {
 	} else {
 		for (auto& slot : m_slots) {
 			if (slot.widget->is_visible()) {
-				slot.widget->cache_geometry();
 				Vec2 const& ws = slot.widget->get_geometry().get_request_size();
 				rs.width += ws.width;
 				rs.height = max_ce(rs.height, ws.height);
@@ -68,16 +66,12 @@ ProtoSlotContainer::cache_geometry_impl() noexcept {
 }
 
 void
-ProtoSlotContainer::reflow_impl(
-	Rect const& area,
-	bool const cache
-) noexcept {
-	base_type::reflow_impl(area, cache);
+ProtoSlotContainer::reflow_impl() noexcept {
+	base_type::reflow_impl();
 	ui::reflow_slots(
 		get_geometry().get_frame(),
 		m_slots,
-		m_orientation,
-		false
+		m_orientation
 	);
 }
 

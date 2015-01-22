@@ -14,7 +14,7 @@ namespace ui {
 
 namespace {
 
-inline void
+inline static void
 center_axis(
 	geom_value_type const ap,
 	geom_value_type const as,
@@ -26,7 +26,7 @@ center_axis(
 	wp = ap + (as / 2) - (ws / 2);
 }
 
-void
+inline static void
 expand_rect(
 	Rect const& area,
 	Rect& rect,
@@ -55,17 +55,12 @@ expand_rect(
 
 void
 reflow(
-	Rect const& area,
 	ui::Geom& geom
 ) noexcept {
 	Rect& w_area = geom.get_area();
 	Rect& w_frame = geom.get_frame();
-
-	Axis const axes_e = geom.get_expand();
-	expand_rect(area, w_area, geom.get_request_size(), axes_e);
-
 	Axis const axes_f = geom.get_fill();
-	if (axes_f == axes_e) {
+	if (axes_f == Axis::both) {
 		w_frame = w_area;
 	} else {
 		expand_rect(w_area, w_frame, geom.get_request_size(), axes_f);
@@ -73,11 +68,19 @@ reflow(
 }
 
 void
+reflow_into(
+	ui::Geom& geom,
+	Rect const& area
+) noexcept {
+	geom.set_area(area);
+	reflow(geom);
+}
+
+void
 reflow_slots(
 	Rect const& area,
 	ui::Widget::slot_vector_type& slots,
-	Axis const axis,
-	bool const cache_geometry
+	Axis const axis
 ) noexcept {
 	if (slots.empty()) {
 		return;
@@ -97,9 +100,6 @@ reflow_slots(
 	// Calculate initial area
 	for (auto& s : slots) {
 		if (s.widget && s.widget->is_visible()) {
-			if (cache_geometry) {
-				s.widget->cache_geometry();
-			}
 			auto const& geom = s.widget->get_geometry();
 			geom_value_type const
 			asize = min_ce(
@@ -151,7 +151,7 @@ reflow_slots(
 			s.area.size = vec2_transpose(s.area.size);
 		}
 		if (s.widget) {
-			ui::reflow(s.area, s.widget->get_geometry());
+			s.widget->get_geometry().set_area(s.area);
 		}
 	}
 }
