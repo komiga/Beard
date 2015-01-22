@@ -22,12 +22,12 @@ expand_range(
 	ui::index_type const end
 ) noexcept {
 	if (-1 != range.x) {
-		if (range.x == range.y) {
-			range.x = begin;
-			range.y = end;
-		} else if (-1 == begin) {
+		if (-1 == begin) {
 			range.x = -1;
 			range.y = -1;
+		} else if (range.x == range.y) {
+			range.x = begin;
+			range.y = end;
 		} else {
 			range.x = min_ce(range.x, begin);
 			range.y = max_ce(range.y, end);
@@ -232,12 +232,7 @@ ProtoGrid::queue_cell_render(
 		),
 		m_view.row_count
 	);
-
-	for (
-		auto row = row_begin;
-		row_end > row;
-		++row
-	) {
+	for (auto row = row_begin; row_end > row; ++row) {
 		expand_range(m_dirty.rows[row], col_begin, col_end);
 	}
 }
