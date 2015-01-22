@@ -124,7 +124,11 @@ Context::run_all_actions() {
 					continue;
 				}
 			}
-			widget->push_action_graph(m_execution_set, actions);
+			if (widget->is_visible()) {
+				widget->push_action_graph(m_execution_set, actions);
+			} else {
+				widget->clear_actions(false);
+			}
 		}
 	}
 
