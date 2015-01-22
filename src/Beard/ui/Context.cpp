@@ -190,6 +190,7 @@ Context::set_root(
 			{{0, 0}, m_terminal.get_size()}
 		);
 		m_root->queue_actions(
+			ui::UpdateActions::render |
 			ui::UpdateActions::reflow
 		);
 	}
