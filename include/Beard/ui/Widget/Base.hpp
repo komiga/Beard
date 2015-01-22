@@ -82,7 +82,8 @@ private:
 
 	ui::Widget::Type const m_type;
 	flag_store_type m_flags;
-	ui::index_type m_index;
+	ui::index_type m_depth;
+	ui::index_type m_index{0};
 	ui::group_hash_type m_group;
 	ui::Geom m_geometry;
 	ui::RootWPtr m_root;
@@ -212,7 +213,7 @@ protected:
 	) noexcept
 		: m_type(type)
 		, m_flags(flags)
-		, m_index(0)
+		, m_depth(type == ui::Widget::Type::Root ? -1 : 0)
 		, m_group(group)
 		, m_geometry(std::move(geometry))
 		, m_root(std::move(root))
@@ -278,21 +279,27 @@ public:
 		return m_group;
 	}
 
+private:
+	void
+	update_depth(
+		ui::Widget::SPtr const& parent
+	) noexcept;
+
+public:
+
 	/**
 		Set parent.
 	*/
 	void
 	set_parent(
 		ui::Widget::SPtr const& widget
-	) noexcept {
-		m_parent = widget;
-	}
+	) noexcept;
 
 	void
 	set_parent(
 		ui::Widget::WPtr const& widget
 	) noexcept {
-		m_parent = widget;
+		set_parent(widget.lock());
 	}
 	/** @} */
 
@@ -302,6 +309,18 @@ public:
 	void
 	set_parent(
 		ui::Widget::WPtr const& widget,
+		unsigned const index
+	) noexcept {
+		set_parent(widget);
+		set_index(index);
+	}
+
+	/**
+		Set parent and index.
+	*/
+	void
+	set_parent(
+		ui::Widget::SPtr const& widget,
 		unsigned const index
 	) noexcept {
 		set_parent(widget);
@@ -486,6 +505,14 @@ public:
 	bool
 	has_input_control() const noexcept {
 		return m_flags.test(ui::Widget::Flags::input_control);
+	}
+
+	/**
+		Get depth of widget.
+	*/
+	ui::index_type
+	get_depth() const noexcept {
+		return m_depth;
 	}
 
 	/**

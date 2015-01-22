@@ -107,6 +107,34 @@ Base::render(
 // properties
 
 void
+Base::update_depth(
+	ui::Widget::SPtr const& parent
+) noexcept {
+	if (type == ui::Widget::Type::Root) {
+		m_depth = -1;
+		return;
+	} else if (parent) {
+		m_depth = parent->get_depth() + 1;
+	} else {
+		m_depth = 0;
+	}
+	for (signed index = 0; index < num_children(); ++index) {
+		auto const child = get_child(index);
+		if (child) {
+			child->update_depth(shared_from_this());
+		}
+	}
+}
+
+void
+Base::set_parent(
+	ui::Widget::SPtr const& widget
+) noexcept {
+	m_parent = widget;
+	update_depth(widget);
+}
+
+void
 Base::set_visible(
 	bool const visible
 ) noexcept {
