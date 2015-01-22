@@ -143,15 +143,24 @@ Base::set_parent(
 
 void
 Base::set_visible(
-	bool const visible
+	bool const visible,
+	bool const queue
 ) noexcept {
 	if (is_visible() != visible) {
 		m_flags.set(ui::Widget::Flags::visible, visible);
-		queue_actions(
-			ui::UpdateActions::flag_parent |
-			ui::UpdateActions::reflow |
-			ui::UpdateActions::render
-		);
+		for (signed index = 0; index < num_children(); ++index) {
+			auto const child = get_child(index);
+			if (child) {
+				child->set_visible(visible, false);
+			}
+		}
+		if (queue) {
+			queue_actions(
+				ui::UpdateActions::flag_parent |
+				ui::UpdateActions::reflow |
+				ui::UpdateActions::render
+			);
+		}
 	}
 }
 

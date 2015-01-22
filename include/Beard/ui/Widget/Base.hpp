@@ -448,10 +448,14 @@ public:
 
 	/**
 		Show or hide the widget.
+
+		@param queue Whether to queue a reflow and render through the
+		parent widget.
 	*/
 	void
 	set_visible(
-		bool const visible
+		bool const visible,
+		bool const queue = true
 	) noexcept;
 
 	/**
