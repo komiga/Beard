@@ -65,6 +65,7 @@ main(
 	ctx.set_root(root);
 
 	auto hcont1 = ui::Container::make(root, Axis::horizontal);
+	root->push_back(hcont1);
 	{
 		auto field = ui::Field::make(
 			root,
@@ -91,6 +92,7 @@ main(
 	}
 
 	auto hcont2 = ui::Container::make(root, Axis::horizontal);
+	root->push_back(hcont2);
 	hcont2->get_geometry().set_request_size(Vec2{0, 3});
 	hcont2->get_geometry().set_static(true);
 	hcont2->get_geometry().set_sizing(Axis::x, Axis::x);
@@ -111,6 +113,7 @@ main(
 	}
 
 	auto hcont3 = ui::Container::make(root, Axis::horizontal);
+	root->push_back(hcont3);
 	hcont3->get_geometry().set_request_size(Vec2{0, 3});
 	hcont3->get_geometry().set_static(true);
 	hcont3->get_geometry().set_sizing(Axis::x, Axis::x);
@@ -127,11 +130,7 @@ main(
 		}
 	}
 
-	root->push_back(hcont1);
-	root->push_back(hcont2);
-	root->push_back(hcont3);
 	ctx.render(true);
-
 	std::cout << "root: " << root->get_geometry() << '\n';
 	std::cout.flush();
 	for (auto const& s1 : root->get_slots()) {
