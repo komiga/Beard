@@ -98,10 +98,7 @@ private:
 private:
 // ui::Widget::Base implementation
 	void
-	reflow_impl(
-		Rect const& area,
-		bool const cache
-	) noexcept override;
+	reflow_impl() noexcept override;
 
 	bool
 	handle_event_impl(
@@ -144,9 +141,7 @@ private:
 	adjust_view() noexcept;
 
 	void
-	reflow_field(
-		bool const cache
-	) noexcept;
+	reflow_field() noexcept;
 
 public:
 	~TestGrid() noexcept override = default;
@@ -255,11 +250,8 @@ public:
 };
 
 void
-TestGrid::reflow_impl(
-	Rect const& area,
-	bool const cache
-) noexcept {
-	base_type::reflow_impl(area, cache);
+TestGrid::reflow_impl() noexcept {
+	base_type::reflow_impl();
 	Rect view_frame = get_geometry().get_frame();
 	++view_frame.pos.x;
 	++view_frame.pos.y;
@@ -271,7 +263,7 @@ TestGrid::reflow_impl(
 	queue_cell_render(0, get_row_count());
 
 	if (has_input_control()) {
-		reflow_field(cache);
+		reflow_field();
 		m_field->queue_actions(
 			ui::UpdateActions::render
 		);
@@ -305,7 +297,7 @@ TestGrid::handle_event_impl(
 			switch (event.key_input.code) {
 			case KeyCode::enter:
 				set_input_control(true);
-				reflow_field(true);
+				reflow_field();
 				m_field->set_text(m_rows[m_cursor.row][m_cursor.col].value);
 				m_field->handle_event(event);
 				m_field->queue_actions(
@@ -689,9 +681,7 @@ TestGrid::adjust_view() noexcept {
 }
 
 void
-TestGrid::reflow_field(
-	bool const cache
-) noexcept {
+TestGrid::reflow_field() noexcept {
 	auto const& frame = get_view().content_frame;
 	Quad cell_quad{
 		{
@@ -705,10 +695,9 @@ TestGrid::reflow_field(
 	Quad const fq = rect_abs_quad(frame);
 	vec2_clamp(cell_quad.v1, fq.v1, fq.v2);
 	vec2_clamp(cell_quad.v2, fq.v1, fq.v2);
-	m_field->reflow(
-		quad_rect(cell_quad),
-		cache
-	);
+	m_field->get_geometry().set_area(quad_rect(cell_quad));
+	m_field->cache_geometry();
+	m_field->reflow();
 }
 
 void
