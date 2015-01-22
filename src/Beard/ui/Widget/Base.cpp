@@ -117,7 +117,7 @@ void
 Base::update_depth(
 	ui::Widget::SPtr const& parent
 ) noexcept {
-	if (type == ui::Widget::Type::Root) {
+	if (m_type == ui::Widget::Type::Root) {
 		m_depth = -1;
 		return;
 	} else if (parent) {
