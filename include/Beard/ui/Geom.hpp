@@ -41,13 +41,13 @@ private:
 		none		= 0u,
 		static_size	= bit(0u),
 		expand_mask	= enum_cast(Axis::both) << expand_shift,
-		fill_mask	= enum_cast(Axis::both) << fill_shift
+		fill_mask	= enum_cast(Axis::both) << fill_shift,
 	};
 
-	Vec2 m_request_size;
-	Rect m_area;
-	Rect m_frame;
-	duct::StateStore<Flags> m_flags;
+	Vec2 m_request_size{};
+	Rect m_area{};
+	Rect m_frame{};
+	duct::StateStore<Flags> m_flags{};
 
 public:
 /** @name Constructors and destructor */ /// @{
@@ -55,12 +55,7 @@ public:
 	~Geom() noexcept = default;
 
 	/** Default constructor. */
-	Geom() noexcept
-		: m_request_size()
-		, m_area()
-		, m_frame()
-		, m_flags()
-	{}
+	Geom() noexcept = default;
 
 	/**
 		Constructor with request size and modes.
@@ -76,9 +71,7 @@ public:
 		Axis const expand = Axis::none,
 		Axis const fill = Axis::none
 	)
-		: m_request_size(std::move(request_size))
-		, m_area()
-		, m_frame()
+		: m_request_size(request_size)
 		, m_flags(
 			(static_size ? Flags::static_size : Flags::none) |
 			static_cast<Flags>(enum_cast(expand) << expand_shift) |
@@ -98,7 +91,7 @@ public:
 		Axis const expand = Axis::none,
 		Axis const fill = Axis::none
 	)
-		: Geom(Vec2(), static_size, expand, fill)
+		: Geom(Vec2{}, static_size, expand, fill)
 	{}
 
 	/** Copy constructor. */
@@ -124,7 +117,7 @@ public:
 	set_request_size(
 		Vec2 request_size
 	) noexcept {
-		m_request_size = std::move(request_size);
+		m_request_size = request_size;
 	}
 
 	/**
@@ -152,7 +145,7 @@ public:
 	set_area(
 		Rect area
 	) noexcept {
-		m_area = std::move(area);
+		m_area = area;
 	}
 
 	/**
@@ -180,7 +173,7 @@ public:
 	set_frame(
 		Rect frame
 	) noexcept {
-		m_frame = std::move(frame);
+		m_frame = frame;
 	}
 
 	/**
