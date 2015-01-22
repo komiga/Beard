@@ -120,7 +120,7 @@ using unordered_set = std::unordered_set<
 */
 template<
 	class Key,
-	class Compare = std::equal_to<Key>
+	class Compare = std::less<Key>
 >
 using set = std::set<
 	Key, Compare, BEARD_AUX_ALLOCATOR<Key>
