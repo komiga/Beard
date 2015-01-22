@@ -21,6 +21,13 @@ Base::~Base() noexcept = default;
 // implementation
 
 void
+Base::push_action_graph_impl(
+	ui::Widget::set_type& /*set*/
+) noexcept {
+	/* Do nothing. */
+}
+
+void
 Base::set_input_control_impl(
 	bool const enabled
 ) noexcept {
@@ -168,7 +175,7 @@ Base::set_focused(
 
 // operations
 
-constexpr bool
+inline constexpr bool
 is_clearing_render(
 	ui::UpdateActions const actions
 ) noexcept {
@@ -178,28 +185,35 @@ is_clearing_render(
 	;
 }
 
+inline ui::UpdateActions
+join_actions(
+	ui::UpdateActions const x,
+	ui::UpdateActions const y
+) {
+	if (is_clearing_render(x) || is_clearing_render(y)) {
+		return (x | y) & ~ui::UpdateActions::flag_noclear;
+	} else {
+		return x | y;
+	}
+}
+
 void
 Base::queue_actions(
-	ui::UpdateActions const actions
+	ui::UpdateActions actions
 ) {
 	if (enum_cast(actions & ui::UpdateActions::mask_actions)) {
 		if (!is_action_queued()) {
 			get_root()->get_context().enqueue_widget(shared_from_this());
 		}
-
-		auto const current = get_queued_actions();
-		auto new_actions = enum_cast(current) | enum_cast(actions);
-		if (
-			is_clearing_render(current) ||
-			is_clearing_render(actions)
-		) {
-			new_actions &= ~ enum_cast(ui::UpdateActions::flag_noclear);
+		actions = join_actions(actions, get_queued_actions());
+		if (enum_cast(actions & ui::UpdateActions::flag_parent) && has_parent()) {
+			get_parent()->queue_actions(
+				actions & ~ui::UpdateActions::flag_parent
+			);
 		}
 		m_flags.set_masked(
 			mask_ua,
-			static_cast<ui::Widget::Flags>(
-				new_actions << shift_ua
-			)
+			static_cast<ui::Widget::Flags>(enum_cast(actions) << shift_ua)
 		);
 		set_action_queued(true);
 	}
@@ -214,6 +228,22 @@ Base::clear_actions(
 	}
 	m_flags.remove(mask_ua);
 	set_action_queued(false);
+}
+
+void
+Base::push_action_graph(
+	ui::Widget::set_type& set,
+	ui::UpdateActions actions
+) noexcept {
+	actions &= ~ui::UpdateActions::flag_parent;
+	auto const prev_actions = get_queued_actions() & ~ui::UpdateActions::flag_parent;
+	m_flags.set_masked(
+		mask_ua,
+		static_cast<ui::Widget::Flags>(enum_cast(actions) << shift_ua)
+	);
+	if (set.insert(this).second || actions != prev_actions) {
+		push_action_graph_impl(set);
+	}
 }
 
 } // namespace Widget

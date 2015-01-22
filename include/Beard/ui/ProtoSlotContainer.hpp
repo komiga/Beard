@@ -56,17 +56,17 @@ private:
 
 protected:
 	virtual void
+	push_action_graph_impl(
+		ui::Widget::set_type& set
+	) noexcept override;
+
+	virtual void
 	cache_geometry_impl() noexcept override;
 
 	virtual void
 	reflow_impl(
 		Rect const& area,
 		bool const cache
-	) noexcept override;
-
-	virtual void
-	render_impl(
-		ui::Widget::RenderData& rd
 	) noexcept override;
 
 	signed

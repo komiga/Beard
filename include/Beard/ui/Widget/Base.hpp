@@ -114,6 +114,18 @@ protected:
 
 /** @name Implementation */ /// @{
 	/**
+		push_action_graph() implementation.
+
+		%Base definition does nothing. The widget is pushed before
+		this is called. This is not called if the widget was already
+		in the set and the new actions were already queued.
+	*/
+	virtual void
+	push_action_graph_impl(
+		ui::Widget::set_type& set
+	) noexcept;
+
+	/**
 		set_input_control() implementation.
 
 		%Base definition assigns Widget::Flags::input_control.
@@ -597,7 +609,7 @@ public:
 	*/
 	void
 	queue_actions(
-		ui::UpdateActions const actions
+		ui::UpdateActions actions
 	);
 
 	/**
@@ -611,6 +623,18 @@ public:
 	clear_actions(
 		bool const dequeue = true
 	);
+
+	/**
+		Push widget graph to depth-ordered set and set queued actions.
+
+		@note This does not enqueue the widget with the context, nor
+		should push_action_graph_impl().
+	*/
+	void
+	push_action_graph(
+		ui::Widget::set_type& set,
+		ui::UpdateActions actions
+	) noexcept;
 
 	/**
 		Cache dynamic geometry.

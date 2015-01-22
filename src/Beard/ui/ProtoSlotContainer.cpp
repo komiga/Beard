@@ -18,6 +18,28 @@ namespace ui {
 ProtoSlotContainer::~ProtoSlotContainer() noexcept = default;
 
 void
+ProtoSlotContainer::push_action_graph_impl(
+	ui::Widget::set_type& set
+) noexcept {
+	// If we're clearing, there's no reason for children to clear
+	auto push_actions = get_queued_actions();
+	if (
+		ui::UpdateActions::render
+		== (push_actions & (ui::UpdateActions::render | ui::UpdateActions::flag_noclear))
+	) {
+		push_actions |= ui::UpdateActions::flag_noclear;
+	}
+	ui::UpdateActions child_actions;
+	for (auto& slot : m_slots) {
+		if (slot.widget->is_visible()) {
+			child_actions = slot.widget->get_queued_actions();
+			child_actions |= push_actions;
+			slot.widget->push_action_graph(set, child_actions);
+		}
+	}
+}
+
+void
 ProtoSlotContainer::cache_geometry_impl() noexcept {
 	Vec2 rs = get_geometry().get_request_size();
 	rs = {0, 0};
@@ -57,16 +79,6 @@ ProtoSlotContainer::reflow_impl(
 		m_orientation,
 		false
 	);
-}
-
-void
-ProtoSlotContainer::render_impl(
-	ui::Widget::RenderData& rd
-) noexcept {
-	for (auto& slot : m_slots) {
-		rd.update_group(slot.widget->get_group());
-		slot.widget->render(rd);
-	}
 }
 
 signed

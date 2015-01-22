@@ -41,12 +41,14 @@ private:
 	>;
 
 	tty::Terminal m_terminal;
-	ui::Event m_event;
+	ui::Event m_event{};
 
 	ui::PropertyMap m_property_map;
 	ui::group_hash_type m_fallback_group{ui::group_default};
-	action_queue_set_type m_action_queue;
-	ui::RootSPtr m_root;
+	action_queue_set_type m_action_queue{};
+	ui::Widget::set_type m_execution_set{};
+	aux::vector<ui::Widget::Base*> m_execution_set_ordered{};
+	ui::RootSPtr m_root{};
 
 	Context(Context const&) = delete;
 	Context& operator=(Context const&) = delete;
@@ -244,7 +246,7 @@ private:
 	ui::UpdateActions
 	run_actions(
 		ui::Widget::RenderData& rd,
-		ui::Widget::SPtr widget,
+		ui::Widget::Base* widget,
 		ui::UpdateActions const mask
 	);
 

@@ -50,6 +50,13 @@ using SPtr = aux::shared_ptr<ui::Widget::Base>;
 using WPtr = aux::weak_ptr<ui::Widget::Base>;
 
 /**
+	Set of widget pointers.
+*/
+using set_type = aux::unordered_set<
+	ui::Widget::Base*
+>;
+
+/**
 	%Widget type.
 
 	@remarks The range <code>[0x01, 0xFF]</code> is reserved for 

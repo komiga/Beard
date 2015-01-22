@@ -33,10 +33,7 @@ Context::Context(
 	ui::PropertyMap property_map
 )
 	: m_terminal()
-	, m_event()
 	, m_property_map(std::move(property_map))
-	, m_action_queue()
-	, m_root()
 {}
 
 Context::Context(
@@ -44,10 +41,7 @@ Context::Context(
 	ui::PropertyMap property_map
 )
 	: m_terminal(std::move(term_info))
-	, m_event()
 	, m_property_map(std::move(property_map))
-	, m_action_queue()
-	, m_root()
 {}
 
 bool
@@ -69,26 +63,18 @@ Context::push_event(
 ui::UpdateActions
 Context::run_actions(
 	ui::Widget::RenderData& rd,
-	ui::Widget::SPtr widget,
+	ui::Widget::Base* widget,
 	ui::UpdateActions const mask
 ) {
 	auto const actions
 		= widget->get_queued_actions()
 		& (mask | ui::UpdateActions::mask_flags)
 	;
-
-	if (
-		enum_cast(actions & ui::UpdateActions::flag_parent) &&
-		widget->has_parent()
-	) {
-		widget = widget->get_parent();
-	}
 	if (enum_cast(actions & ui::UpdateActions::reflow)) {
 		widget->reflow(
-			(widget == m_root)
-				? Rect{{0, 0}, m_terminal.get_size()}
-				: widget->get_geometry().get_area()
-			,
+			(widget == m_root.get())
+			? Rect{{0, 0}, m_terminal.get_size()}
+			: widget->get_geometry().get_area(),
 			true
 		);
 	}
@@ -104,6 +90,14 @@ Context::run_actions(
 	return actions;
 }
 
+inline static bool
+widget_depth_less(
+	ui::Widget::Base const* const lhs,
+	ui::Widget::Base const* const rhs
+) noexcept {
+	return lhs->get_depth() < rhs->get_depth();
+}
+
 void
 Context::run_all_actions() {
 	ui::Widget::RenderData rd{
@@ -114,25 +108,40 @@ Context::run_all_actions() {
 		m_property_map.cend(),
 		m_property_map.find(m_fallback_group)
 	};
-	auto const root_actions = m_root->get_queued_actions();
 
-	if (enum_cast(root_actions & ui::UpdateActions::reflow)) {
-		run_actions(rd, m_root, ui::UpdateActions::reflow);
-	} else {
-		for (auto wp : m_action_queue) {
-			if (!wp.expired()) {
-				run_actions(rd, wp.lock(), ui::UpdateActions::reflow);
+	for (auto wp : m_action_queue) {
+		if (!wp.expired()) {
+			auto const widget = wp.lock();
+			auto const actions = widget->get_queued_actions();
+			if (
+				enum_cast(actions & ui::UpdateActions::flag_parent) &&
+				widget->has_parent()
+			) {
+				auto parent = widget->get_parent();
+				if (parent->is_action_queued()) {
+					widget->clear_actions(false);
+					parent->queue_actions(actions);
+					continue;
+				}
 			}
+			widget->push_action_graph(m_execution_set, actions);
 		}
 	}
-	if (enum_cast(root_actions & ui::UpdateActions::render)) {
-		run_actions(rd, m_root, ui::UpdateActions::render);
-	} else {
-		for (auto wp : m_action_queue) {
-			if (!wp.expired()) {
-				run_actions(rd, wp.lock(), ui::UpdateActions::render);
-			}
-		}
+
+	for (auto widget : m_execution_set) {
+		m_execution_set_ordered.push_back(widget);
+	}
+	std::sort(
+		m_execution_set_ordered.begin(),
+		m_execution_set_ordered.end(),
+		widget_depth_less
+	);
+
+	for (auto widget : m_execution_set_ordered) {
+		run_actions(rd, widget, ui::UpdateActions::reflow);
+	}
+	for (auto widget : m_execution_set_ordered) {
+		run_actions(rd, widget, ui::UpdateActions::render);
 	}
 	clear_actions();
 }
@@ -156,12 +165,12 @@ Context::dequeue_widget(
 
 void
 Context::clear_actions() {
-	for (auto& wp : m_action_queue) {
-		if (!wp.expired()) {
-			wp.lock()->clear_actions(false);
-		}
+	for (auto widget : m_execution_set) {
+		widget->clear_actions(false);
 	}
 	m_action_queue.clear();
+	m_execution_set.clear();
+	m_execution_set_ordered.clear();
 }
 
 // operations
@@ -226,8 +235,9 @@ Context::update(
 
 void
 Context::reflow() noexcept {
-	Rect const area{{0, 0}, m_terminal.get_size()};
-	m_root->reflow(area, true);
+	m_root->queue_actions(
+		ui::UpdateActions::reflow
+	);
 }
 
 void
