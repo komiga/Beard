@@ -234,13 +234,6 @@ Context::update(
 }
 
 void
-Context::reflow() noexcept {
-	m_root->queue_actions(
-		ui::UpdateActions::reflow
-	);
-}
-
-void
 Context::render(
 	bool const reflow
 ) {

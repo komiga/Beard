@@ -226,12 +226,6 @@ public:
 	);
 
 	/**
-		Reflow root widget.
-	*/
-	void
-	reflow() noexcept;
-
-	/**
 		Render.
 
 		@param reflow Whether to reflow the root widget.
