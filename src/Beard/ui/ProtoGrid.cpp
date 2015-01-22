@@ -341,6 +341,8 @@ ProtoGrid::render_view(
 		bool first = true;
 		while (row < m_view.row_count) {
 			if (row_end == m_view.row_count || m_dirty.rows[row_end].y == 0) {
+				first = true;
+				all = false;
 				if (row == row_end) {
 					row = ++row_end;
 					continue;
@@ -348,12 +350,12 @@ ProtoGrid::render_view(
 			} else {
 				if (!all) {
 					cr_queued = m_dirty.rows[row_end];
-					if (first) {
-						cr = cr_queued;
-						first = false;
-					} else if (cr_queued.x == -1) {
+					if (cr_queued.x == -1) {
 						cr = m_view.col_range;
 						all = true;
+					} else if (first) {
+						cr = cr_queued;
+						first = false;
 					} else {
 						cr.x = value_clamp(min_ce(cr.x, cr_queued.x), m_view.col_range);
 						cr.y = value_clamp(max_ce(cr.y, cr_queued.y), cr.x, m_view.col_range.y);
@@ -380,8 +382,6 @@ ProtoGrid::render_view(
 				Vec2{0, 0}
 			);
 			row = ++row_end;
-			first = true;
-			all = false;
 		}
 	}
 	if (m_view.fit_count > m_view.row_count) {
