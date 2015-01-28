@@ -63,12 +63,12 @@ operator<<(
 ) {
 	return stream
 		<< "{\n"
-		<< "  area  = " << geom.get_area() << ",\n"
-		<< "  frame = " << geom.get_frame() << ",\n"
-		<< "  request_size = " << geom.get_request_size() << ",\n"
+		<< "  area  = " << geom.area() << ",\n"
+		<< "  frame = " << geom.frame() << ",\n"
+		<< "  request_size = " << geom.request_size() << ",\n"
 		<< std::boolalpha
-		<< "  expand = " << geom.get_expand() << ",\n"
-		<< "  fill   = " << geom.get_fill()
+		<< "  expand = " << geom.expand() << ",\n"
+		<< "  fill   = " << geom.fill()
 		<< "\n}"
 	;
 }
@@ -78,8 +78,8 @@ report_error(
 	Beard::Error const& e
 ) {
 	std::cerr
-		<< '[' << Beard::get_error_name(e.get_code()) << ']'
-		<< '\n' << e.get_message()
+		<< '[' << Beard::get_error_name(e.code()) << ']'
+		<< '\n' << e.message()
 		<< '\n'
 	<< std::endl;
 }
@@ -123,7 +123,7 @@ context_update(
 	unsigned const timeout_ms = 10u
 ) {
 	if (!context.update(timeout_ms)) {
-		auto const& event = context.get_last_event();
+		auto const& event = context.last_event();
 		if (Beard::ui::EventType::key_input == event.type) {
 			if (Beard::key_input_match(event.key_input, s_kim_c)) {
 				return false;

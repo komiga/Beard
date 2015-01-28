@@ -28,16 +28,16 @@ add_button(
 ) {
 	if (root->has_focus()) {
 		container = std::static_pointer_cast<ui::ProtoSlotContainer>(
-			root->get_focus()->get_parent()
+			root->focused_widget()->parent()
 		);
 	}
 	auto button = ui::Button::make(root, std::move(label));
-	button->get_geometry().set_sizing(Axis::both, Axis::both);
+	button->geometry().set_sizing(Axis::both, Axis::both);
 	if (no_container) {
 		container->push_back(std::move(button));
 	} else {
 		auto const button_container = ui::Container::make(root, orientation);
-		button_container->get_geometry().set_sizing(Axis::both, Axis::both);
+		button_container->geometry().set_sizing(Axis::both, Axis::both);
 		button_container->push_back(std::move(button));
 		container->push_back(std::move(button_container));
 	}
@@ -48,11 +48,11 @@ remove_widget(
 	ui::RootSPtr const& root
 ) {
 	if (root->has_focus()) {
-		auto const focus = root->get_focus();
+		auto const focus = root->focused_widget();
 		auto const container = std::static_pointer_cast<ui::ProtoSlotContainer>(
-			focus->get_parent()
+			focus->parent()
 		);
-		container->remove(focus->get_index());
+		container->remove(focus->index());
 	}
 }
 
@@ -70,10 +70,10 @@ main(
 	}
 
 	ui::Context ctx;
-	tty::Terminal& term = ctx.get_terminal();
+	tty::Terminal& term = ctx.terminal();
 
 	char const* const info_path = argv[1];
-	if (!load_term_info(term.get_info(), info_path)) {
+	if (!load_term_info(term.info(), info_path)) {
 		return -2;
 	}
 	term.update_cache();
@@ -98,7 +98,7 @@ main(
 	ctx.set_root(root);
 
 	auto const hcont = ui::Container::make(root, Axis::horizontal);
-	hcont->get_geometry().set_sizing(Axis::both, Axis::both);
+	hcont->geometry().set_sizing(Axis::both, Axis::both);
 	root->push_back(hcont);
 
 	ctx.render(true);
@@ -107,7 +107,7 @@ main(
 		if (ctx.update(15u)) {
 			continue;
 		}
-		auto const& event = ctx.get_last_event();
+		auto const& event = ctx.last_event();
 		if (ui::EventType::key_input != event.type) {
 			continue;
 		} else if (key_input_match(event.key_input, s_kim_c)) {

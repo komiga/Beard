@@ -82,7 +82,7 @@ main(
 	Beard::tty::Terminal term{};
 
 	char const* const info_path = argv[1];
-	if (!load_term_info(term.get_info(), info_path)) {
+	if (!load_term_info(term.info(), info_path)) {
 		return -2;
 	}
 
@@ -113,9 +113,9 @@ main(
 
 	std::cout
 		<< "size: "
-		<< term.get_width()
+		<< term.width()
 		<< " x "
-		<< term.get_height()
+		<< term.height()
 		<< '\n'
 	;
 
@@ -134,8 +134,8 @@ main(
 				<< ev.resize.old_size.width << " x "
 				<< ev.resize.old_size.height
 				<< " to "
-				<< term.get_width() << " x "
-				<< term.get_height()
+				<< term.width() << " x "
+				<< term.height()
 				<< std::endl
 			;
 			render(term);

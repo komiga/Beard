@@ -22,7 +22,7 @@ cout_flag(
 	CapFlag const cap,
 	char const name[]
 ) {
-	auto const value = term_info.get_cap_flag(cap);
+	auto const value = term_info.cap_flag(cap);
 	if (value) {
 		std::cout
 			<< name
@@ -38,7 +38,7 @@ cout_number(
 	CapNumber const cap,
 	char const name[]
 ) {
-	auto const value = term_info.get_cap_number(cap);
+	auto const value = term_info.cap_number(cap);
 	if (Beard::tty::CAP_NUMBER_NOT_SUPPORTED != value) {
 		std::cout
 			<< name
@@ -101,8 +101,8 @@ main(
 		return -2;
 	}
 
-	std::cout << "names (" << term_info.get_names().size() << "):\n";
-	for (auto const& name : term_info.get_names()) {
+	std::cout << "names (" << term_info.names().size() << "):\n";
+	for (auto const& name : term_info.names()) {
 		std::cout << "  '" << name << "'\n";
 	}
 
@@ -110,7 +110,7 @@ main(
 	std::cout << '\n';
 	std::cout
 		<< std::boolalpha
-		<< "flags (" << term_info.get_cap_flag_count() << "):\n"
+		<< "flags (" << term_info.cap_flag_count() << "):\n"
 	;
 
 	BEARD_TEST_TTY_CAP_FLAG__(auto_right_margin);
@@ -163,7 +163,7 @@ main(
 	std::cout << '\n';
 	std::cout
 		<< std::boolalpha
-		<< "numbers (" << term_info.get_cap_number_count() << "):\n"
+		<< "numbers (" << term_info.cap_number_count() << "):\n"
 	;
 
 	BEARD_TEST_TTY_CAP_NUMBER__(columns);
@@ -210,7 +210,7 @@ main(
 	std::cout << '\n';
 	std::cout
 		<< std::boolalpha
-		<< "strings (" << term_info.get_cap_string_count() << "):\n"
+		<< "strings (" << term_info.cap_string_count() << "):\n"
 	;
 
 	if (!print_strings) {

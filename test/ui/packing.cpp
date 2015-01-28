@@ -37,10 +37,10 @@ main(
 	}
 
 	ui::Context ctx;
-	tty::Terminal& term = ctx.get_terminal();
+	tty::Terminal& term = ctx.terminal();
 
 	char const* const info_path = argv[1];
-	if (!load_term_info(term.get_info(), info_path)) {
+	if (!load_term_info(term.info(), info_path)) {
 		return -2;
 	}
 	term.update_cache();
@@ -72,17 +72,17 @@ main(
 			""
 		);
 		field->set_text("X_111_222_333_444_555_666_777_888_999_Y");
-		field->get_geometry().set_sizing(Axis::both, Axis::horizontal);
+		field->geometry().set_sizing(Axis::both, Axis::horizontal);
 		hcont1->push_back(std::move(field));
 
 		hcont1->push_back(ui::Label::make(root, "abacabadabacaba"));
 
 		auto button = ui::Button::make(root, "xyzzyzzyx");
-		button->get_geometry().set_sizing(Axis::both, Axis::both);
+		button->geometry().set_sizing(Axis::both, Axis::both);
 		button->signal_pressed.bind([](
 			ui::Button::SPtr b
 		) {
-			if ('x' == b->get_text()[0u]) {
+			if ('x' == b->text()[0u]) {
 				b->set_text("blblblblblblblblblbl");
 			} else {
 				b->set_text("xyzzyzzyx");
@@ -93,9 +93,9 @@ main(
 
 	auto hcont2 = ui::Container::make(root, Axis::horizontal);
 	root->push_back(hcont2);
-	hcont2->get_geometry().set_request_size(Vec2{0, 3});
-	hcont2->get_geometry().set_static(true);
-	hcont2->get_geometry().set_sizing(Axis::x, Axis::x);
+	hcont2->geometry().set_request_size(Vec2{0, 3});
+	hcont2->geometry().set_static(true);
+	hcont2->geometry().set_sizing(Axis::x, Axis::x);
 	{
 		hcont2->push_back(ui::Field::make(root, "hi I am a field"));
 		hcont2->push_back(ui::Spacer::make(root));
@@ -103,9 +103,9 @@ main(
 			root,
 			"that is not a field, I am a field!"
 		));
-		for (auto& s : hcont2->get_slots()) {
+		for (auto& s : hcont2->slots()) {
 			if (s.widget) {
-				s.widget->get_geometry().set_sizing(
+				s.widget->geometry().set_sizing(
 					Axis::both, Axis::horizontal
 				);
 			}
@@ -114,33 +114,33 @@ main(
 
 	auto hcont3 = ui::Container::make(root, Axis::horizontal);
 	root->push_back(hcont3);
-	hcont3->get_geometry().set_request_size(Vec2{0, 3});
-	hcont3->get_geometry().set_static(true);
-	hcont3->get_geometry().set_sizing(Axis::x, Axis::x);
+	hcont3->geometry().set_request_size(Vec2{0, 3});
+	hcont3->geometry().set_static(true);
+	hcont3->geometry().set_sizing(Axis::x, Axis::x);
 	{
 		hcont3->push_back(ui::Button::make(root, "aaa"));
 		hcont3->push_back(ui::Button::make(root, "bbb"));
 		hcont3->push_back(ui::Spacer::make(root));
 		hcont3->push_back(ui::Button::make(root, "ccc"));
 		hcont3->push_back(ui::Button::make(root, "ddd"));
-		for (auto& s : hcont3->get_slots()) {
+		for (auto& s : hcont3->slots()) {
 			if (s.widget) {
-				s.widget->get_geometry().set_sizing(Axis::both, Axis::none);
+				s.widget->geometry().set_sizing(Axis::both, Axis::none);
 			}
 		}
 	}
 
 	ctx.render(true);
-	std::cout << "root: " << root->get_geometry() << '\n';
+	std::cout << "root: " << root->geometry() << '\n';
 	std::cout.flush();
-	for (auto const& s1 : root->get_slots()) {
-		std::cout << "top-level child: " << s1.widget->get_geometry() << '\n';
+	for (auto const& s1 : root->slots()) {
+		std::cout << "top-level child: " << s1.widget->geometry() << '\n';
 		for (
 			auto const& s2
-			: std::static_pointer_cast<ui::Container>(s1.widget)->get_slots()
+			: std::static_pointer_cast<ui::Container>(s1.widget)->slots()
 		) {
 			if (s2.widget) {
-				std::cout << "inner child: " << s2.widget->get_geometry() << '\n';
+				std::cout << "inner child: " << s2.widget->geometry() << '\n';
 			}
 		}
 	}

@@ -142,7 +142,7 @@ KeyInspector::handle_event_impl(
 		return false;
 	}
 	m_kid = event.key_input;
-	queue_actions(ui::UpdateActions::render);
+	enqueue_actions(ui::UpdateActions::render);
 	return true;
 }
 
@@ -153,17 +153,17 @@ void
 KeyInspector::render_impl(
 	ui::Widget::RenderData& rd
 ) noexcept {
-	auto const& frame = get_geometry().get_frame();
+	auto const& frame = geometry().frame();
 
 	bool const has_alt = enum_cast(m_kid.mod & KeyMod::esc);
 	bool const has_ctrl = enum_cast(m_kid.mod & KeyMod::ctrl);
 	bool const has_shift = enum_cast(m_kid.mod & KeyMod::shift);
 
 	tty::attr_type const
-		inactive_fg = rd.get_attr(ui::property_content_fg_inactive),
-		inactive_bg = rd.get_attr(ui::property_content_bg_inactive),
-		active_fg = rd.get_attr(ui::property_content_fg_selected),
-		active_bg = rd.get_attr(ui::property_content_bg_selected)
+		inactive_fg = rd.attr(ui::property_content_fg_inactive),
+		inactive_bg = rd.attr(ui::property_content_bg_inactive),
+		active_fg = rd.attr(ui::property_content_fg_selected),
+		active_bg = rd.attr(ui::property_content_bg_selected)
 	;
 
 	rd.terminal.put_sequence(
@@ -226,10 +226,10 @@ main(
 	}
 
 	ui::Context ctx;
-	tty::Terminal& term = ctx.get_terminal();
+	tty::Terminal& term = ctx.terminal();
 
 	char const* const info_path = argv[1];
-	if (!load_term_info(term.get_info(), info_path)) {
+	if (!load_term_info(term.info(), info_path)) {
 		return -2;
 	}
 	term.update_cache();
@@ -257,13 +257,13 @@ main(
 	root->push_back(key_inspector);
 	root->set_focus(key_inspector);
 
-	auto& pmap = ctx.get_property_map().find(ui::group_default)->second;
+	auto& pmap = ctx.property_map().find(ui::group_default)->second;
 	pmap.find(ui::property_frame_debug_enabled)->second.set_boolean(false);
 
 	ctx.render(true);
 	while (true) {
 		ctx.update(15u);
-		auto const& event = ctx.get_last_event();
+		auto const& event = ctx.last_event();
 		if (ui::EventType::key_input != event.type) {
 			continue;
 		} else if (key_input_match(event.key_input, s_kim_c)) {

@@ -193,13 +193,13 @@ public:
 			row_count
 		);
 		p->m_field = ui::Field::make(
-			p->get_root(),
+			p->root(),
 			{},
 			nullptr,
 			ui::group_field/*,
 			p*/
 		);
-		p->m_field->get_geometry().set_sizing(Axis::x, Axis::x);
+		p->m_field->geometry().set_sizing(Axis::x, Axis::x);
 		p->m_field->set_focused(true);
 		p->m_field->clear_actions();
 		return p;
@@ -210,7 +210,7 @@ public:
 
 public:
 	row_vector_type&
-	get_rows() noexcept {
+	rows() noexcept {
 		return m_rows;
 	}
 
@@ -252,7 +252,7 @@ public:
 void
 TestGrid::reflow_impl() noexcept {
 	base_type::reflow_impl();
-	Rect view_frame = get_geometry().get_frame();
+	Rect view_frame = geometry().frame();
 	++view_frame.pos.x;
 	++view_frame.pos.y;
 	view_frame.size.width -= 2;
@@ -260,11 +260,11 @@ TestGrid::reflow_impl() noexcept {
 	reflow_view(view_frame);
 	adjust_view();
 	queue_header_render();
-	queue_cell_render(0, get_row_count());
+	queue_cell_render(0, row_count());
 
 	if (has_input_control()) {
 		reflow_field();
-		m_field->queue_actions(
+		m_field->enqueue_actions(
 			ui::UpdateActions::render
 		);
 	}
@@ -280,13 +280,13 @@ TestGrid::handle_event_impl(
 			bool const handled = m_field->handle_event(event);
 			if (handled && !m_field->has_input_control()) {
 				set_input_control(false);
-				m_rows[m_cursor.row][m_cursor.col].value = m_field->get_text();
+				m_rows[m_cursor.row][m_cursor.col].value = m_field->text();
 				m_field->clear_actions();
 				queue_cell_render(
 					m_cursor.row, m_cursor.row + 1,
 					m_cursor.col, m_cursor.col + 1
 				);
-				queue_actions(
+				enqueue_actions(
 					ui::UpdateActions::render |
 					ui::UpdateActions::flag_noclear
 				);
@@ -300,7 +300,7 @@ TestGrid::handle_event_impl(
 				reflow_field();
 				m_field->set_text(m_rows[m_cursor.row][m_cursor.col].value);
 				m_field->handle_event(event);
-				m_field->queue_actions(
+				m_field->enqueue_actions(
 					ui::UpdateActions::render
 				);
 				break;
@@ -310,15 +310,15 @@ TestGrid::handle_event_impl(
 			case KeyCode::left : col_step(-1); break;
 			case KeyCode::right: col_step(+1); break;
 			case KeyCode::home: row_abs(0); break;
-			case KeyCode::end : row_abs(max_ce(0, get_row_count() - 1)); break;
+			case KeyCode::end : row_abs(max_ce(0, row_count() - 1)); break;
 			case KeyCode::pgup:
-				row_step(min_ce(0, -get_view().fit_count - 1)); break;
+				row_step(min_ce(0, -view().fit_count - 1)); break;
 			case KeyCode::pgdn:
-				row_step(max_ce(0, +get_view().fit_count - 1)); break;
+				row_step(max_ce(0, +view().fit_count - 1)); break;
 
 			case KeyCode::f1:
 				set_header_enabled(!is_header_enabled());
-				queue_actions(
+				enqueue_actions(
 					ui::UpdateActions::reflow |
 					ui::UpdateActions::render
 				);
@@ -367,7 +367,7 @@ TestGrid::render_impl(
 	/*DUCT_DEBUGF(
 		"clearing render: %d",
 		signed{!enum_cast(
-			get_queued_actions() &
+			queued_actions() &
 			ui::UpdateActions::flag_noclear
 		)}
 	);*/
@@ -377,18 +377,18 @@ TestGrid::render_impl(
 		is_focused(),
 		is_focused()
 	};
-	auto const& view = get_view();
+	auto const& view = this->view();
 
 	render_view(
 		grid_rd,
 		!enum_cast(
-			get_queued_actions() &
+			queued_actions() &
 			ui::UpdateActions::flag_noclear
 		)
 	);
 
 	if (has_input_control()) {
-		grid_rd.rd.update_group(m_field->get_group());
+		grid_rd.rd.update_group(m_field->group());
 		m_field->render(grid_rd.rd);
 	}
 
@@ -422,8 +422,8 @@ TestGrid::content_action(
 	if (ContentAction::insert_after == action) {
 		++row_begin;
 	}
-	row_begin = value_clamp(row_begin, 0, get_row_count());
-	auto const row_end = min_ce(row_begin + count, get_row_count());
+	row_begin = value_clamp(row_begin, 0, row_count());
+	auto const row_end = min_ce(row_begin + count, row_count());
 	auto clear_flag = ui::UpdateActions::none;
 	switch (action) {
 	// Select
@@ -464,14 +464,14 @@ TestGrid::content_action(
 		m_rows.insert(
 			m_rows.begin() + row_begin,
 			static_cast<std::size_t>(count),
-			Row{static_cast<std::size_t>(get_col_count())}
+			Row{static_cast<std::size_t>(col_count())}
 		);
 		content_action_internal(
 			ContentAction::insert_before,
 			row_begin,
 			count
 		);
-		if (1 == get_row_count()) {
+		if (1 == row_count()) {
 			set_cursor(m_cursor.col, 0);
 		} else if (row_begin <= m_cursor.row) {
 			set_cursor(m_cursor.col, m_cursor.row + count);
@@ -501,9 +501,9 @@ TestGrid::content_action(
 			tail = head,
 			rcount = 0
 		;
-		for (; get_row_count() >= tail;) {
+		for (; row_count() >= tail;) {
 			if (
-				get_row_count() == tail ||
+				row_count() == tail ||
 				!m_rows[tail].states.test(Row::Flags::selected)
 			) {
 				if (tail > head) {
@@ -537,7 +537,7 @@ TestGrid::content_action(
 	case ContentAction::erase_selected:
 		// Let cursor clamp to new bounds
 		set_cursor(m_cursor.col, m_cursor.row);
-		if (0 < get_row_count()) {
+		if (0 < row_count()) {
 			// Set focused flag in case set_cursor() did nothing
 			m_rows[m_cursor.row][m_cursor.col].states.enable(
 				Column::Flags::focused
@@ -550,7 +550,7 @@ TestGrid::content_action(
 		break;
 	}
 
-	queue_actions(
+	enqueue_actions(
 		ui::UpdateActions::render |
 		clear_flag
 	);
@@ -601,7 +601,7 @@ TestGrid::render_content(
 		"render_content: row = %3d, col_range = {%3d, %3d}"
 		", view.col_range = {%3d, %3d}, pos = {%3d, %3d}",
 		row, col_begin, col_end,
-		get_view().col_range.x, get_view().col_range.y,
+		view().col_range.x, view().col_range.y,
 		frame.pos.x, frame.pos.y
 	);*/
 
@@ -609,7 +609,7 @@ TestGrid::render_content(
 	Rect cell_frame = frame;
 	cell_frame.size.height = 1;
 	/*auto const end
-		= get_col_count() < col_end
+		= col_count() < col_end
 		? r.columns.cend()
 		: r.columns.cbegin() + col_end
 	;*/
@@ -658,7 +658,7 @@ TestGrid::render_content(
 
 void
 TestGrid::adjust_view() noexcept {
-	auto const& view = get_view();
+	auto const& view = this->view();
 	if (
 		view.row_range.x >  m_cursor.row ||
 		view.row_range.y <= m_cursor.row ||
@@ -673,20 +673,20 @@ TestGrid::adjust_view() noexcept {
 			row_begin,
 			row_begin + view.fit_count,
 			0,
-			get_col_count(),
+			col_count(),
 			true
 		);
-		queue_actions(ui::UpdateActions::render);
+		enqueue_actions(ui::UpdateActions::render);
 	}
 }
 
 void
 TestGrid::reflow_field() noexcept {
-	auto const& frame = get_view().content_frame;
+	auto const& frame = view().content_frame;
 	Quad cell_quad{
 		{
 			frame.pos.x + (m_cursor.col * 10),
-			frame.pos.y + m_cursor.row - get_view().row_range.x
+			frame.pos.y + m_cursor.row - view().row_range.x
 		},
 		{0, 0}
 	};
@@ -695,7 +695,7 @@ TestGrid::reflow_field() noexcept {
 	Quad const fq = rect_abs_quad(frame);
 	vec2_clamp(cell_quad.v1, fq.v1, fq.v2);
 	vec2_clamp(cell_quad.v2, fq.v1, fq.v2);
-	m_field->get_geometry().set_area(quad_rect(cell_quad));
+	m_field->geometry().set_area(quad_rect(cell_quad));
 	m_field->cache_geometry();
 	m_field->reflow();
 }
@@ -705,12 +705,12 @@ TestGrid::set_cursor(
 	ui::index_type col,
 	ui::index_type row
 ) noexcept {
-	col = value_clamp(col, 0, max_ce(0, get_col_count() - 1));
-	row = value_clamp(row, 0, max_ce(0, get_row_count() - 1));
+	col = value_clamp(col, 0, max_ce(0, col_count() - 1));
+	row = value_clamp(row, 0, max_ce(0, row_count() - 1));
 	if (col != m_cursor.col || row != m_cursor.row) {
 		if (
-			value_in_bounds(m_cursor.row, 0, get_row_count()) &&
-			value_in_bounds(m_cursor.col, 0, get_col_count())
+			value_in_bounds(m_cursor.row, 0, row_count()) &&
+			value_in_bounds(m_cursor.col, 0, col_count())
 		) {
 			m_rows[m_cursor.row][m_cursor.col].states.disable(
 				Column::Flags::focused
@@ -729,7 +729,7 @@ TestGrid::set_cursor(
 				col, col + 1
 			);
 		}
-		queue_actions(
+		enqueue_actions(
 			ui::UpdateActions::render |
 			ui::UpdateActions::flag_noclear
 		);
@@ -753,10 +753,10 @@ main(
 	}
 
 	ui::Context ctx;
-	tty::Terminal& term = ctx.get_terminal();
+	tty::Terminal& term = ctx.terminal();
 
 	char const* const info_path = argv[1];
-	if (!load_term_info(term.get_info(), info_path)) {
+	if (!load_term_info(term.info(), info_path)) {
 		return -2;
 	}
 	term.update_cache();
@@ -781,7 +781,7 @@ main(
 
 	auto grid = TestGrid::make(root, 16, 120);
 	signed row = 0, col = 0;
-	for (auto& r : grid->get_rows()) {
+	for (auto& r : grid->rows()) {
 		auto const row_str = std::to_string(row);
 		for (auto& c : r.columns) {
 			c.value = std::to_string(col) + " , " + row_str;
