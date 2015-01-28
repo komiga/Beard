@@ -52,7 +52,7 @@ public:
 		Get the default property group.
 	*/
 	static ui::PropertyGroup&
-	get_default() noexcept {
+	default_group() noexcept {
 		extern ui::PropertyGroup s_default_group;
 		return s_default_group;
 	}
@@ -65,7 +65,7 @@ private:
 	map_type m_values;
 
 	PropertyValue*
-	get_property(
+	property(
 		ui::property_hash_type const name
 	) {
 		if (ui::property_null == name) {
@@ -80,7 +80,7 @@ private:
 	}
 
 	PropertyValue const*
-	get_property(
+	property(
 		ui::property_hash_type const name
 	) const {
 		if (ui::property_null == name) {

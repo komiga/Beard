@@ -29,7 +29,6 @@ namespace Widget {
 // Forward declarations
 class Base; // external
 enum class Type : unsigned;
-struct type_info;
 enum class Flags : unsigned;
 struct Slot;
 struct RenderData;
@@ -124,7 +123,7 @@ enum class Flags : unsigned {
 		Containers must implement the following functions:
 
 		- ui::Widget::Base::num_children_impl()
-		- ui::Widget::Base::get_child_impl()
+		- ui::Widget::Base::child_at_impl()
 	*/
 	trait_container	= bit(1u),
 
@@ -217,13 +216,13 @@ struct RenderData final {
 	}
 
 	/**
-		See ui::PropertyMap::get_number().
+		See ui::PropertyMap::number().
 	*/
 	ui::property_number_type
-	get_number(
+	number(
 		ui::property_hash_type const name
 	) const {
-		return this->property_map.get_number(
+		return this->property_map.number(
 			name,
 			this->it_group,
 			this->it_fallback
@@ -231,13 +230,13 @@ struct RenderData final {
 	}
 
 	/**
-		See ui::PropertyMap::get_attr().
+		See ui::PropertyMap::attr().
 	*/
 	ui::property_attr_type
-	get_attr(
+	attr(
 		ui::property_hash_type const name
 	) const {
-		return this->property_map.get_attr(
+		return this->property_map.attr(
 			name,
 			this->it_group,
 			this->it_fallback
@@ -245,13 +244,13 @@ struct RenderData final {
 	}
 
 	/**
-		See ui::PropertyMap::get_boolean().
+		See ui::PropertyMap::boolean().
 	*/
 	ui::property_boolean_type
-	get_boolean(
+	boolean(
 		ui::property_hash_type const name
 	) const {
-		return this->property_map.get_boolean(
+		return this->property_map.boolean(
 			name,
 			this->it_group,
 			this->it_fallback
@@ -259,13 +258,13 @@ struct RenderData final {
 	}
 
 	/**
-		See ui::PropertyMap::get_boolean().
+		See ui::PropertyMap::boolean().
 	*/
 	ui::property_string_type const&
-	get_string(
+	string(
 		ui::property_hash_type const name
 	) const {
-		return this->property_map.get_string(
+		return this->property_map.string(
 			name,
 			this->it_group,
 			this->it_fallback

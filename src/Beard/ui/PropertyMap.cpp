@@ -15,7 +15,7 @@ namespace ui {
 #define BEARD_SCOPE_CLASS ui::PropertyMap
 
 PropertyValue const*
-PropertyMap::get_property(
+PropertyMap::property(
 	ui::property_hash_type const name,
 	const_iterator group,
 	const_iterator fallback
@@ -32,9 +32,9 @@ PropertyMap::get_property(
 	if (cend() == group) {
 		return nullptr;
 	} else {
-		auto const pv = group->second.get_property(name);
+		auto const pv = group->second.property(name);
 		return (!pv && cend() != fallback)
-			? fallback->second.get_property(name)
+			? fallback->second.property(name)
 			: pv
 		;
 	}
@@ -49,16 +49,16 @@ BEARD_DEF_FMT_FQN(
 );
 } // anonymous namespace
 
-#define BEARD_SCOPE_FUNC get_number
+#define BEARD_SCOPE_FUNC number
 ui::property_number_type
-PropertyMap::get_number(
+PropertyMap::number(
 	ui::property_hash_type const name,
 	const_iterator group,
 	const_iterator fallback
 ) const {
-	auto const pv = get_property(name, group, fallback);
+	auto const pv = property(name, group, fallback);
 	if (pv && pv->is_type(ui::PropertyType::number)) {
-		return pv->get_number();
+		return pv->number();
 	} else {
 		BEARD_THROW_FMT(
 			ErrorCode::ui_property_not_found,
@@ -69,16 +69,16 @@ PropertyMap::get_number(
 }
 #undef BEARD_SCOPE_FUNC
 
-#define BEARD_SCOPE_FUNC get_attr
+#define BEARD_SCOPE_FUNC attr
 ui::property_attr_type
-PropertyMap::get_attr(
+PropertyMap::attr(
 	ui::property_hash_type const name,
 	const_iterator group,
 	const_iterator fallback
 ) const {
-	auto const pv = get_property(name, group, fallback);
+	auto const pv = property(name, group, fallback);
 	if (pv && pv->is_type(ui::PropertyType::attr)) {
-		return pv->get_attr();
+		return pv->attr();
 	} else {
 		BEARD_THROW_FMT(
 			ErrorCode::ui_property_not_found,
@@ -89,16 +89,16 @@ PropertyMap::get_attr(
 }
 #undef BEARD_SCOPE_FUNC
 
-#define BEARD_SCOPE_FUNC get_boolean
+#define BEARD_SCOPE_FUNC boolean
 ui::property_boolean_type
-PropertyMap::get_boolean(
+PropertyMap::boolean(
 	ui::property_hash_type const name,
 	const_iterator group,
 	const_iterator fallback
 ) const {
-	auto const pv = get_property(name, group, fallback);
+	auto const pv = property(name, group, fallback);
 	if (pv && pv->is_type(ui::PropertyType::boolean)) {
-		return pv->get_boolean();
+		return pv->boolean();
 	} else {
 		BEARD_THROW_FMT(
 			ErrorCode::ui_property_not_found,
@@ -109,16 +109,16 @@ PropertyMap::get_boolean(
 }
 #undef BEARD_SCOPE_FUNC
 
-#define BEARD_SCOPE_FUNC get_string
+#define BEARD_SCOPE_FUNC string
 ui::property_string_type const&
-PropertyMap::get_string(
+PropertyMap::string(
 	ui::property_hash_type const name,
 	const_iterator group,
 	const_iterator fallback
 ) const {
-	auto const pv = get_property(name, group, fallback);
+	auto const pv = property(name, group, fallback);
 	if (pv && pv->is_type(ui::PropertyType::string)) {
-		return pv->get_string();
+		return pv->string();
 	} else {
 		BEARD_THROW_FMT(
 			ErrorCode::ui_property_not_found,

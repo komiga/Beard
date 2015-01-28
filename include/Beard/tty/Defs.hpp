@@ -201,7 +201,7 @@ struct Event final {
 	/**
 		%Event data for tty::EventType::resize.
 
-		@sa tty::Terminal::get_size()
+		@sa tty::Terminal::size()
 	*/
 	struct {
 		/** Old size of terminal. */

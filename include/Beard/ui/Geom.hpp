@@ -124,7 +124,7 @@ public:
 		Get request size (mutable).
 	*/
 	Vec2&
-	get_request_size() noexcept {
+	request_size() noexcept {
 		return m_request_size;
 	}
 
@@ -132,7 +132,7 @@ public:
 		Get request size.
 	*/
 	Vec2 const&
-	get_request_size() const noexcept {
+	request_size() const noexcept {
 		return m_request_size;
 	}
 
@@ -152,7 +152,7 @@ public:
 		Get area (mutable).
 	*/
 	Rect&
-	get_area() noexcept {
+	area() noexcept {
 		return m_area;
 	}
 
@@ -160,7 +160,7 @@ public:
 		Get area.
 	*/
 	Rect const&
-	get_area() const noexcept {
+	area() const noexcept {
 		return m_area;
 	}
 
@@ -180,7 +180,7 @@ public:
 		Get frame (mutable).
 	*/
 	Rect&
-	get_frame() noexcept {
+	frame() noexcept {
 		return m_frame;
 	}
 
@@ -188,7 +188,7 @@ public:
 		Get frame.
 	*/
 	Rect const&
-	get_frame() const noexcept {
+	frame() const noexcept {
 		return m_frame;
 	}
 
@@ -247,9 +247,9 @@ public:
 		Get expand axes.
 	*/
 	Axis
-	get_expand() const noexcept {
+	expand() const noexcept {
 		return static_cast<Axis>(
-			enum_cast(m_flags.get_states(Flags::expand_mask)) >> expand_shift
+			enum_cast(m_flags.states(Flags::expand_mask)) >> expand_shift
 		);
 	}
 
@@ -266,8 +266,8 @@ public:
 	) const noexcept {
 		return
 			equal
-			? axes == get_expand()
-			: enum_cast(axes) & enum_cast(get_expand())
+			? axes == expand()
+			: enum_cast(axes) & enum_cast(expand())
 		;
 	}
 
@@ -290,9 +290,9 @@ public:
 		Get fill axes.
 	*/
 	Axis
-	get_fill() const noexcept {
+	fill() const noexcept {
 		return static_cast<Axis>(
-			enum_cast(m_flags.get_states(Flags::fill_mask)) >> fill_shift
+			enum_cast(m_flags.states(Flags::fill_mask)) >> fill_shift
 		);
 	}
 
@@ -310,8 +310,8 @@ public:
 	) const noexcept {
 		return
 			equal
-			? axes == get_fill()
-			: enum_cast(axes) & enum_cast(get_fill())
+			? axes == fill()
+			: enum_cast(axes) & enum_cast(fill())
 		;
 	}
 

@@ -88,28 +88,28 @@ struct GridRenderData final {
 		bool const content_active
 	) noexcept
 		: rd(rd)
-		, primary_fg(rd.get_attr(
+		, primary_fg(rd.attr(
 			primary_active
 			? ui::property_primary_fg_active
 			: ui::property_primary_fg_inactive
 		))
-		, primary_bg(rd.get_attr(
+		, primary_bg(rd.attr(
 			primary_active
 			? ui::property_primary_bg_active
 			: ui::property_primary_bg_inactive
 		))
-		, content_fg(rd.get_attr(
+		, content_fg(rd.attr(
 			content_active
 			? ui::property_content_fg_active
 			: ui::property_content_fg_inactive
 		))
-		, content_bg(rd.get_attr(
+		, content_bg(rd.attr(
 			content_active
 			? ui::property_content_bg_active
 			: ui::property_content_bg_inactive
 		))
-		, selected_fg(rd.get_attr(ui::property_content_fg_selected))
-		, selected_bg(rd.get_attr(ui::property_content_bg_selected))
+		, selected_fg(rd.attr(ui::property_content_fg_selected))
+		, selected_bg(rd.attr(ui::property_content_bg_selected))
 	{}
 };
 
@@ -192,7 +192,7 @@ protected:
 		Get view (mutable).
 	*/
 	GridView&
-	get_view() noexcept {
+	view() noexcept {
 		return m_view;
 	}
 
@@ -450,7 +450,7 @@ public:
 		Get the number of columns.
 	*/
 	ui::index_type
-	get_col_count() const noexcept {
+	col_count() const noexcept {
 		return m_col_count;
 	}
 
@@ -458,7 +458,7 @@ public:
 		Get the number of rows.
 	*/
 	ui::index_type
-	get_row_count() const noexcept {
+	row_count() const noexcept {
 		return m_row_count;
 	}
 
@@ -466,7 +466,7 @@ public:
 		Get view.
 	*/
 	GridView const&
-	get_view() const noexcept {
+	view() const noexcept {
 		return m_view;
 	}
 /// @}
@@ -477,7 +477,7 @@ public:
 	*/
 	void
 	select_none() noexcept {
-		content_action(ContentAction::unselect, 0, get_row_count());
+		content_action(ContentAction::unselect, 0, row_count());
 	}
 
 	/**
@@ -485,7 +485,7 @@ public:
 	*/
 	void
 	select_all() noexcept {
-		content_action(ContentAction::select, 0, get_row_count());
+		content_action(ContentAction::select, 0, row_count());
 	}
 
 	/**
@@ -501,7 +501,7 @@ public:
 		ui::index_type row_begin,
 		ui::index_type const count
 	) noexcept {
-		row_begin = value_clamp(row_begin, 0, get_row_count());
+		row_begin = value_clamp(row_begin, 0, row_count());
 		content_action(
 			select
 				? ContentAction::select
@@ -523,7 +523,7 @@ public:
 		ui::index_type row_begin,
 		ui::index_type const count
 	) noexcept {
-		row_begin = value_clamp(row_begin, 0, get_row_count());
+		row_begin = value_clamp(row_begin, 0, row_count());
 		content_action(ContentAction::select_toggle, row_begin, max_ce(0, count));
 	}
 
@@ -540,7 +540,7 @@ public:
 		ui::index_type row_begin,
 		ui::index_type const count
 	) noexcept {
-		row_begin = value_clamp(row_begin, 0, get_row_count());
+		row_begin = value_clamp(row_begin, 0, row_count());
 		content_action(ContentAction::insert_before, row_begin, max_ce(0, count));
 	}
 
@@ -557,7 +557,7 @@ public:
 		ui::index_type row_begin,
 		ui::index_type const count
 	) noexcept {
-		row_begin = value_clamp(row_begin, 0, get_row_count());
+		row_begin = value_clamp(row_begin, 0, row_count());
 		content_action(ContentAction::insert_after, row_begin, max_ce(0, count));
 	}
 
@@ -572,7 +572,7 @@ public:
 		ui::index_type row_begin,
 		ui::index_type const count
 	) noexcept {
-		row_begin = value_clamp(row_begin, 0, get_row_count());
+		row_begin = value_clamp(row_begin, 0, row_count());
 		content_action(ContentAction::erase, row_begin, max_ce(0, count));
 	}
 

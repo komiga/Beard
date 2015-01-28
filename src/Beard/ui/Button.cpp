@@ -24,11 +24,11 @@ Button::~Button() noexcept = default;
 
 void
 Button::cache_geometry_impl() noexcept {
-	if (get_geometry().is_static()) {
+	if (geometry().is_static()) {
 		return;
 	}
 
-	auto& rs = get_geometry().get_request_size();
+	auto& rs = geometry().request_size();
 	rs.width = max_ce(1, 2 + static_cast<signed>(m_text.size()));
 	rs.height = 1;
 }
@@ -37,9 +37,9 @@ void
 Button::reflow_impl() noexcept {
 	base_type::reflow_impl();
 
-	auto const& geom = get_geometry();
-	auto const& fr = geom.get_frame();
-	auto const& rs = geom.get_request_size();
+	auto const& geom = geometry();
+	auto const& fr = geom.frame();
+	auto const& rs = geom.request_size();
 	m_gc_pos = fr.pos;
 	if (geom.expands_and_fills(Axis::x)) {
 		m_gc_pos.x
@@ -89,17 +89,17 @@ void
 Button::render_impl(
 	ui::Widget::RenderData& rd
 ) noexcept {
-	auto const& frame = get_geometry().get_frame();
+	auto const& frame = geometry().frame();
 	rd.terminal.put_sequence(
 		m_gc_pos.x + (signed_cast(m_text.size()) < frame.size.width),
 		m_gc_pos.y,
 		txt::Sequence{m_text, 0u, m_text.size()},
 		unsigned_cast(max_ce(0, frame.size.width)),
-		rd.get_attr(is_focused()
+		rd.attr(is_focused()
 			? ui::property_primary_fg_active
 			: ui::property_primary_fg_inactive
 		),
-		rd.get_attr(is_focused()
+		rd.attr(is_focused()
 			? ui::property_primary_bg_active
 			: ui::property_primary_bg_inactive
 		)
@@ -113,7 +113,7 @@ Button::set_text(
 	String text
 ) {
 	m_text.assign(std::move(text));
-	queue_actions(
+	enqueue_actions(
 		ui::UpdateActions::flag_parent |
 		ui::UpdateActions::reflow |
 		ui::UpdateActions::render

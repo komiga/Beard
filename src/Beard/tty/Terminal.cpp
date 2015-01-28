@@ -505,14 +505,14 @@ static void
 flush(
 	tty::Terminal& terminal
 ) {
-	std::size_t const size = terminal.m_streambuf_out.get_sequence_size();
+	std::size_t const size = terminal.m_streambuf_out.sequence_size();
 	ssize_t written = 0;
 	signed err = 0;
 	unsigned retries = 1;
 	do {
 		written = ::write(
 			terminal.m_tty_fd,
-			terminal.m_streambuf_out.get_buffer().data(),
+			terminal.m_streambuf_out.buffer().data(),
 			size
 		);
 		if (-1 == written) {
@@ -910,12 +910,12 @@ void
 Terminal::poll_input(
 	unsigned const input_timeout
 ) {
-	std::size_t seq_size = m_streambuf_in.get_sequence_size();
+	std::size_t seq_size = m_streambuf_in.sequence_size();
 	if (inbuf_high_mark <= seq_size) {
 		seq_size = m_streambuf_in.discard(
-			inbuf_size == seq_size && 0u == m_streambuf_in.get_position()
+			inbuf_size == seq_size && 0u == m_streambuf_in.position()
 			? seq_size
-			: m_streambuf_in.get_position()
+			: m_streambuf_in.position()
 		);
 	}
 
@@ -951,7 +951,7 @@ Terminal::poll_input(
 		do {
 			amt_read = ::read(
 				m_tty_fd,
-				m_streambuf_in.get_buffer().data() + seq_size,
+				m_streambuf_in.buffer().data() + seq_size,
 				inbuf_size - seq_size
 			);
 			if (-1 == amt_read) {
@@ -977,14 +977,14 @@ Terminal::poll_input(
 bool
 Terminal::parse_input() {
 	char const* const buffer
-		= m_streambuf_in.get_buffer().data()
-		+ m_streambuf_in.get_position()
+		= m_streambuf_in.buffer().data()
+		+ m_streambuf_in.position()
 	;
 	bool have_event = false;
 	std::size_t seq_size = terminal_internal::decode_key(
 		m_key_decode_graph, 0,
 		buffer,
-		buffer + m_streambuf_in.get_remaining(),
+		buffer + m_streambuf_in.remaining(),
 		m_ev_pending.key_input.mod,
 		m_ev_pending.key_input.code,
 		m_ev_pending.key_input.cp
@@ -1008,7 +1008,7 @@ Terminal::parse_input() {
 	} else {
 		// Else hopefully a sequence of UTF-8 units
 		seq_size = txt::EncUtils::required_first_whole(buffer[0u]);
-		if (m_streambuf_in.get_remaining() >= seq_size) {
+		if (m_streambuf_in.remaining() >= seq_size) {
 			char32 cp = codepoint_none;
 			txt::EncUtils::decode(buffer, buffer + seq_size, cp, codepoint_none);
 			if (codepoint_none != cp) {
@@ -1456,13 +1456,13 @@ Terminal::poll(
 		poll_input(input_timeout);
 		bool parse_escape = false;
 		l_parse_escape:
-		if (0u < m_streambuf_in.get_remaining()) {
+		if (0u < m_streambuf_in.remaining()) {
 			if (parse_input()) {
 				/*BEARD_DEBUG_MSG_FQN_F(
 					"parsed: seq_size = %zu  pos = %zu  remaining = %zu",
-					m_streambuf_in.get_sequence_size(),
-					m_streambuf_in.get_position(),
-					m_streambuf_in.get_remaining()
+					m_streambuf_in.sequence_size(),
+					m_streambuf_in.position(),
+					m_streambuf_in.remaining()
 				);*/
 				event.type = tty::EventType::key_input;
 				event.key_input.mod  = m_ev_pending.key_input.mod;
@@ -1475,9 +1475,9 @@ Terminal::poll(
 			} else if (!parse_escape && m_ev_pending.key_input.escaped) {
 				/*BEARD_DEBUG_MSG_FQN_F(
 					"escaped: seq_size = %zu  pos = %zu  remaining = %zu",
-					m_streambuf_in.get_sequence_size(),
-					m_streambuf_in.get_position(),
-					m_streambuf_in.get_remaining()
+					m_streambuf_in.sequence_size(),
+					m_streambuf_in.position(),
+					m_streambuf_in.remaining()
 				);*/
 				parse_escape = true;
 				goto l_parse_escape;
@@ -1516,7 +1516,7 @@ Terminal::update_cache() {
 	// TODO: Should colors be disabled if the terminal says they're
 	// not supported? (What if it's lying to us!?)
 	// NB: Assuming terminal is capable of at least 8 colors
-	auto const max_colors = m_info.get_cap_number(tty::CapNumber::max_colors);
+	auto const max_colors = m_info.cap_number(tty::CapNumber::max_colors);
 	m_cap_max_colors =
 		(tty::CAP_NUMBER_NOT_SUPPORTED == max_colors)
 		? 8u

@@ -57,13 +57,13 @@ void
 reflow(
 	ui::Geom& geom
 ) noexcept {
-	Rect& w_area = geom.get_area();
-	Rect& w_frame = geom.get_frame();
-	Axis const axes_f = geom.get_fill();
+	Rect& w_area = geom.area();
+	Rect& w_frame = geom.frame();
+	Axis const axes_f = geom.fill();
 	if (axes_f == Axis::both) {
 		w_frame = w_area;
 	} else {
-		expand_rect(w_area, w_frame, geom.get_request_size(), axes_f);
+		expand_rect(w_area, w_frame, geom.request_size(), axes_f);
 	}
 }
 
@@ -100,11 +100,11 @@ reflow_slots(
 	// Calculate initial area
 	for (auto& s : slots) {
 		if (s.widget && s.widget->is_visible()) {
-			auto const& geom = s.widget->get_geometry();
+			auto const& geom = s.widget->geometry();
 			geom_value_type const
 			asize = min_ce(
 				max_ce(0, unused - remaining),
-				max_ce(1, vec2_axis_value(geom.get_request_size(), axis))
+				max_ce(1, vec2_axis_value(geom.request_size(), axis))
 			);
 			unused -= asize;
 			s.area.size.x = asize;
@@ -138,7 +138,7 @@ reflow_slots(
 				!expand_only ||
 				!s.widget || (
 					s.widget->is_visible() &&
-					s.widget->get_geometry().expands(axis)
+					s.widget->geometry().expands(axis)
 				)
 			)
 		) {
@@ -151,7 +151,7 @@ reflow_slots(
 			s.area.size = vec2_transpose(s.area.size);
 		}
 		if (s.widget) {
-			s.widget->get_geometry().set_area(s.area);
+			s.widget->geometry().set_area(s.area);
 		}
 	}
 }

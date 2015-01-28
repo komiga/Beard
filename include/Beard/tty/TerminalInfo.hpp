@@ -92,7 +92,7 @@ public:
 		Get name collection.
 	*/
 	name_vector_type const&
-	get_names() const noexcept {
+	names() const noexcept {
 		return m_names;
 	}
 /// @}
@@ -106,7 +106,7 @@ public:
 		@param cap Capability flag to test.
 	*/
 	tty::CapFlagValue
-	get_cap_flag(
+	cap_flag(
 		tty::CapFlag const cap
 	) const noexcept {
 		return
@@ -120,7 +120,7 @@ public:
 		Get capability flag count.
 	*/
 	std::size_t
-	get_cap_flag_count() const noexcept {
+	cap_flag_count() const noexcept {
 		return m_cap_flags.size();
 	}
 
@@ -133,7 +133,7 @@ public:
 		@param cap Capability number to fetch.
 	*/
 	tty::CapNumberValue
-	get_cap_number(
+	cap_number(
 		tty::CapNumber const cap
 	) const noexcept {
 		return
@@ -147,7 +147,7 @@ public:
 		Get capability number count.
 	*/
 	std::size_t
-	get_cap_number_count() const noexcept {
+	cap_number_count() const noexcept {
 		return m_cap_numbers.size();
 	}
 
@@ -179,7 +179,7 @@ public:
 		@param value Result value.
 	*/
 	bool
-	get_cap_string(
+	cap_string(
 		tty::CapString const cap,
 		String& value
 	) const noexcept {
@@ -195,7 +195,7 @@ public:
 		Get capability string map.
 	*/
 	cap_string_map_type const&
-	get_cap_string_map() const noexcept {
+	cap_string_map() const noexcept {
 		return m_cap_strings;
 	}
 
@@ -203,7 +203,7 @@ public:
 		Get capability string count.
 	*/
 	std::size_t
-	get_cap_string_count() const noexcept {
+	cap_string_count() const noexcept {
 		return m_cap_strings.size();
 	}
 /// @}

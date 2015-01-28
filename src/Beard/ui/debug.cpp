@@ -16,7 +16,7 @@ geom_debug_render(
 	bool const focused
 ) noexcept {
 	term.put_rect(
-		geometry.get_area(),
+		geometry.area(),
 		focused
 			? tty::s_frame_single_heavy
 			: tty::s_frame_single
@@ -28,7 +28,7 @@ geom_debug_render(
 		attr_bg
 	);
 	term.put_rect(
-		geometry.get_frame(),
+		geometry.frame(),
 		focused
 			? tty::s_frame_single_heavy
 			: tty::s_frame_single

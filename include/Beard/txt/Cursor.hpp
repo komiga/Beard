@@ -84,7 +84,7 @@ public:
 		Get tree (mutable).
 	*/
 	txt::Tree&
-	get_tree() noexcept {
+	tree() noexcept {
 		return m_tree;
 	}
 
@@ -92,7 +92,7 @@ public:
 		Get tree.
 	*/
 	txt::Tree const&
-	get_tree() const noexcept {
+	tree() const noexcept {
 		return m_tree;
 	}
 
@@ -100,8 +100,8 @@ public:
 		Get node.
 	*/
 	txt::Node&
-	get_node() {
-		return get_tree().get_nodes().at(m_row);
+	node() {
+		return tree().nodes().at(m_row);
 	}
 
 	/**
@@ -232,7 +232,7 @@ public:
 			break;
 
 		case txt::Extent::tail:
-			auto const& node = get_node();
+			auto const& node = this->node();
 			m_col = signed_cast(node.points());
 			m_index = signed_cast(node.units());
 			break;

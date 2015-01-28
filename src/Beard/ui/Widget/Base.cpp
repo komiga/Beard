@@ -8,6 +8,8 @@
 #include <Beard/ui/Widget/Base.hpp>
 #include <Beard/ui/debug.hpp>
 
+#include <duct/debug.hpp>
+
 #include <utility>
 
 namespace Beard {
@@ -41,7 +43,7 @@ Base::cache_geometry_impl() noexcept {
 
 void
 Base::reflow_impl() noexcept {
-	ui::reflow(get_geometry());
+	ui::reflow(geometry());
 }
 
 bool
@@ -64,7 +66,7 @@ Base::num_children_impl() const noexcept {
 }
 
 ui::Widget::SPtr
-Base::get_child_impl(
+Base::child_at_impl(
 	index_type const /*index*/
 ) {
 	return nullptr;
@@ -94,10 +96,10 @@ Base::render(
 	if (!is_visible()) {
 		return;
 	}
-	if (rd.get_boolean(ui::property_frame_debug_enabled)) {
+	if (rd.boolean(ui::property_frame_debug_enabled)) {
 		ui::geom_debug_render(
 			rd.terminal,
-			get_geometry(),
+			geometry(),
 			tty::Color::term_default,
 			is_focused()
 		);
@@ -115,12 +117,12 @@ Base::update_depth(
 		m_depth = -1;
 		return;
 	} else if (parent) {
-		m_depth = parent->get_depth() + 1;
+		m_depth = parent->depth() + 1;
 	} else {
 		m_depth = 0;
 	}
 	for (signed index = 0; index < num_children(); ++index) {
-		auto const child = get_child(index);
+		auto const child = child_at(index);
 		if (child) {
 			child->update_depth(shared_from_this());
 		}
@@ -143,13 +145,13 @@ Base::set_visible(
 	if (is_visible() != visible) {
 		m_flags.set(ui::Widget::Flags::visible, visible);
 		for (signed index = 0; index < num_children(); ++index) {
-			auto const child = get_child(index);
+			auto const child = child_at(index);
 			if (child) {
 				child->set_visible(visible, false);
 			}
 		}
 		if (queue) {
-			queue_actions(
+			enqueue_actions(
 				ui::UpdateActions::flag_parent |
 				ui::UpdateActions::reflow |
 				ui::UpdateActions::render
@@ -168,7 +170,7 @@ Base::set_focused(
 		event.focus_changed.previous = is_focused();
 		m_flags.set(ui::Widget::Flags::focused, focused);
 		if (!handle_event(event)) {
-			queue_actions(
+			enqueue_actions(
 				ui::UpdateActions::flag_noclear |
 				ui::UpdateActions::render
 			);
@@ -201,16 +203,16 @@ join_actions(
 }
 
 void
-Base::queue_actions(
+Base::enqueue_actions(
 	ui::UpdateActions actions
 ) {
 	if (enum_cast(actions & ui::UpdateActions::mask_actions)) {
 		if (!is_action_queued()) {
-			get_root()->get_context().enqueue_widget(shared_from_this());
+			root()->context().enqueue_widget(shared_from_this());
 		}
-		actions = join_actions(actions, get_queued_actions());
+		actions = join_actions(actions, queued_actions());
 		if (enum_cast(actions & ui::UpdateActions::flag_parent) && has_parent()) {
-			get_parent()->queue_actions(
+			parent()->enqueue_actions(
 				actions & ~ui::UpdateActions::flag_parent
 			);
 		}
@@ -227,7 +229,7 @@ Base::clear_actions(
 	bool const dequeue
 ) {
 	if (dequeue) {
-		get_root()->get_context().dequeue_widget(shared_from_this());
+		root()->context().dequeue_widget(shared_from_this());
 	}
 	m_flags.remove(mask_ua);
 	set_action_queued(false);
@@ -239,12 +241,17 @@ Base::push_action_graph(
 	ui::UpdateActions actions
 ) noexcept {
 	actions &= ~ui::UpdateActions::flag_parent;
-	auto const prev_actions = get_queued_actions() & ~ui::UpdateActions::flag_parent;
+	auto const prev_actions = queued_actions() & ~ui::UpdateActions::flag_parent;
 	m_flags.set_masked(
 		mask_ua,
 		static_cast<ui::Widget::Flags>(enum_cast(actions) << shift_ua)
 	);
-	if (set.insert(this).second || actions != prev_actions) {
+	bool const push = set.insert(this).second || actions != prev_actions;
+	DUCT_DEBUGF(
+		"Widget::Base::push_action_graph: %8x %16p %3d %u",
+		type(), this, depth(), unsigned{push}
+	);
+	if (push) {
 		push_action_graph_impl(set);
 	}
 }

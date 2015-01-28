@@ -27,7 +27,7 @@ Field::update_view() noexcept {
 	if (!has_input_control()) {
 		m_view.col_extent(txt::Extent::head);
 	} else {
-		auto const& frame = get_geometry().get_frame();
+		auto const& frame = geometry().frame();
 		auto const inner_width = max_ce(0, frame.size.width - 2 - 1);
 		if (
 			m_view.col() > m_cursor.col() ||
@@ -53,7 +53,7 @@ Field::set_input_control_impl(
 		)),
 		has_input_control()
 	);
-	get_root()->get_context().get_terminal().set_caret_visible(
+	root()->context().terminal().set_caret_visible(
 		has_input_control()
 	);
 	/*m_cursor.col_extent(
@@ -62,7 +62,7 @@ Field::set_input_control_impl(
 		: txt::Extent::head
 	);*/
 	update_view();
-	queue_actions(
+	enqueue_actions(
 		ui::UpdateActions::render |
 		ui::UpdateActions::flag_noclear
 	);
@@ -128,7 +128,7 @@ Field::handle_event_impl(
 				break;
 			}
 			update_view();
-			queue_actions(
+			enqueue_actions(
 				ui::UpdateActions::render |
 				ui::UpdateActions::flag_noclear
 			);
@@ -146,32 +146,32 @@ void
 Field::render_impl(
 	ui::Widget::RenderData& rd
 ) noexcept {
-	auto const& frame = get_geometry().get_frame();
-	auto const& node = m_cursor.get_node();
+	auto const& frame = geometry().frame();
+	auto const& node = m_cursor.node();
 
-	bool const use_underline = rd.get_boolean(
+	bool const use_underline = rd.boolean(
 		ui::property_field_content_underline
 	);
 	tty::attr_type const
 		content_fg
 		= (use_underline) ? tty::Attr::underline : 0
-		| rd.get_attr(is_focused()
+		| rd.attr(is_focused()
 			? ui::property_content_fg_active
 			: ui::property_content_fg_inactive
 		),
 		content_bg
-		= rd.get_attr(is_focused()
+		= rd.attr(is_focused()
 			? ui::property_content_bg_active
 			: ui::property_content_bg_inactive
 		)
 	;
 	tty::Cell cell_end = tty::make_cell(
 		'[',
-		rd.get_attr(is_focused()
+		rd.attr(is_focused()
 			? ui::property_primary_fg_active
 			: ui::property_primary_fg_inactive
 		),
-		rd.get_attr(is_focused()
+		rd.attr(is_focused()
 			? ui::property_primary_bg_active
 			: ui::property_primary_bg_inactive
 		)
@@ -240,7 +240,7 @@ Field::set_text(
 	m_cursor.assign(text);
 	m_cursor.col_extent(txt::Extent::tail);
 	update_view();
-	queue_actions(
+	enqueue_actions(
 		ui::UpdateActions::flag_parent |
 		ui::UpdateActions::reflow |
 		ui::UpdateActions::render

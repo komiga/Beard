@@ -93,7 +93,7 @@ public:
 		Get nodes (mutable).
 	*/
 	node_vector_type&
-	get_nodes() noexcept {
+	nodes() noexcept {
 		return m_nodes;
 	}
 
@@ -101,7 +101,7 @@ public:
 		Get nodes.
 	*/
 	node_vector_type const&
-	get_nodes() const noexcept {
+	nodes() const noexcept {
 		return m_nodes;
 	}
 

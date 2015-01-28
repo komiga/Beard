@@ -220,7 +220,7 @@ public:
 		See txt::Tree::to_string().
 	*/
 	String
-	get_text() const noexcept {
+	text() const noexcept {
 		return m_tree.to_string();
 	}
 
@@ -228,7 +228,7 @@ public:
 		Get text tree.
 	*/
 	txt::Tree const&
-	get_tree() const noexcept {
+	tree() const noexcept {
 		return m_tree;
 	}
 
@@ -252,7 +252,7 @@ public:
 		Get input filter.
 	*/
 	filter_type const&
-	get_filter() const noexcept {
+	filter() const noexcept {
 		return m_filter;
 	}
 /// @}

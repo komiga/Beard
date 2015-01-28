@@ -9,6 +9,8 @@
 #include <Beard/ui/Widget/Base.hpp>
 #include <Beard/ui/Container.hpp>
 
+#include <duct/debug.hpp>
+
 #include <utility>
 
 #include <Beard/detail/gr_ceformat.hpp>
@@ -53,7 +55,7 @@ Context::push_event(
 		if (widget->handle_event(event)) {
 			return true;
 		}
-		widget = widget->get_parent();
+		widget = widget->parent();
 	}
 	return false;
 }
@@ -67,7 +69,7 @@ Context::run_actions(
 	ui::UpdateActions const mask
 ) {
 	auto const actions
-		= widget->get_queued_actions()
+		= widget->queued_actions()
 		& (mask | ui::UpdateActions::mask_flags)
 	;
 	if (enum_cast(actions & ui::UpdateActions::reflow)) {
@@ -77,9 +79,9 @@ Context::run_actions(
 		// TODO: Optimization: only clear if the terminal hasn't been
 		// cleared entirely?
 		if (!enum_cast(actions & ui::UpdateActions::flag_noclear)) {
-			m_terminal.clear_back(widget->get_geometry().get_area());
+			m_terminal.clear_back(widget->geometry().area());
 		}
-		rd.update_group(widget->get_group());
+		rd.update_group(widget->group());
 		widget->render(rd);
 	}
 	return actions;
@@ -90,7 +92,7 @@ widget_depth_less(
 	ui::Widget::Base const* const lhs,
 	ui::Widget::Base const* const rhs
 ) noexcept {
-	return lhs->get_depth() < rhs->get_depth();
+	return lhs->depth() < rhs->depth();
 }
 
 void
@@ -104,18 +106,19 @@ Context::run_all_actions() {
 		m_property_map.find(m_fallback_group)
 	};
 
+	DUCT_DEBUG("Context: start frame");
 	for (auto wp : m_action_queue) {
 		if (!wp.expired()) {
 			auto const widget = wp.lock();
-			auto const actions = widget->get_queued_actions();
+			auto const actions = widget->queued_actions();
 			if (
 				enum_cast(actions & ui::UpdateActions::flag_parent) &&
 				widget->has_parent()
 			) {
-				auto parent = widget->get_parent();
+				auto parent = widget->parent();
 				if (parent->is_action_queued()) {
 					widget->clear_actions(false);
-					parent->queue_actions(actions);
+					parent->enqueue_actions(actions);
 					continue;
 				}
 			}
@@ -137,7 +140,7 @@ Context::run_all_actions() {
 	);
 
 	for (auto it = m_execution_set_ordered.rbegin(); it != m_execution_set_ordered.rend(); ++it) {
-		if (enum_cast((*it)->get_queued_actions() & ui::UpdateActions::reflow)) {
+		if (enum_cast((*it)->queued_actions() & ui::UpdateActions::reflow)) {
 			(*it)->cache_geometry();
 		}
 	}
@@ -186,10 +189,10 @@ Context::set_root(
 ) noexcept {
 	m_root = std::move(root);
 	if (m_root) {
-		m_root->get_geometry().set_area(
-			{{0, 0}, m_terminal.get_size()}
+		m_root->geometry().set_area(
+			{{0, 0}, m_terminal.size()}
 		);
-		m_root->queue_actions(
+		m_root->enqueue_actions(
 			ui::UpdateActions::render |
 			ui::UpdateActions::reflow
 		);
@@ -229,10 +232,10 @@ Context::update(
 	m_event.type = ui::EventType::none;
 	switch (m_terminal.poll(tty_event, input_timeout)) {
 	case tty::EventType::resize:
-		m_root->get_geometry().set_area(
-			{{0, 0}, m_terminal.get_size()}
+		m_root->geometry().set_area(
+			{{0, 0}, m_terminal.size()}
 		);
-		m_root->queue_actions(
+		m_root->enqueue_actions(
 			ui::UpdateActions::render |
 			ui::UpdateActions::reflow
 		);
@@ -242,9 +245,9 @@ Context::update(
 		m_event.type = ui::EventType::key_input;
 		m_event.key_input = tty_event.key_input;
 		focus
-			= get_root()->has_focus()
-			? get_root()->get_focus()
-			: get_root()
+			= root()->has_focus()
+			? root()->focused_widget()
+			: root()
 		;
 		if (push_event(m_event, focus)) {
 			return true;
@@ -266,7 +269,7 @@ void
 Context::render(
 	bool const reflow
 ) {
-	m_root->queue_actions(
+	m_root->enqueue_actions(
 		ui::UpdateActions::render |
 		(reflow ? ui::UpdateActions::reflow : ui::UpdateActions::none)
 	);

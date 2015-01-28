@@ -70,7 +70,7 @@ protected:
 	num_children_impl() const noexcept override;
 
 	ui::Widget::SPtr
-	get_child_impl(
+	child_at_impl(
 		ui::index_type const index
 	) override;
 
@@ -145,7 +145,7 @@ public:
 		Get orientation.
 	*/
 	Axis
-	get_orientation() const noexcept {
+	orientation() const noexcept {
 		return m_orientation;
 	}
 
@@ -153,7 +153,7 @@ public:
 		Get slots (mutable).
 	*/
 	ui::Widget::slot_vector_type&
-	get_slots() noexcept {
+	slots() noexcept {
 		return m_slots;
 	}
 
@@ -161,7 +161,7 @@ public:
 		Get slots.
 	*/
 	ui::Widget::slot_vector_type const&
-	get_slots() const noexcept {
+	slots() const noexcept {
 		return m_slots;
 	}
 /// @}

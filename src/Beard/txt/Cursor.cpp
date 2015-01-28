@@ -19,7 +19,7 @@ namespace txt {
 
 bool
 Cursor::row_bound() noexcept {
-	if (signed_cast(get_tree().lines()) <= m_row) {
+	if (signed_cast(tree().lines()) <= m_row) {
 		row_extent(txt::Extent::tail);
 		return true;
 	}
@@ -34,7 +34,7 @@ Cursor::row_abs(
 		row,
 		max_ce(
 			signed_cast(std::size_t{0u}),
-			signed_cast(get_tree().lines()) - 1
+			signed_cast(tree().lines()) - 1
 		)
 	);
 	if (row != m_row) {
@@ -45,7 +45,7 @@ Cursor::row_abs(
 
 void
 Cursor::col_recalc() noexcept {
-	auto const& node = get_node();
+	auto const& node = this->node();
 	if (0 >= m_col) {
 		m_col = 0;
 		m_index = 0;
@@ -78,7 +78,7 @@ Cursor::col_step(
 		return;
 	}
 
-	auto const& node = get_node();
+	auto const& node = this->node();
 	difference_type const dest = m_col + n;
 	/*DUCT_DEBUGF(
 		"col_step: m_col = %zd, m_index = %zd, dest = %ld, n = %ld, "
@@ -138,11 +138,11 @@ Cursor::col_step(
 
 void
 Cursor::clear() {
-	auto& node = get_node();
+	auto& node = this->node();
 	auto const ucount = signed_cast(node.units());
 	auto const pcount = signed_cast(node.points());
 	node.m_buffer.clear();
-	get_tree().update_counts(node, -ucount, -pcount);
+	tree().update_counts(node, -ucount, -pcount);
 	m_col = 0;
 	m_index = 0;
 }
@@ -152,14 +152,14 @@ Cursor::assign(
 	char8 const* const str,
 	unsigned const size
 ) {
-	auto& node = get_node();
+	auto& node = this->node();
 	auto const ucount = signed_cast(node.units());
 	auto const pcount = signed_cast(node.points());
 	node.m_buffer.assign(str, str + size);
 	auto const new_pcount = signed_cast(
 		txt::EncUtils::count(str, str + size, false)
 	);
-	get_tree().update_counts(
+	tree().update_counts(
 		node,
 		signed_cast(node.units()) - ucount,
 		new_pcount - pcount
@@ -178,10 +178,10 @@ Cursor::insert(
 		duct::CHAR_NULL
 	);
 	if (std::begin(units) != it) {
-		auto& node = get_node();
+		auto& node = this->node();
 		node.m_buffer.insert(node.cbegin() + m_index, std::begin(units), it);
 		auto const size = std::distance(std::begin(units), it);
-		get_tree().update_counts(node, size, 1);
+		tree().update_counts(node, size, 1);
 		return unsigned_cast(size);
 	} else {
 		// Invalid code point (ignored)
@@ -207,12 +207,12 @@ Cursor::insert_step(
 
 std::size_t
 Cursor::erase() {
-	auto& node = get_node();
+	auto& node = this->node();
 	/*DUCT_DEBUGF(
 		"erase: m_col = %zd, m_index = %zd, ucount = %zu"
 		", tree units: %zu",
 		m_col, m_index, node.units(),
-		get_tree().units()
+		tree().units()
 	);*/
 	if (signed_cast(node.units()) <= m_index) {
 		return 0u;
@@ -222,7 +222,7 @@ Cursor::erase() {
 	auto const size = signed_cast(txt::EncUtils::required_first_whole(*it));
 	if (signed_cast(node.units()) >= m_index + size) {
 		node.m_buffer.erase(it, it + size);
-		get_tree().update_counts(node, -size, -1);
+		tree().update_counts(node, -size, -1);
 		return size;
 	} else {
 		// Incomplete sequence

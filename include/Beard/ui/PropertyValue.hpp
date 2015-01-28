@@ -126,14 +126,14 @@ public:
 		Get type.
 	*/
 	ui::PropertyType
-	get_type() const noexcept {
+	type() const noexcept {
 		return m_type;
 	}
 
 	/**
 		Check type.
 
-		@returns <code>type == get_type()</code>.
+		@returns <code>type == type()</code>.
 		@param type Type to compare with.
 	*/
 	bool
@@ -160,7 +160,7 @@ public:
 		Get number value.
 	*/
 	ui::property_number_type
-	get_number() const noexcept {
+	number() const noexcept {
 		return m_number;
 	}
 
@@ -181,7 +181,7 @@ public:
 		Get attribute value.
 	*/
 	ui::property_attr_type
-	get_attr() const noexcept {
+	attr() const noexcept {
 		return m_attr;
 	}
 
@@ -202,7 +202,7 @@ public:
 		Get boolean value.
 	*/
 	ui::property_boolean_type
-	get_boolean() const noexcept {
+	boolean() const noexcept {
 		return m_boolean;
 	}
 
@@ -223,7 +223,7 @@ public:
 		Get string value.
 	*/
 	ui::property_string_type const&
-	get_string() const noexcept {
+	string() const noexcept {
 		return m_string;
 	}
 /// @}

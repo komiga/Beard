@@ -101,7 +101,7 @@ public:
 		Get terminal (mutable).
 	*/
 	tty::Terminal&
-	get_terminal() noexcept {
+	terminal() noexcept {
 		return m_terminal;
 	}
 
@@ -109,7 +109,7 @@ public:
 		Get terminal.
 	*/
 	tty::Terminal const&
-	get_terminal() const noexcept {
+	terminal() const noexcept {
 		return m_terminal;
 	}
 
@@ -122,7 +122,7 @@ public:
 		- ui::EventType::key_input
 	*/
 	ui::Event const&
-	get_last_event() const noexcept {
+	last_event() const noexcept {
 		return m_event;
 	}
 
@@ -140,7 +140,7 @@ public:
 		Get property map (mutable).
 	*/
 	ui::PropertyMap&
-	get_property_map() noexcept {
+	property_map() noexcept {
 		return m_property_map;
 	}
 
@@ -148,7 +148,7 @@ public:
 		Get property map.
 	*/
 	ui::PropertyMap const&
-	get_property_map() const noexcept {
+	property_map() const noexcept {
 		return m_property_map;
 	}
 
@@ -166,7 +166,7 @@ public:
 		Get fallback property group.
 	*/
 	ui::group_hash_type
-	get_fallback_group() const noexcept {
+	fallback_group() const noexcept {
 		return m_fallback_group;
 	}
 
@@ -182,7 +182,7 @@ public:
 		Get root.
 	*/
 	ui::RootSPtr const&
-	get_root() const noexcept {
+	root() const noexcept {
 		return m_root;
 	}
 /// @}
@@ -216,7 +216,7 @@ public:
 		@returns @c true if an event was handled.
 		@param input_timeout Input polling timeout in milliseconds.
 
-		@sa get_last_event()
+		@sa last_event()
 	*/
 	bool
 	update(

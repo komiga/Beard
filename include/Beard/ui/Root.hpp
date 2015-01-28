@@ -114,7 +114,7 @@ public:
 		Get context (mutable).
 	*/
 	ui::Context&
-	get_context() noexcept {
+	context() noexcept {
 		return m_context;
 	}
 
@@ -122,7 +122,7 @@ public:
 		Get context.
 	*/
 	ui::Context const&
-	get_context() const noexcept {
+	context() const noexcept {
 		return m_context;
 	}
 
@@ -130,16 +130,16 @@ public:
 		Get terminal (mutable).
 	*/
 	tty::Terminal&
-	get_terminal() noexcept {
-		return get_context().get_terminal();
+	terminal() noexcept {
+		return context().terminal();
 	}
 
 	/**
 		Get terminal.
 	*/
 	tty::Terminal const&
-	get_terminal() const noexcept {
-		return get_context().get_terminal();
+	terminal() const noexcept {
+		return context().terminal();
 	}
 /// @}
 
@@ -176,7 +176,7 @@ public:
 		@note If @c !has_focus(), the return pointer will be null.
 	*/
 	ui::Widget::SPtr
-	get_focus() noexcept {
+	focused_widget() noexcept {
 		return m_focus.lock();
 	}
 
@@ -195,7 +195,7 @@ public:
 	focus_dir(
 		ui::FocusDir const dir
 	) {
-		set_focus(focus_dir(get_focus(), dir));
+		set_focus(focus_dir(focused_widget(), dir));
 	}
 /// @}
 };

@@ -55,7 +55,7 @@ private:
 	PropertyMap& operator=(PropertyMap const&) = delete;
 
 	PropertyValue const*
-	get_property(
+	property(
 		ui::property_hash_type const name,
 		const_iterator group,
 		const_iterator fallback
@@ -87,7 +87,7 @@ public:
 		: m_groups()
 	{
 		if (emplace_default) {
-			emplace(ui::group_default, ui::PropertyGroup::get_default());
+			emplace(ui::group_default, ui::PropertyGroup::default_group());
 		}
 	}
 
@@ -105,7 +105,7 @@ public:
 		: m_groups(std::move(ilist))
 	{
 		if (emplace_default) {
-			emplace(ui::group_default, ui::PropertyGroup::get_default());
+			emplace(ui::group_default, ui::PropertyGroup::default_group());
 		}
 	}
 
@@ -368,7 +368,7 @@ public:
 		@param fallback Iterator to fallback group.
 	*/
 	ui::property_number_type
-	get_number(
+	number(
 		ui::property_hash_type const name,
 		const_iterator group,
 		const_iterator fallback
@@ -386,7 +386,7 @@ public:
 		@param fallback Iterator to fallback group.
 	*/
 	ui::property_attr_type
-	get_attr(
+	attr(
 		ui::property_hash_type const name,
 		const_iterator group,
 		const_iterator fallback
@@ -404,7 +404,7 @@ public:
 		@param fallback Iterator to fallback group.
 	*/
 	ui::property_boolean_type
-	get_boolean(
+	boolean(
 		ui::property_hash_type const name,
 		const_iterator group,
 		const_iterator fallback
@@ -422,7 +422,7 @@ public:
 		@param fallback Iterator to fallback group.
 	*/
 	ui::property_string_type const&
-	get_string(
+	string(
 		ui::property_hash_type const name,
 		const_iterator group,
 		const_iterator fallback

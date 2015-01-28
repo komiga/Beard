@@ -99,7 +99,7 @@ protected:
 		Get flag store (mutable).
 	*/
 	flag_store_type&
-	get_flag_store() noexcept {
+	flag_store() noexcept {
 		return m_flags;
 	}
 
@@ -107,7 +107,7 @@ protected:
 		Get flag store.
 	*/
 	flag_store_type const&
-	get_flag_store() const noexcept {
+	flag_store() const noexcept {
 		return m_flags;
 	}
 /// @}
@@ -180,12 +180,12 @@ protected:
 	num_children_impl() const noexcept;
 
 	/**
-		get_child() implementation.
+		child_at() implementation.
 
 		%Base definition returns nullptr.
 	*/
 	virtual ui::Widget::SPtr
-	get_child_impl(
+	child_at_impl(
 		ui::index_type const index
 	);
 /// @}
@@ -241,7 +241,7 @@ public:
 		Get type.
 	*/
 	ui::Widget::Type
-	get_type() const noexcept {
+	type() const noexcept {
 		return m_type;
 	}
 
@@ -249,7 +249,7 @@ public:
 		Get root.
 	*/
 	ui::RootSPtr
-	get_root() const noexcept {
+	root() const noexcept {
 		return m_root.lock();
 	}
 
@@ -257,7 +257,7 @@ public:
 		Get root (weak).
 	*/
 	ui::RootWPtr
-	get_root_weak() const noexcept {
+	root_weak() const noexcept {
 		return m_root;
 	}
 
@@ -283,7 +283,7 @@ public:
 		Get property group.
 	*/
 	ui::group_hash_type
-	get_group() const noexcept {
+	group() const noexcept {
 		return m_group;
 	}
 
@@ -350,7 +350,7 @@ public:
 		there is no parent or the parent was destroyed.
 	*/
 	ui::Widget::SPtr
-	get_parent() const noexcept {
+	parent() const noexcept {
 		return m_parent.lock();
 	}
 
@@ -376,7 +376,7 @@ public:
 		Get geometry (mutable).
 	*/
 	ui::Geom&
-	get_geometry() noexcept {
+	geometry() noexcept {
 		return m_geometry;
 	}
 
@@ -384,7 +384,7 @@ public:
 		Get geometry.
 	*/
 	ui::Geom const&
-	get_geometry() const noexcept {
+	geometry() const noexcept {
 		return m_geometry;
 	}
 
@@ -410,9 +410,9 @@ public:
 		Get queued update actions.
 	*/
 	ui::UpdateActions
-	get_queued_actions() const noexcept {
+	queued_actions() const noexcept {
 		return static_cast<ui::UpdateActions>(
-			enum_cast(m_flags.get_states(mask_ua)) >> shift_ua
+			enum_cast(m_flags.states(mask_ua)) >> shift_ua
 		);
 	}
 
@@ -523,7 +523,7 @@ public:
 		Get depth of widget.
 	*/
 	ui::index_type
-	get_depth() const noexcept {
+	depth() const noexcept {
 		return m_depth;
 	}
 
@@ -541,7 +541,7 @@ public:
 		Get index of widget in parent.
 	*/
 	ui::index_type
-	get_index() const noexcept {
+	index() const noexcept {
 		return m_index;
 	}
 
@@ -569,17 +569,17 @@ public:
 		@note This returns nullptr if the widget is not a container.
 	*/
 	ui::Widget::SPtr
-	get_child(
+	child_at(
 		ui::index_type const index
 	) {
-		return is_container() ? get_child_impl(max_ce(0, index)) : nullptr;
+		return is_container() ? child_at_impl(max_ce(0, index)) : nullptr;
 	}
 
 	/**
 		Get last child index.
 	*/
 	ui::index_type
-	get_last_child_index() const noexcept {
+	last_child_index() const noexcept {
 		signed const num = num_children_impl();
 		return max_ce(0, num - 1);
 	}
@@ -588,9 +588,9 @@ public:
 		Get last child.
 	*/
 	ui::Widget::SPtr
-	get_last_child() noexcept {
+	last_child() noexcept {
 		signed const num = num_children_impl();
-		return 0 < num ? get_child_impl(num - 1) : nullptr;
+		return 0 < num ? child_at_impl(num - 1) : nullptr;
 	}
 /// @}
 
@@ -608,7 +608,7 @@ public:
 		@param actions Actions to queue.
 	*/
 	void
-	queue_actions(
+	enqueue_actions(
 		ui::UpdateActions actions
 	);
 

@@ -164,7 +164,7 @@ public:
 		Get text.
 	*/
 	String const&
-	get_text() const noexcept {
+	text() const noexcept {
 		return m_text;
 	}
 /// @}

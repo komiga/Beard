@@ -67,7 +67,7 @@ deepest_rightmost_widget(
 	ui::Widget::SPtr widget
 ) {
 	while (widget->has_children()) {
-		widget = widget->get_last_child();
+		widget = widget->last_child();
 	}
 	return widget;
 }
@@ -87,27 +87,27 @@ Root::focus_dir(
 	if ((FLAG_DIR_PREV & flags) && this == widget.get()) {
 		widget = deepest_rightmost_widget(widget);
 	}
-	child_index = widget->get_index();
+	child_index = widget->index();
 	while (true) {
 		if (
 			INDEX_SWIM != child_index &&
 			widget->is_visible() &&
 			widget->has_children()
 		) {
-			widget = widget->get_child(
+			widget = widget->child_at(
 				/*(FLAG_USE_INDEX & flags)
 				? */child_index
-				// : ((FLAG_DIR_PREV & flags) ? widget->get_last_child_index() : 0)
+				// : ((FLAG_DIR_PREV & flags) ? widget->last_child_index() : 0)
 			);
 			child_index
 				= (FLAG_DIR_PREV & flags)
-				? widget->get_last_child_index()
+				? widget->last_child_index()
 				: 0
 			;
 			flags &= ~FLAG_USE_INDEX;
 		} else if (widget->has_parent()) {
-			child_index = widget->get_index() + dir_value;
-			widget = widget->get_parent();
+			child_index = widget->index() + dir_value;
+			widget = widget->parent();
 			if (
 				0 > child_index ||
 				widget->num_children() <= child_index
@@ -119,7 +119,7 @@ Root::focus_dir(
 			// Swam all the way to the root (assuming invariants)
 			if (ui::FocusDir::prev == dir) {
 				widget = deepest_rightmost_widget(shared_from_this());
-				child_index = widget->get_index();
+				child_index = widget->index();
 			} else {
 				widget = shared_from_this();
 				child_index = 0;
@@ -138,7 +138,7 @@ void
 Root::set_focus(
 	ui::Widget::SPtr const& widget
 ) {
-	ui::Widget::SPtr const current = get_focus();
+	ui::Widget::SPtr const current = focused_widget();
 	if (current == widget) {
 		return;
 	}

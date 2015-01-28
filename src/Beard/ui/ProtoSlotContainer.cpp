@@ -22,7 +22,7 @@ ProtoSlotContainer::push_action_graph_impl(
 	ui::Widget::set_type& set
 ) noexcept {
 	// If we're clearing, there's no reason for children to clear
-	auto push_actions = get_queued_actions();
+	auto push_actions = queued_actions();
 	if (
 		ui::UpdateActions::render
 		== (push_actions & (ui::UpdateActions::render | ui::UpdateActions::flag_noclear))
@@ -32,7 +32,7 @@ ProtoSlotContainer::push_action_graph_impl(
 	ui::UpdateActions child_actions;
 	for (auto& slot : m_slots) {
 		if (slot.widget->is_visible()) {
-			child_actions = slot.widget->get_queued_actions();
+			child_actions = slot.widget->queued_actions();
 			child_actions |= push_actions;
 			slot.widget->push_action_graph(set, child_actions);
 		}
@@ -41,12 +41,12 @@ ProtoSlotContainer::push_action_graph_impl(
 
 void
 ProtoSlotContainer::cache_geometry_impl() noexcept {
-	Vec2 rs = get_geometry().get_request_size();
+	Vec2 rs = geometry().request_size();
 	rs = {0, 0};
 	if (m_orientation == Axis::vertical) {
 		for (auto& slot : m_slots) {
 			if (slot.widget->is_visible()) {
-				Vec2 const& ws = slot.widget->get_geometry().get_request_size();
+				Vec2 const& ws = slot.widget->geometry().request_size();
 				rs.width = max_ce(rs.width, ws.width);
 				rs.height += ws.height;
 			}
@@ -54,14 +54,14 @@ ProtoSlotContainer::cache_geometry_impl() noexcept {
 	} else {
 		for (auto& slot : m_slots) {
 			if (slot.widget->is_visible()) {
-				Vec2 const& ws = slot.widget->get_geometry().get_request_size();
+				Vec2 const& ws = slot.widget->geometry().request_size();
 				rs.width += ws.width;
 				rs.height = max_ce(rs.height, ws.height);
 			}
 		}
 	}
-	if (!get_geometry().is_static()) {
-		get_geometry().set_request_size(std::move(rs));
+	if (!geometry().is_static()) {
+		geometry().set_request_size(std::move(rs));
 	}
 }
 
@@ -69,7 +69,7 @@ void
 ProtoSlotContainer::reflow_impl() noexcept {
 	base_type::reflow_impl();
 	ui::reflow_slots(
-		get_geometry().get_frame(),
+		geometry().frame(),
 		m_slots,
 		m_orientation
 	);
@@ -81,7 +81,7 @@ ProtoSlotContainer::num_children_impl() const noexcept {
 }
 
 ui::Widget::SPtr
-ProtoSlotContainer::get_child_impl(
+ProtoSlotContainer::child_at_impl(
 	ui::index_type const index
 ) {
 	return m_slots.at(static_cast<unsigned>(index)).widget;
@@ -101,7 +101,7 @@ ProtoSlotContainer::remove(
 	for (; index < size; ++index) {
 		m_slots[index].widget->set_index(index);
 	}
-	queue_actions(
+	enqueue_actions(
 		ui::UpdateActions::reflow |
 		ui::UpdateActions::render
 	);
@@ -113,7 +113,7 @@ ProtoSlotContainer::clear() {
 		slot.widget->clear_parent();
 	}
 	m_slots.clear();
-	queue_actions(
+	enqueue_actions(
 		ui::UpdateActions::reflow |
 		ui::UpdateActions::render
 	);
@@ -135,7 +135,7 @@ ProtoSlotContainer::set_child(
 	slot.widget->clear_parent();
 	slot.widget = std::move(widget);
 	slot.widget->set_parent(shared_from_this(), index);
-	queue_actions(
+	enqueue_actions(
 		ui::UpdateActions::reflow |
 		ui::UpdateActions::render
 	);
@@ -155,7 +155,7 @@ ProtoSlotContainer::push_back(
 	}
 	widget->set_parent(shared_from_this(), static_cast<signed>(m_slots.size()));
 	m_slots.push_back(ui::Widget::Slot{std::move(widget), {}});
-	queue_actions(
+	enqueue_actions(
 		ui::UpdateActions::reflow |
 		ui::UpdateActions::render
 	);

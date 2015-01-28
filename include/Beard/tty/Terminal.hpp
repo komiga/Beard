@@ -317,7 +317,7 @@ public:
 		Get size.
 	*/
 	Vec2 const&
-	get_size() const noexcept {
+	size() const noexcept {
 		return m_tty_size;
 	}
 
@@ -325,7 +325,7 @@ public:
 		Get terminal width.
 	*/
 	geom_value_type
-	get_width() const noexcept {
+	width() const noexcept {
 		return m_tty_size.width;
 	}
 
@@ -333,7 +333,7 @@ public:
 		Get terminal height.
 	*/
 	geom_value_type
-	get_height() const noexcept {
+	height() const noexcept {
 		return m_tty_size.height;
 	}
 
@@ -356,7 +356,7 @@ public:
 		Get terminal info (mutable).
 	*/
 	tty::TerminalInfo&
-	get_info() noexcept {
+	info() noexcept {
 		return m_info;
 	}
 
@@ -364,7 +364,7 @@ public:
 		Get terminal info.
 	*/
 	tty::TerminalInfo const&
-	get_info() const noexcept {
+	info() const noexcept {
 		return m_info;
 	}
 
@@ -406,7 +406,7 @@ public:
 		Get caret position.
 	*/
 	Vec2 const&
-	get_caret_pos() const noexcept {
+	caret_pos() const noexcept {
 		return m_caret_pos;
 	}
 
