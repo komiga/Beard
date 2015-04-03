@@ -1,30 +1,29 @@
 
-dofile("../premake_common.lua")
+local S, G, P = precore.helpers()
 
 function make_test(group, name, srcglob, configs)
+	configs = configs or {}
+	table.insert(configs, 1, "beard.strict")
+	table.insert(configs, 2, "beard.dep")
+
 	precore.make_project(
 		group .. "_" .. name,
 		"C++", "ConsoleApp",
 		"./", "out/",
 		nil, configs
 	)
-
-	if nil == configs then
-		precore.apply("beard-strict")
-	end
-
-	if nil == srcglob then
+	if not srcglob then
 		srcglob = name .. ".cpp"
 	end
+
+	configuration {"linux"}
+		targetsuffix(".elf")
 
 	configuration {}
 		targetname(name)
 		files {
 			srcglob
 		}
-
-	configuration {"linux"}
-		targetsuffix(".elf")
 end
 
 function make_tests(group, tests)
@@ -33,25 +32,17 @@ function make_tests(group, tests)
 	end
 end
 
--- Test solution
-
 precore.make_solution(
 	"test",
 	{"debug", "release"},
 	{"x64", "x32"},
 	nil,
 	{
-		"precore-generic",
-		"beard-deps",
-		"beard-import"
+		"precore.generic",
 	}
 )
 
--- Groups
-
-include("general")
-include("tty")
-include("txt")
-include("ui")
-
-precore.action_clean("out")
+precore.import("general")
+precore.import("tty")
+precore.import("txt")
+precore.import("ui")
