@@ -1,6 +1,10 @@
 
 local S, G, R = precore.helpers()
 
+precore.import(G"${DEP_PATH}/duct")
+precore.import(G"${DEP_PATH}/ceformat")
+precore.import(G"${DEP_PATH}/am")
+
 precore.make_config_scoped("beard.env", {
 	once = true,
 }, {
@@ -104,7 +108,3 @@ precore.apply_global({
 	"precore.env-common",
 	"beard.env",
 })
-
-precore.import(G"${DEP_PATH}/duct")
-precore.import(G"${DEP_PATH}/ceformat")
-precore.import(G"${DEP_PATH}/am")

@@ -1,7 +1,7 @@
 
 dofile("precore_import.lua")
 
-local S, G, P = precore.helpers()
+local _, G, P = precore.helpers()
 
 precore.init(
 	nil,
@@ -19,5 +19,5 @@ precore.import("test")
 
 precore.action_clean("out")
 if _ACTION == "clean" then
-	os.rmdir(S"${BUILD_PATH}")
+	os.rmdir(G"${BUILD_PATH}")
 end
