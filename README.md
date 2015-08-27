@@ -30,7 +30,7 @@ compiled using plash's standard project protocol: http://komiga.com/pp-cpp
 `LICENSE` file.
 
 ```
-Copyright (c) 2013-2015 Timothy Howard
+Copyright (c) 2013-2015 plash <plash@komiga.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
