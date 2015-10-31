@@ -22,7 +22,7 @@ due to the ceformat dependency. This may be alleviated in the near future, but
 Beard is currently in heavy development, so expect things to break often.
 
 Once dependencies are setup (see `dep/README.md`), the library and tests can be
-compiled using plash's standard project protocol: http://komiga.com/pp-cpp
+using my [standard project protocol](http://komiga.com/pp-cpp).
 
 ## License
 
@@ -30,7 +30,7 @@ compiled using plash's standard project protocol: http://komiga.com/pp-cpp
 `LICENSE` file.
 
 ```
-Copyright (c) 2013-2015 plash <plash@komiga.com>
+Copyright (c) 2013-2015 Coranna Howard <me@komiga.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
